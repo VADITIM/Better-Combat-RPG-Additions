@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.weapon;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.combat.CriticalHits;
 import dev.vadim.bcenchantments.perk.Perks;
 import java.util.List;
@@ -23,8 +23,8 @@ import net.minecraft.world.item.ItemStack;
 public final class SwordStyle implements WeaponStyle {
 	public static final SwordStyle INSTANCE = new SwordStyle();
 
-	public static final String UPPERCUT = RpgAdditions.MOD_ID + ":uppercut";
-	public static final String AIR_CRIT = RpgAdditions.MOD_ID + ":air_crit";
+	public static final String UPPERCUT = TrimEnchantments.MOD_ID + ":uppercut";
+	public static final String AIR_CRIT = TrimEnchantments.MOD_ID + ":air_crit";
 
 	private static final int SPECIAL_SWING = 3;
 	// Weapon trails, after Better Combat's own one-handed uppercut and two-handed slam; the air crit's is centred.

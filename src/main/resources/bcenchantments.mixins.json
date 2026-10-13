@@ -18,8 +18,10 @@
 	],
 	"client": [
 		"AttackInteractorMixin",
-		"GuiGraphicsExtractorMixin",
 		"HudMixin",
+		"ItemLayerRenderStateMixin",
+		"ItemModelResolverMixin",
+		"ItemStackRenderStateMixin",
 		"SmithingScreenMixin"
 	],
 	"injectors": {

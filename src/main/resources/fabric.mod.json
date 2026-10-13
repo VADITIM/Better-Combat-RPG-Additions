@@ -2,18 +2,18 @@
 	"schemaVersion": 1,
 	"id": "bcenchantments",
 	"version": "${version}",
-	"name": "Better Combat: RPG Additions",
-	"description": "Minecraft Dungeons-style perks, weapon playstyles, vanilla-friendly weapon progression and a harder, hack-and-slash PvE, built on Better Combat and Punchy.",
+	"name": "Trim Enchantments",
+	"description": "Armor trims become weapon enchantments: every trim grants a Trim Power, and any two combine. With weapon refinement, weapon playstyles and harder hack-and-slash PvE, built on Better Combat and Punchy.",
 	"authors": [
 		"vadim"
 	],
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.vadim.bcenchantments.RpgAdditions"
+			"dev.vadim.bcenchantments.TrimEnchantments"
 		],
 		"client": [
-			"dev.vadim.bcenchantments.client.RpgAdditionsClient"
+			"dev.vadim.bcenchantments.client.TrimEnchantmentsClient"
 		],
 		"modmenu": [
 			"dev.vadim.bcenchantments.client.ModMenuIntegration"

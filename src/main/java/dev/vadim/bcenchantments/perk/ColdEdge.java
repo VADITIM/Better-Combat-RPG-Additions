@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.combat.SwingResult;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,7 +31,7 @@ final class ColdEdge {
 	private static final float[] SLOW = {0.10F, 0.25F, 0.40F};
 	private static final int DURATION_TICKS = 25;
 	private static final int FREEZE_AFTER_TICKS = 60;
-	private static final Identifier MODIFIER = RpgAdditions.id("cold_edge");
+	private static final Identifier MODIFIER = TrimEnchantments.id("cold_edge");
 	private static final TagKey<Item> SWEEPING = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("minecraft", "enchantable/sweeping"));
 
 	private static final class Chill {

@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.weapon;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import java.util.Map;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.logic.WeaponRegistry;
@@ -18,10 +18,10 @@ import net.minecraft.world.item.ItemStack;
 public final class SpearStyle implements WeaponStyle {
 	public static final SpearStyle INSTANCE = new SpearStyle();
 
-	public static final String STAB_RIGHT = RpgAdditions.MOD_ID + ":spear_stab_right";
-	public static final String STAB_LEFT = RpgAdditions.MOD_ID + ":spear_stab_left";
-	public static final String STAB_CENTER = RpgAdditions.MOD_ID + ":spear_stab_center";
-	public static final String HEAVY = RpgAdditions.MOD_ID + ":spear_heavy";
+	public static final String STAB_RIGHT = TrimEnchantments.MOD_ID + ":spear_stab_right";
+	public static final String STAB_LEFT = TrimEnchantments.MOD_ID + ":spear_stab_left";
+	public static final String STAB_CENTER = TrimEnchantments.MOD_ID + ":spear_stab_center";
+	public static final String HEAVY = TrimEnchantments.MOD_ID + ":spear_heavy";
 
 	/** Attack cooldown of each stab, relative to the weapon's own. */
 	private static final Map<String, Float> COOLDOWN = Map.of(

@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.combat;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.network.CritRollPayload;
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -41,7 +41,7 @@ public final class CriticalHits {
 	public static final Holder<Attribute> CRITICAL_DAMAGE = register("critical_damage",
 		new RangedAttribute("attribute.name.bcenchantments.critical_damage", 1.5, 1.0, 10.0));
 
-	public static final Identifier WEAPON_CHANCE = RpgAdditions.id("base_critical_chance");
+	public static final Identifier WEAPON_CHANCE = TrimEnchantments.id("base_critical_chance");
 
 	/** Rolls in [0, 1) waiting for each player's next main-hand and off-hand swing. */
 	private static final Map<ServerPlayer, float[]> ROLLS = new WeakHashMap<>();
@@ -59,7 +59,7 @@ public final class CriticalHits {
 	}
 
 	private static Holder<Attribute> register(String name, Attribute attribute) {
-		return Registry.registerForHolder(BuiltInRegistries.ATTRIBUTE, RpgAdditions.id(name), attribute.setSyncable(true));
+		return Registry.registerForHolder(BuiltInRegistries.ATTRIBUTE, TrimEnchantments.id(name), attribute.setSyncable(true));
 	}
 
 	public static void init() {

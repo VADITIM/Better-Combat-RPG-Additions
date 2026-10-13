@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.client;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.perk.Synergy;
 import dev.vadim.bcenchantments.progression.Refinement;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public final class PowerTooltips {
 	private static boolean powerBook(ItemStack stack) {
 		ItemEnchantments stored = stack.get(DataComponents.STORED_ENCHANTMENTS);
 		return stored != null && stored.keySet().stream()
-			.anyMatch(holder -> holder.unwrapKey().map(key -> key.identifier().getNamespace().equals(RpgAdditions.MOD_ID)).orElse(false));
+			.anyMatch(holder -> holder.unwrapKey().map(key -> key.identifier().getNamespace().equals(TrimEnchantments.MOD_ID)).orElse(false));
 	}
 
 	/** A trim template names the power it grants on a weapon, and on a shield if it works there. */

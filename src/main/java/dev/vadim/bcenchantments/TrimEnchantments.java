@@ -14,12 +14,13 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.resources.Identifier;
 
 /**
- * Better Combat: RPG Additions. Builds on Better Combat and Punchy: each weapon kind plays its own way
- * ({@code weapon}), Dungeons-style perks hang off combos ({@code perk}), weapons are refined at the
+ * Trim Enchantments: armor trims are the enchantments. Every trim grants a Trim Power ({@code perk}) and
+ * any two combine. Builds on Better Combat and Punchy: each weapon kind plays its own way
+ * ({@code weapon}), weapons are refined at the
  * smithing table ({@code progression}), and monsters scale up to meet the stronger player ({@code mob}).
  * The mod id stays {@code bcenchantments} so existing items and worlds keep their data.
  */
-public class RpgAdditions implements ModInitializer {
+public class TrimEnchantments implements ModInitializer {
 	public static final String MOD_ID = "bcenchantments";
 
 	@Override

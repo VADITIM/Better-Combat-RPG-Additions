@@ -57,4 +57,4 @@ Server tick   → CombatHooks.onServerTick (ColdEdge, Shockwave, Control, Impact
 | What | Where |
 |---|---|
 | HUD settings and the Better Combat switch | `config/bcenchantments-client.json`, through `HudConfig` |
-| Switch → registry | `RpgAdditionsClient` copies the switch into the static `BetterCombatSwitch` every client tick; `WeaponRegistryMixin` reads it |
+| Switch → registry | `TrimEnchantmentsClient` copies the switch into the static `BetterCombatSwitch` every client tick; `WeaponRegistryMixin` reads it |

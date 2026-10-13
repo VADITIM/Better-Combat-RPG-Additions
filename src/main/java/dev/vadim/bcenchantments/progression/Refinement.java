@@ -2,7 +2,7 @@ package dev.vadim.bcenchantments.progression;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.combat.CriticalHits;
 import dev.vadim.bcenchantments.perk.Perks;
 import dev.vadim.bcenchantments.perk.Synergy;
@@ -98,13 +98,13 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 			powers.isEmpty() && trim.isPresent() ? List.of(new Power(trim.get(), Math.max(1, perkLevel))) : powers)));
 
 	public static final DataComponentType<Refinement> COMPONENT = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE,
-		RpgAdditions.id("refinement"),
+		TrimEnchantments.id("refinement"),
 		DataComponentType.<Refinement>builder().persistent(CODEC).networkSynchronized(ByteBufCodecs.fromCodec(CODEC)).build());
 
-	private static final Identifier BOOST_DAMAGE = RpgAdditions.id("refinement_damage");
-	private static final Identifier BOOST_ATTACK_SPEED = RpgAdditions.id("refinement_attack_speed");
-	private static final Identifier BOOST_CRITICAL_CHANCE = RpgAdditions.id("refinement_critical_chance");
-	private static final Identifier BOOST_CRITICAL_DAMAGE = RpgAdditions.id("refinement_critical_damage");
+	private static final Identifier BOOST_DAMAGE = TrimEnchantments.id("refinement_damage");
+	private static final Identifier BOOST_ATTACK_SPEED = TrimEnchantments.id("refinement_attack_speed");
+	private static final Identifier BOOST_CRITICAL_CHANCE = TrimEnchantments.id("refinement_critical_chance");
+	private static final Identifier BOOST_CRITICAL_DAMAGE = TrimEnchantments.id("refinement_critical_damage");
 
 	public Refinement {
 		powers = List.copyOf(powers);

@@ -34,9 +34,18 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 - **Attack Speed stopped being a power.** Refinement grants +0.1 per level, the old maximum at level 5. *Why:* better build-crafting. Frenzy became Echo + Refinement 5.
 - **Fire Aspect stacks burn** (+1 stack per melee hit, max 5, 0.2 hearts/s per stack, 4 s per level after the last hit). Armor stands never burn. *Why:* vanilla Fire Aspect is too strong on the first hit.
 
+**Power effects**
+
+- **Effects play on the item's pixels, not around the slot.** The old Lightning overlay blitted a 24 px strike around the icon in GUIs only. Now every power's effect is extra item quads drawn with the glint pipeline (equal depth test, additive), so it is masked to the sprite and shows in hand too. UVs come from model positions, so one effect pixel lands on one item pixel. *Rejected:* a custom `FoilType` (an enum, awkward to extend) and per-item model overrides (one per weapon).
+
 **Monsters**
 
 - **Spawn cap ×1.8.** Health +0–30% per monster (mean of three rolls, so middle values are common). Damage +0–15%, rolled evenly. Health no longer scales with difficulty or player power; armor and knockback resistance still do.
+- **Difficulty plan (from an outside proposal), what was taken:** elites and captains, status attacks, place multipliers, and a power measure that counts power pairs. *Rejected:* a threat level from recent power damage and adaptive resistance (both punish using the powers you earned), Echo Strain weapon upkeep (a chore, and experience cost already balances powers), and flanking AI (a rewrite of vanilla AI for little gain).
+- **Elites hurt with statuses, not damage.** Frost, Weakening and Shredding add pressure without turning monsters into sponges. Captains are the kill-first target that breaks up click-and-slash fights; the ominous banner reuses vanilla's raid-captain look. Ranks are entity tags, saved with the monster, and their health goes into the same health modifier so mob farms keep their drop height.
+- **Place multiplies every bonus.** Near spawn ×0.5 keeps the home base calm; caves ×1.25, Deep Dark and Nether ×1.5, End ×1.75.
+- **Player power counts pairs.** Weapons hold unlimited powers now, so the measure is power levels + 2 per pair, capped at 30 instead of 12, with smaller per-point armor and knockback resistance.
+- **Ominous bottles are the difficulty dial.** Bad Omen I–V adds health +6%, damage +3%, armor +0.5 and knockback resistance +0.02 per level to monsters spawning near the player, and the player's monster kills drop an emerald at 4% + 1% per level, plus an echo shard at 0.2% at level V. It reuses a vanilla item, it is opt-in, and it pays in the refinement currencies. The buff is applied at spawn like the rest of the scaling, so drinking a bottle affects new monsters, not ones already loaded.
 
 **Settings and guide**
 
@@ -45,7 +54,7 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 
 **Naming**
 
-- **The mod is named "Better Combat: RPG Additions"**; the id stays `bcenchantments` so world data survives.
+- **The mod is named "Trim Enchantments"** (previously "Better Combat: RPG Additions"): the mod is framed around Trim Powers, armor trims acting as weapon enchantments. The id stays `bcenchantments` so world data survives; the main classes are `TrimEnchantments` and `TrimEnchantmentsClient`.
 
 ## 2026-10-12
 

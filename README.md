@@ -1,6 +1,7 @@
-# Better Combat: RPG Additions
+# Trim Enchantments
 
-A Fabric mod for Minecraft 26.2 that layers a combat RPG onto vanilla, built on
+A Fabric mod for Minecraft 26.2 where armor trims are the enchantments. Put a trim on a weapon
+at the smithing table and it gains that trim's **Trim Power**; put on two and they combine. Built on
 [Better Combat](https://modrinth.com/mod/better-combat) and Punchy (both required).
 
 - **Weapon playstyles**: each weapon kind plays its own way, with its own attacks and animations
@@ -11,6 +12,12 @@ A Fabric mod for Minecraft 26.2 that layers a combat RPG onto vanilla, built on
   and echo shards to a finished weapon for its powers. Shields take a few powers too.
 - **Harder hack-and-slash PvE**: more monsters, softer single hits that ramp up when they keep
   landing, and subtle hidden stat buffs that grow with the player's weapon power.
+- **Visible powers**: each trim power plays its own animation on the weapon's pixels, in the inventory and in hand.
+- **Elites and captains**: some monsters spawn as elites whose hits slow, weaken or strip armor.
+  Captains wear an ominous banner and hurry and shield the monsters around them.
+- **Harder by place**: mild near world spawn, harder underground, in the Deep Dark, the Nether and the End.
+- **Ominous difficulty**: drink an ominous bottle to make monsters tougher on purpose. While Bad
+  Omen lasts, kills can drop emeralds (5% at I, up to 9% at V), and at level V an echo shard (0.2%).
 
 ## Guide
 
@@ -88,4 +95,10 @@ The jar lands in `build/libs/`.
 
 ```
 python tools/animations.py src/main/resources
+```
+
+`tools/power_effects.py` generates the animation each trim power plays on its weapon:
+
+```
+python tools/power_effects.py src/main/resources
 ```

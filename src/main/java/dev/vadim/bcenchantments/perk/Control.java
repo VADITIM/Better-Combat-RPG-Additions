@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -17,7 +17,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
  * mid-effect.
  */
 public final class Control {
-	private static final Identifier ROOT = RpgAdditions.id("root");
+	private static final Identifier ROOT = TrimEnchantments.id("root");
 
 	private static final class Hold {
 		long until;

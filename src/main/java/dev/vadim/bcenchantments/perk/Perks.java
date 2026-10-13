@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.combat.CombatHooks;
 import dev.vadim.bcenchantments.progression.Refinement;
 import java.util.List;
@@ -70,7 +70,7 @@ public final class Perks {
 	}
 
 	private static ResourceKey<Enchantment> key(String name) {
-		return ResourceKey.create(Registries.ENCHANTMENT, RpgAdditions.id(name));
+		return ResourceKey.create(Registries.ENCHANTMENT, TrimEnchantments.id(name));
 	}
 
 	/**
@@ -80,17 +80,5 @@ public final class Perks {
 	 */
 	public static int level(ItemStack stack, ResourceKey<Enchantment> key) {
 		return Refinement.perkLevel(stack, key);
-	}
-
-	/** Sum of every perk's level on {@code stack}: 0 for a plain weapon. */
-	public static int totalLevel(ItemStack stack) {
-		if (stack.isEmpty()) {
-			return 0;
-		}
-		int total = 0;
-		for (ResourceKey<Enchantment> key : ALL) {
-			total += level(stack, key);
-		}
-		return total;
 	}
 }

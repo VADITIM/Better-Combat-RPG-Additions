@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
  * modifier, so nothing stays on a player who logs out mid-rampage.
  */
 final class Rampaging {
-	private static final Identifier RAMPAGE = RpgAdditions.id("rampaging");
+	private static final Identifier RAMPAGE = TrimEnchantments.id("rampaging");
 	/** Attack speed gained for levels 1 to 3, as a share of the total. */
 	private static final double[] SPEED = {0.2, 0.3, 0.4};
 	/** How long the rampage lasts after the last kill: 4 s. */

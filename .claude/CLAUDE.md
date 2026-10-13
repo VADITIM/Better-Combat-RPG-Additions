@@ -1,6 +1,7 @@
-# Better Combat: RPG Additions
+# Trim Enchantments
 
-A Fabric mod for Minecraft 26.2 that turns vanilla combat into hack-and-slash PvE progression. It has:
+A Fabric mod for Minecraft 26.2 where armor trims are the enchantments: every trim grants a Trim
+Power on a weapon, and any two combine. Around that core it has:
 
 - Trim Powers adapted from Minecraft Dungeons enchantments;
 - weapon refinement at the smithing table;
@@ -10,8 +11,8 @@ A Fabric mod for Minecraft 26.2 that turns vanilla combat into hack-and-slash Pv
 It is an addon to **Better Combat** and **Punchy**, and requires both.
 
 - **Mod id:** `bcenchantments`. Never rename it: item data saved in worlds depends on it.
-- **Display name:** "Better Combat: RPG Additions", with the colon.
-- **Repository:** https://github.com/VADITIM/Better-Combat-RPG-Additions, branch `master`.
+- **Display name:** "Trim Enchantments". Describe the mod as being about Trim Powers; players still see "Trim Powers" (or "Powers") for the powers themselves.
+- **Repository:** https://github.com/VADITIM/Trim-Enchantments, branch `master`.
 
 V/AS: this project uses the **base** register, cut down for a game. The cut-down rules are in `docs/rules/frontend.md`, and `client/Theme.java` implements them.
 
@@ -34,10 +35,14 @@ cp build/libs/bcenchantments-0.1.0.jar "/c/Users/vadim/AppData/Roaming/ModrinthA
 ```bash
 python tools/animations.py src/main/resources
 ```
+```bash
+python tools/power_effects.py src/main/resources
+```
 
 1. Build.
 2. Deploy: copy the jar after every build.
 3. Regenerate the animations: every PAL emote and Punchy clip is generated, never hand-edited.
+4. Regenerate the power effect textures the same way.
 
 ## Working rules
 

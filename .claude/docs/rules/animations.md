@@ -199,7 +199,7 @@ with `src/main/resources`.
 ### A new special attack for an existing weapon (like the air crit)
 
 1. **Style** (`weapon/<Weapon>Style.java`):
-   - add `public static final String NAME = RpgAdditions.MOD_ID + ":name";`
+   - add `public static final String NAME = TrimEnchantments.MOD_ID + ":name";`
    - return it from `replace()` through a `with(hand, NAME, angle, trail)` helper that copies the
      base `Attack` and changes the animation, hitbox, angle and trail;
    - if it launches, slows the cooldown or changes knockback, override `launches`,

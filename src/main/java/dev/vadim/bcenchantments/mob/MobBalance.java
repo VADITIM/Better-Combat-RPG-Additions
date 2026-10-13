@@ -26,7 +26,9 @@ final class MobBalance {
 	/** Players within this many blocks of a spawning monster count toward its power. */
 	static final double POWER_RADIUS = 48.0;
 	/** Power above this adds nothing more. */
-	static final int MAX_POWER = 12;
+	static final int MAX_POWER = 30;
+	/** Each power pair on a weapon counts this much power on top of the power levels. */
+	static final int PAIR_POWER = 2;
 
 	/**
 	 * Most max health added, as a share of the monster's own. Each monster rolls between none and this,
@@ -39,12 +41,65 @@ final class MobBalance {
 	/** Armor points added. */
 	static final double ARMOR_BASE = 1.0;
 	static final double ARMOR_PER_DIFFICULTY = 1.0;
-	static final double ARMOR_PER_POWER = 0.25;
+	static final double ARMOR_PER_POWER = 0.15;
 
 	/** Knockback resistance added, 0 to 1. */
 	static final double KNOCKBACK_RESISTANCE_BASE = 0.05;
 	static final double KNOCKBACK_RESISTANCE_PER_DIFFICULTY = 0.05;
-	static final double KNOCKBACK_RESISTANCE_PER_POWER = 0.015;
+	static final double KNOCKBACK_RESISTANCE_PER_POWER = 0.01;
+
+	// Bad Omen from an ominous bottle: opt-in difficulty. Monsters spawning near a player with it get
+	// these on top, per omen level (1 to 5), and the player's kills may drop loot.
+	static final int OMEN_MAX = 5;
+	/** Max health added per omen level, as a share of the monster's own: +30% at V. */
+	static final double OMEN_HEALTH = 0.06;
+	/** Attack damage added per omen level, as a share of the monster's own: +15% at V. */
+	static final double OMEN_DAMAGE = 0.03;
+	/** Armor points added per omen level. */
+	static final double OMEN_ARMOR = 0.5;
+	/** Knockback resistance added per omen level. */
+	static final double OMEN_KNOCKBACK_RESISTANCE = 0.02;
+	/** Emerald drop chance on a kill: 5% at I, one point more per level, 9% at V. */
+	static final float OMEN_EMERALD_BASE = 0.04F;
+	static final float OMEN_EMERALD_PER_LEVEL = 0.01F;
+	/** Echo shard drop chance on a kill at Bad Omen V. */
+	static final float OMEN_ECHO_SHARD = 0.002F;
+
+	// Place: every bonus above (health, damage, armor, knockback resistance, elite odds) is multiplied
+	// by where the monster spawns.
+	static final double PLACE_NEAR_SPAWN = 0.5;
+	static final double PLACE_UNDERGROUND = 1.25;
+	static final double PLACE_DEEP_DARK = 1.5;
+	static final double PLACE_NETHER = 1.5;
+	static final double PLACE_END = 1.75;
+	/** Overworld surface within this many blocks of world spawn counts as near spawn. */
+	static final double SPAWN_RADIUS = 256.0;
+
+	// Elites and captains. An elite carries one affix; a captain is an elite that rallies others.
+	/** Chance a monster spawns elite, before place. */
+	static final double ELITE_CHANCE = 0.03;
+	static final double ELITE_PER_OMEN = 0.01;
+	static final double ELITE_PER_POWER = 0.001;
+	/** Captain odds as a share of the elite odds; only zombies, skeletons and piglins can lead. */
+	static final double CAPTAIN_SHARE = 0.35;
+	/** Max health added for the rank, as a share of the monster's own. */
+	static final double ELITE_HEALTH = 0.2;
+	static final double CAPTAIN_HEALTH = 0.4;
+	/** Elites show their affix and captains rally this often: 1 s. */
+	static final int ELITE_PULSE_TICKS = 20;
+	/** Monsters within this many blocks of a captain get Speed I and Resistance I. */
+	static final double CAPTAIN_RADIUS = 8.0;
+	static final int CAPTAIN_EFFECT_TICKS = 40;
+	/** Frost: Slowness II for 3 s. Weakening: Weakness I for 5 s. */
+	static final int FROST_TICKS = 60;
+	static final int WEAKENING_TICKS = 100;
+	/** Shredding: each hit strips this much armor, stacking, until 5 s pass without one. */
+	static final double SHRED_ARMOR = 2.0;
+	static final int SHRED_MAX_STACKS = 3;
+	static final int SHRED_TICKS = 100;
+	/** Emerald drop chance when a player kills one. */
+	static final double ELITE_EMERALD = 0.2;
+	static final double CAPTAIN_EMERALD = 0.5;
 
 	private MobBalance() {
 	}

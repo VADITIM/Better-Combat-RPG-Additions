@@ -1,6 +1,6 @@
 # Trim Powers & Combinations
 
-Living design sheet for Better Combat: RPG Additions. Update it whenever a power or combination changes.
+Living design sheet for Trim Enchantments. Update it whenever a power or combination changes.
 
 ## Powers
 
@@ -363,9 +363,57 @@ No refinement needed: trim template + shield + echo shard → the power, one lev
 | Hit chain | First monster hit 0.75× damage, +0.25 per further hit (max 2×); resets after 2 s without a monster hit |
 | Health | +0–30% per monster, middle values common, the ends rare |
 | Damage | +0–15% per monster, rolled evenly |
-| Armor / knockback resistance | Small bonus, more with local difficulty and nearby player power |
-| Player power | Trim power levels on the strongest nearby player's weapons (48 blocks, max 12) |
+| Armor | +1, +1 at full local difficulty, +0.15 per player power |
+| Knockback resistance | +0.05, +0.05 at full local difficulty, +0.01 per player power |
+| Player power | On the strongest nearby player's held weapons (48 blocks): trim power levels + 2 per power pair, max 30 |
 | Mob farms | Scaled mobs still die from their original fall height |
+
+### Ominous difficulty
+
+Drinking an ominous bottle (Bad Omen I–V) raises the difficulty on purpose. Monsters that spawn within 48 blocks of a player with Bad Omen get extra stats per omen level, on top of the rolls above, and monsters that player kills can drop loot.
+
+| Omen level | Health | Damage | Armor | Knockback res. | Emerald on kill | Echo shard on kill |
+|---|---|---|---|---|---|---|
+| I | +6% | +3% | +0.5 | +0.02 | 5% | — |
+| II | +12% | +6% | +1 | +0.04 | 6% | — |
+| III | +18% | +9% | +1.5 | +0.06 | 7% | — |
+| IV | +24% | +12% | +2 | +0.08 | 8% | — |
+| V | +30% | +15% | +2.5 | +0.10 | 9% | 0.2% |
+
+Vanilla still turns Bad Omen into a raid in a village and a trial omen at a trial spawner.
+
+### Place
+
+Every bonus above (health, damage, armor, knockback resistance, omen stats and elite odds) is multiplied by where the monster spawns.
+
+| Where | Multiplier |
+|---|---|
+| Overworld surface within 256 blocks of world spawn | ×0.5 |
+| Overworld surface elsewhere | ×1 |
+| Underground (below sea level, no sky) | ×1.25 |
+| Deep Dark | ×1.5 |
+| Nether | ×1.5 |
+| End | ×1.75 |
+
+### Elites and captains
+
+A monster can spawn as an **elite** with one affix. Its hits apply a status rather than more damage, and it shows the affix with a faint particle every second. Its name ("Frost Zombie") shows when you look at it.
+
+| Affix | On hit | Particle |
+|---|---|---|
+| Frost | Slowness II, 3 s | Snowflake |
+| Weakening | Weakness I, 5 s | Smoke |
+| Shredding | −2 armor per hit, stacks to −6, all back after 5 s without a hit | Crit |
+
+A **captain** is an elite that wears an ominous banner ("Frost Zombie Captain"). Every second it gives monsters within 8 blocks Speed I and Resistance I for 2 s, so kill it first. Only zombies, skeletons and piglins can be captains; illagers keep vanilla's.
+
+| | Value |
+|---|---|
+| Elite chance | (3% + 1% per omen level + 0.1% per player power) × place |
+| Captain chance | 35% of the elite chance, zombies, skeletons and piglins only |
+| Extra health | Elite +20%, captain +40% |
+| Emerald when a player kills it | Elite 20%, captain 50% |
+| Excluded | Wither, Ender Dragon |
 
 ## Settings
 

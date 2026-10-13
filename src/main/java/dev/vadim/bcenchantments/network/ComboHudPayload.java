@@ -1,6 +1,6 @@
 package dev.vadim.bcenchantments.network;
 
-import dev.vadim.bcenchantments.RpgAdditions;
+import dev.vadim.bcenchantments.TrimEnchantments;
 import io.netty.buffer.ByteBuf;
 import java.util.List;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -12,7 +12,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
  * one per entry of {@code Perks.CHARGED} in the same order. A hand that shows nothing sends an empty list.
  */
 public record ComboHudPayload(int combo, List<Charge> mainHand, List<Charge> offHand) implements CustomPacketPayload {
-	public static final Type<ComboHudPayload> TYPE = new Type<>(RpgAdditions.id("combo_hud"));
+	public static final Type<ComboHudPayload> TYPE = new Type<>(TrimEnchantments.id("combo_hud"));
 	public static final StreamCodec<ByteBuf, ComboHudPayload> CODEC = StreamCodec.composite(
 		ByteBufCodecs.VAR_INT, ComboHudPayload::combo,
 		Charge.LIST_CODEC, ComboHudPayload::mainHand,
