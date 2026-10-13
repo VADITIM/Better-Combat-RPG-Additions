@@ -1,0 +1,41 @@
+# Frontend rules (HUD, screens, tooltips)
+
+This project uses V/AS (base register), cut down for a game. The user's rules below override V/AS. All shared values live in `client/Theme.java`; new UI goes through it.
+
+## Kept from V/AS
+
+- Near-black ground and hairline borders.
+- Flat colour slabs, one accent per surface.
+- Slow enter, fast leave.
+- Decoding text.
+- The "pixel squircle": the corner pixel is left out.
+
+## The user's rules
+
+**Text and colour**
+
+- **Minecraft font only,** at native size or a whole multiple of it. No half sizes, letter-spacing or forced-uppercase micro-labels.
+- **The accent is monochrome black** (`Theme.ACCENT`). Minecraft and V/AS colours don't fit. Only the Lightning and Shockwave bars, and red for a miss, keep colour.
+
+**Motion**
+
+- **No camera shake,** ever.
+
+**Combo count**
+
+- No backdrop, no timeline and no "COMBO" label.
+- The number shrinks about its bottom centre as the window drains, then pops out.
+
+**Charge blocks**
+
+- Empty blocks are very transparent black.
+- Filled blocks are plain colour with no border.
+- Spent or leaving blocks snap away one after another. They never fade.
+
+**Shadows**
+
+- No soft or feathered shadows.
+
+## Field Guide
+
+The smithing table's **?** button opens `client/GuideScreen`. Update it whenever a power, trim, recipe or combination changes, along with `lang/en_us.json`, `README.md` and `docs/POWERS.md`.

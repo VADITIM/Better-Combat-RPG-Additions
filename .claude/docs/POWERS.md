@@ -1,12 +1,12 @@
-# Perks & Combinations
+# Trim Powers & Combinations
 
-Living design sheet for Better Combat: RPG Additions. Update it whenever a perk or combination changes.
+Living design sheet for Better Combat: RPG Additions. Update it whenever a power or combination changes.
 
-## Perks
+## Powers
 
-Levels I–III unless noted. Charged perks show as bars under the crosshair.
+Trim Powers (Powers for short) are enchantments that a trim can also grant. Levels I–III unless noted. Charged powers show as bars under the crosshair.
 
-| Perk | Type | What it does | Numbers (I / II / III) | Weapons | Based on |
+| Power | Type | What it does | Numbers (I / II / III) | Weapons | Based on |
 |---|---|---|---|---|---|
 | Lightning | Charged | Bolt on the target after a long combo (2 full combos − 2 hits) | 7 / 13 / 17 dmg | sharp weapons | Dungeons *Thundering* |
 | Shockwave | Charged | Wave flies out after 3 swings in a row that each hit 3+ enemies | 4 / 6 / 8 dmg, 8 / 10 / 12 blocks | sharp weapons | Dungeons *Shockwave* |
@@ -18,7 +18,7 @@ Levels I–III unless noted. Charged perks show as bars under the crosshair.
 
 ## Combinations
 
-Active when the weapon has every listed perk (enchantment or trim, any level). Shown in gold in the tooltip and in the Field Guide.
+Active when the weapon has every listed power (enchantment or trim, any level). Shown in gold in the tooltip and in the Field Guide.
 
 | Combination | Needs | Effect |
 |---|---|---|
@@ -38,7 +38,7 @@ Chained Lightning + Wind Charged: enemies killed by the chain bolts burst.
 
 | Weapon | Style |
 |---|---|
-| Sword | Slam in the air; 3rd swing becomes a rising cut with Uppercut |
+| Sword | Normal Better Combat combo. Air crit: any swing in the air that rolls a crit becomes a two-handed, centred overhead strike. 3rd swing on the ground becomes a rising cut with Uppercut |
 | Spear | Four-stab combo; heavy thrust launches |
 | Mace | Swing on the ground launches with Uppercut; swing in the air is the mace smash |
 
@@ -61,29 +61,39 @@ Smithing table, empty template slot, weapon in the middle, emeralds or emerald b
 | 4 | 120 | +0.4 | " |
 | 5 | 140 | +0.5 | " |
 
-## Trim perks
+## Trim Powers
 
-At refinement 5: trim template + echo shard → trim's perk at level 1. Same trim again, no shard → level 2, then 3.
+At refinement 5: trim template + echo shard → trim's power at level 1. Same trim again, no shard → level 2, then 3.
 
-| Perk | Trims |
-|---|---|
-| Lightning | bolt, eye, spire, vex |
-| Shockwave | flow, rib, snout, silence |
-| Cold Edge | tide, coast, ward |
-| Uppercut | sentry, raiser, shaper, host |
-| *unassigned* | dune, wild, wayfinder |
+| Power | Trims | Why |
+|---|---|---|
+| Lightning | bolt, spire, eye | storm bolt, sky-high End city, ender eye |
+| Wind Charged | flow, dune, wayfinder | breeze vaults, desert winds, the traveller |
+| Shockwave | rib, snout | fortress and bastion brutes |
+| Cold Edge | tide, coast | the sea |
+| Echo | silence, ward | ancient city, home of echo shards |
+| Chains | wild, vex | binding vines, evoker fangs |
+| Uppercut | sentry, raiser, shaper, host | outposts and trail ruins |
 
-Chains, Echo and Wind Charged have no trim yet.
+## Shield powers
+
+No refinement needed: trim template + shield + echo shard → the power, one level only. Only these work on a shield:
+
+| Power | Trims | On a blocked hit | Cooldown |
+|---|---|---|---|
+| Wind Charged | flow, dune, wayfinder | Gust from the shield throws back everything in front (4 blocks, 30% of a wind charge) | 30 s |
+| Cold Edge | tide, coast | The attacker, within 5 blocks, is chilled hard (−40% speed) | 10 s |
 
 ## Mobs
 
 | Change | Value |
 |---|---|
-| Monster spawn cap | ×1.5 |
+| Monster spawn cap | ×1.8 |
 | Hit chain | First monster hit 0.75× damage, +0.25 per further hit (max 2×); resets after 2 s without a monster hit |
-| Health | +15% base, more with local difficulty and nearby player power |
+| Health | +0–30% per monster, middle values common, the ends rare |
+| Damage | +0–15% per monster, rolled evenly |
 | Armor / knockback resistance | Small bonus, more with local difficulty and nearby player power |
-| Player power | Perk levels on the strongest nearby player's weapons (48 blocks, max 12) |
+| Player power | Power levels on the strongest nearby player's weapons (48 blocks, max 12) |
 | Mob farms | Scaled mobs still die from their original fall height |
 
 ## Settings

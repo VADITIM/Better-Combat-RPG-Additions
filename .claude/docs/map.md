@@ -1,0 +1,54 @@
+# Map
+
+Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in `src/main/resources/`.
+
+## Code
+
+| Folder | Purpose | Entry points |
+|---|---|---|
+| `/` | Mod entry: wires every system's `init` | `RpgAdditions` |
+| `client/` | Client entry; the HUD, settings, Field Guide and Punchy clips | `RpgAdditionsClient`, `ComboHud`, `HudSettingsScreen`, `GuideScreen`, `Theme`, `PunchyClips`, `PunchySpear` |
+| `combat/` | Server swing tracking, hooks, rolled crits, the Better Combat switch | `ComboTracker`, `CombatHooks`, `CriticalHits`, `BetterCombatSwitch` |
+| `perk/` | Every power, the combinations and the shield powers | `Perks` (registration), `Synergy`, `ShieldPowers`, one class per power |
+| `progression/` | Refinement and trim powers at the smithing table | `Refinement` |
+| `weapon/` | How each weapon kind plays | `WeaponStyles` (registry), `SwordStyle`, `SpearStyle`, `MaceStyle` |
+| `mob/` | The monster overhaul | `MobBalance` (all numbers), `MobScaling`, `HitChain`, `SpawnDensity` |
+| `vanilla/` | Reworked vanilla enchantments | `FireAspect` |
+| `network/` | Server-to-client payloads | `ComboHudPayload`, `CritRollPayload` |
+| `mixin/` | Hooks into vanilla and Better Combat | listed in `bcenchantments.mixins.json` |
+| `mixin/punchy/` | `@Pseudo` hooks into Punchy, client only | listed in `bcenchantments.punchy.mixins.json` |
+
+## Resources
+
+| Path | What |
+|---|---|
+| `data/bcenchantments/enchantment/` | One JSON per power. `attack_speed.json` is legacy, kept so existing items load |
+| `data/bcenchantments/tags/item/` | `uppercut_weapons` (swords and the mace) |
+| `data/bcenchantments/weapon_attributes/spear.json` | The spear combo preset |
+| `data/minecraft/weapon_attributes/*_spear.json` | Point each vanilla spear at the preset |
+| `data/minecraft/enchantment/fire_aspect.json` | Vanilla Fire Aspect with its effects removed; `vanilla/FireAspect` replaces them |
+| `data/minecraft/tags/enchantment/` | Which powers appear in the enchanting table, loot and trades |
+| `assets/bcenchantments/player_animations/` | Third-person PAL emotes (generated) |
+| `assets/minecraft/punchy/animations/bcenchantments.animation.json` | First-person Punchy clips (generated) |
+| `assets/bcenchantments/lang/en_us.json` | Every player-facing string |
+
+## Other
+
+| Path | What |
+|---|---|
+| `tools/animations.py` | Generates every emote and Punchy clip; see `rules/animations.md` |
+| `libs/` | The local Punchy jar (not committed) |
+| `README.md` | Player-facing overview |
+| `.claude/docs/POWERS.md` | The design sheet: every power, combination, trim and number |
+
+## To change X, look in Y
+
+| Change | Where |
+|---|---|
+| A power's numbers | its class in `perk/`, then `POWERS.md`, the lang file and the README |
+| Which trim grants which power | `Refinement.TRIM_PERKS`; shield powers in `Refinement.SHIELD_PERKS` |
+| A combination | `perk/Synergy`, then the class it affects, then `synergy.*.desc` in the lang file |
+| Monster numbers | `mob/MobBalance` |
+| An attack, combo or animation | `weapon/`, `weapon_attributes`, `tools/animations.py`; follow `rules/animations.md` |
+| HUD look | `client/Theme`, `client/ComboHud` |
+| Field Guide pages | `client/GuideScreen`, `guide.*` lang keys |

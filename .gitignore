@@ -42,11 +42,8 @@ replay_*.log
 # run
 run/
 
-# V/AS is fetched from GitHub, never committed
-.claude/skills/vas/
-
-# Local Claude Code config and skills
-.claude/
-
 # Third-party jars are not redistributed
 libs/*.jar
+
+# Claude Code: CLAUDE.md and docs/ are committed; V/AS and the shared skills are fetched from GitHub
+.claude/skills/
