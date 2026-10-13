@@ -54,7 +54,7 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 
 **Naming**
 
-- **The mod is named "Trim Enchantments"** (previously "Better Combat: RPG Additions"): the mod is framed around Trim Powers, armor trims acting as weapon enchantments. The id stays `bcenchantments` so world data survives; the main classes are `TrimEnchantments` and `TrimEnchantmentsClient`.
+- **The mod is named "Trim Enchantments"** (previously "Better Combat: RPG Additions"): the mod is framed around Trim Powers, a late-game enchanting layer added on top of vanilla enchantments, which stay the early and mid game. Trims never replace enchantments. The id stays `bcenchantments` so world data survives; the main classes are `TrimEnchantments` and `TrimEnchantmentsClient`.
 
 ## 2026-10-12
 

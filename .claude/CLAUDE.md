@@ -1,7 +1,8 @@
 # Trim Enchantments
 
-A Fabric mod for Minecraft 26.2 where armor trims are the enchantments: every trim grants a Trim
-Power on a weapon, and any two combine. Around that core it has:
+A Fabric mod for Minecraft 26.2 that adds Trim Powers, a late-game enchanting layer on top of
+vanilla enchantments (which stay the early and mid game): every trim grants a Trim Power on a fully
+refined weapon, and any two combine. Around that core it has:
 
 - Trim Powers adapted from Minecraft Dungeons enchantments;
 - weapon refinement at the smithing table;

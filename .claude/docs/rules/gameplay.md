@@ -7,6 +7,7 @@ The user stated these rules for this project. They override V/AS, defaults and o
 - **Expand Minecraft's systems, don't replace them.** Progression uses vanilla items: emeralds, the smithing table, armor trims and echo shards. Mob buffs stay subtle: no damage sponges.
 - **Powers should change how a weapon plays,** not just add damage. Players pick a weapon for how it plays, not for its DPS.
 - **Monsters are easy one at a time and dangerous in groups.** Pressure comes from density, consecutive hits, positioning, armor and knockback resistance.
+- **Trim Powers add to enchanting, they don't replace it.** Vanilla enchantments are the early and mid game; Trim Powers are the late-game layer on a fully refined weapon.
 - **Naming:** the mod is "Trim Enchantments"; players see "Trim Powers", or "Powers" for short. The code still says `perk`; renaming it is not needed.
 
 ## Rules

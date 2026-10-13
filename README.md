@@ -1,7 +1,8 @@
 # Trim Enchantments
 
-A Fabric mod for Minecraft 26.2 where armor trims are the enchantments. Put a trim on a weapon
-at the smithing table and it gains that trim's **Trim Power**; put on two and they combine. Built on
+A Fabric mod for Minecraft 26.2 that adds a late-game enchanting layer on top of vanilla's.
+Regular enchantments still carry the early and mid game; once a weapon is fully refined, put a trim
+on it at the smithing table and it gains that trim's **Trim Power**; put on two and they combine. Built on
 [Better Combat](https://modrinth.com/mod/better-combat) and Punchy (both required).
 
 - **Weapon playstyles**: each weapon kind plays its own way, with its own attacks and animations

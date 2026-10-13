@@ -3,7 +3,7 @@
 	"id": "bcenchantments",
 	"version": "${version}",
 	"name": "Trim Enchantments",
-	"description": "Armor trims become weapon enchantments: every trim grants a Trim Power, and any two combine. With weapon refinement, weapon playstyles and harder hack-and-slash PvE, built on Better Combat and Punchy.",
+	"description": "A late-game enchanting layer on top of vanilla enchantments: on a fully refined weapon, every armor trim grants a Trim Power, and any two combine. With weapon refinement, weapon playstyles and harder hack-and-slash PvE, built on Better Combat and Punchy.",
 	"authors": [
 		"vadim"
 	],
