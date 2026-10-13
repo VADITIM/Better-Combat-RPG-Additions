@@ -22,7 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * Weapon refinement on the smithing table: a weapon in the base slot takes gems, an echo shard with a
  * trim template, or a trim template alone, and a shield takes a trim template with an echo shard, as
- * described in {@link Refinement}.
+ * described in {@link Refinement}. A weapon's second and later powers cost experience levels, shown
+ * by {@code SmithingScreenMixin}.
  */
 @Mixin(SmithingMenu.class)
 public abstract class SmithingMenuMixin extends ItemCombinerMenu {
@@ -66,6 +67,16 @@ public abstract class SmithingMenuMixin extends ItemCombinerMenu {
 		}
 	}
 
+	/** A new power on a weapon that has one already costs experience levels, which the player must have. */
+	@Override
+	protected boolean mayPickup(Player player, boolean hasStack) {
+		Refinement.Plan plan = this.bcenchantments$plan();
+		if (plan != null && plan.levelCost() > 0 && !player.hasInfiniteMaterials() && player.experienceLevel < plan.levelCost()) {
+			return false;
+		}
+		return super.mayPickup(player, hasStack);
+	}
+
 	@Inject(method = "onTake", at = @At("HEAD"), cancellable = true)
 	private void bcenchantments$take(Player player, ItemStack carried, CallbackInfo ci) {
 		// Planned again from the inputs, which both sides have, so the client takes the same items the server does.
@@ -75,6 +86,9 @@ public abstract class SmithingMenuMixin extends ItemCombinerMenu {
 		}
 		ci.cancel();
 		carried.onCraftedBy(player, carried.getCount());
+		if (plan.levelCost() > 0 && !player.hasInfiniteMaterials()) {
+			player.giveExperienceLevels(-plan.levelCost());
+		}
 		if (plan.levelUp() && !player.level().isClientSide()) {
 			// A new seed for the next level's rolls, so they cannot be read off by putting the weapon back.
 			player.onEnchantmentPerformed(ItemStack.EMPTY, 0);

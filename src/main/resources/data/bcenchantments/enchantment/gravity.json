@@ -2,8 +2,7 @@
 	"description": {
 		"translate": "enchantment.bcenchantments.gravity"
 	},
-	"supported_items": "#minecraft:enchantable/weapon",
-	"primary_items": "#minecraft:enchantable/melee_weapon",
+	"supported_items": "#bcenchantments:none",
 	"weight": 3,
 	"max_level": 3,
 	"min_cost": {

@@ -10,7 +10,7 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 | `client/` | Client entry; the HUD, settings, Field Guide and Punchy clips | `RpgAdditionsClient`, `ComboHud`, `HudSettingsScreen`, `GuideScreen`, `Theme`, `PunchyClips`, `PunchySpear` |
 | `combat/` | Server swing tracking, hooks, rolled crits, the Better Combat switch | `ComboTracker`, `CombatHooks`, `CriticalHits`, `BetterCombatSwitch` |
 | `perk/` | Every power, the combinations and the shield powers | `Perks` (registration), `Synergy`, `ShieldPowers`, one class per power |
-| `progression/` | Refinement and trim powers at the smithing table | `Refinement` |
+| `progression/` | Refinement, trim powers and their pairing at the smithing table | `Refinement` |
 | `weapon/` | How each weapon kind plays | `WeaponStyles` (registry), `SwordStyle`, `SpearStyle`, `MaceStyle` |
 | `mob/` | The monster overhaul | `MobBalance` (all numbers), `MobScaling`, `HitChain`, `SpawnDensity` |
 | `vanilla/` | Reworked vanilla enchantments | `FireAspect` |
@@ -46,7 +46,9 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 | Change | Where |
 |---|---|
 | A power's numbers | its class in `perk/`, then `POWERS.md`, the lang file and the README |
-| Which trim grants which power | `Refinement.TRIM_PERKS`; shield powers in `Refinement.SHIELD_PERKS` |
+| Which trim grants which power | `Refinement.TRIM_PERKS` (one each); shield powers in `Refinement.SHIELD_PERKS`; unbuilt powers have `Refinement.Perk.built = false` |
+| Power tooltips, smithing combination list, trim template lines | `client/PowerTooltips` |
+| Level cost of a new power | `Refinement.powerCost`, charged in `mixin/SmithingMenuMixin`, shown by `mixin/SmithingScreenMixin` |
 | A combination | `perk/Synergy`, then the class it affects, then `synergy.*.desc` in the lang file |
 | Monster numbers | `mob/MobBalance` |
 | An attack, combo or animation | `weapon/`, `weapon_attributes`, `tools/animations.py`; follow `rules/animations.md` |

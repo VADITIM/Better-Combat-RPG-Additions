@@ -2,8 +2,7 @@
 	"description": {
 		"translate": "enchantment.bcenchantments.cold_edge"
 	},
-	"supported_items": "#minecraft:enchantable/sharp_weapon",
-	"primary_items": "#minecraft:enchantable/melee_weapon",
+	"supported_items": "#bcenchantments:none",
 	"weight": 4,
 	"max_level": 3,
 	"min_cost": {

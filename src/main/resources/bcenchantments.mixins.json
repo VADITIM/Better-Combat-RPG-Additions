@@ -3,6 +3,7 @@
 	"package": "dev.vadim.bcenchantments.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
+		"AnvilMenuMixin",
 		"ArmorStandMixin",
 		"LivingEntityMixin",
 		"MobCategoryMixin",
@@ -18,7 +19,8 @@
 	"client": [
 		"AttackInteractorMixin",
 		"GuiGraphicsExtractorMixin",
-		"HudMixin"
+		"HudMixin",
+		"SmithingScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

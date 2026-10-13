@@ -2,6 +2,13 @@
 
 Shipped work and why it was built this way, newest first. Dates are when it was decided.
 
+## 2026-10-13 (combinations rework)
+
+- **One power per trim, 18 in all, and a combination for every pair (153).** 8 powers and 140 combinations are drafted in `POWERS.md` for review before they are built.
+- **Powers pair in the order applied** (1st+2nd, 3rd+4th, …); a power in a combination is locked out of every other. Simple to read off a weapon, no player choice needed.
+- **Combining happens at the smithing table, not the anvil.** A new power costs 20 levels for the 2nd, +10 per further one; the anvil refuses a right-hand item with powers so they are never lost.
+- **No books.** The enchantment JSONs stay registered (world safety for items that carry them) but apply to nothing and are hidden.
+
 ## 2026-10-13 (powers)
 
 - **Ten powers over the 18 trims,** each trim matched by name, look or structure (`Refinement.TRIM_PERKS`, table in `POWERS.md`). Lightning (bolt) and Echo (silence) have one trim each.

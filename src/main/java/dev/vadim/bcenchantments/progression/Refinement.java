@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.vadim.bcenchantments.RpgAdditions;
 import dev.vadim.bcenchantments.combat.CriticalHits;
 import dev.vadim.bcenchantments.perk.Perks;
+import dev.vadim.bcenchantments.perk.Synergy;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -39,19 +40,23 @@ import org.jspecify.annotations.Nullable;
 /**
  * Weapon refinement at the smithing table. Gems (emeralds, or blocks of emerald worth nine) are paid
  * into a weapon until it reaches the next refinement level; each level adds attack speed and one
- * small, random stat boost, and rolls what the next level will cost. At level {@link #MAX_LEVEL} the weapon is locked and
- * waits for a trim: a trim template and an echo shard turn it into a trim refinement, which grants one
- * power in place of an enchantment. Another trim of the same power raises that power, up to
- * {@link #MAX_PERK}. A shield skips the levels: a trim of one of the few shield powers and an echo
- * shard grant it straight away.
+ * small, random stat boost, and rolls what the next level will cost. At level {@link #MAX_LEVEL} the
+ * weapon is locked and takes trims: each trim template with an echo shard grants that trim's power.
+ * The first is free; every further one costs experience levels. Another template of a trim the
+ * weapon already has raises that power, up to {@link #MAX_PERK}.
+ * <p>
+ * Powers combine in the order they were applied: the first with the second, the third with the
+ * fourth, and so on. A power already in a combination is locked out of every other, so a third
+ * power stays alone until a fourth joins it. A shield skips the levels: a trim of one of the few
+ * shield powers and an echo shard grant it once.
  *
  * @param level refinement level, 0 to {@link #MAX_LEVEL}
  * @param gems gems paid toward the next level
  * @param cost gems the next level costs, rolled when the previous one was reached
- * @param trim the trim pattern's name, such as {@code bolt}, once the weapon is trim refined
+ * @param powers the trim powers, in the order they were applied
  */
 public record Refinement(int level, int gems, int cost, float damage, float attackSpeed, float critChance, float critDamage,
-	Optional<String> trim, int perkLevel) {
+	List<Power> powers) {
 
 	public static final int MAX_LEVEL = 5;
 	public static final int MAX_PERK = 3;
@@ -60,6 +65,21 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 	private static final float COST_SPREAD = 0.1F;
 	/** Attack speed every refinement level adds; level 5 matches the old Attack Speed V. */
 	private static final float ATTACK_SPEED_PER_LEVEL = 0.1F;
+	/** Experience levels for a weapon's second power, and how much each further one adds. */
+	private static final int POWER_LEVELS = 20;
+	private static final int POWER_LEVELS_STEP = 10;
+
+	/** One trim power on a weapon: the trim's name, such as {@code bolt}, and the power's level. */
+	public record Power(String trim, int level) {
+		public static final Codec<Power> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			Codec.STRING.fieldOf("trim").forGetter(Power::trim),
+			Codec.INT.fieldOf("level").forGetter(Power::level)
+		).apply(instance, Power::new));
+
+		public @Nullable Perk perk() {
+			return Refinement.perk(this.trim);
+		}
+	}
 
 	public static final Codec<Refinement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Codec.INT.fieldOf("level").forGetter(Refinement::level),
@@ -69,9 +89,13 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		Codec.FLOAT.optionalFieldOf("attack_speed", 0.0F).forGetter(Refinement::attackSpeed),
 		Codec.FLOAT.optionalFieldOf("critical_chance", 0.0F).forGetter(Refinement::critChance),
 		Codec.FLOAT.optionalFieldOf("critical_damage", 0.0F).forGetter(Refinement::critDamage),
-		Codec.STRING.optionalFieldOf("trim").forGetter(Refinement::trim),
-		Codec.INT.optionalFieldOf("perk_level", 0).forGetter(Refinement::perkLevel)
-	).apply(instance, Refinement::new));
+		Power.CODEC.listOf().optionalFieldOf("powers", List.of()).forGetter(Refinement::powers),
+		// Before several powers, a weapon held one trim and its level; read so old items keep their power.
+		Codec.STRING.optionalFieldOf("trim").forGetter(refinement -> Optional.empty()),
+		Codec.INT.optionalFieldOf("perk_level", 0).forGetter(refinement -> 0)
+	).apply(instance, (level, gems, cost, damage, attackSpeed, critChance, critDamage, powers, trim, perkLevel) ->
+		new Refinement(level, gems, cost, damage, attackSpeed, critChance, critDamage,
+			powers.isEmpty() && trim.isPresent() ? List.of(new Power(trim.get(), Math.max(1, perkLevel))) : powers)));
 
 	public static final DataComponentType<Refinement> COMPONENT = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE,
 		RpgAdditions.id("refinement"),
@@ -82,50 +106,91 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 	private static final Identifier BOOST_CRITICAL_CHANCE = RpgAdditions.id("refinement_critical_chance");
 	private static final Identifier BOOST_CRITICAL_DAMAGE = RpgAdditions.id("refinement_critical_damage");
 
+	public Refinement {
+		powers = List.copyOf(powers);
+	}
+
 	/**
-	 * The one power a trim refinement grants, counted as that enchantment's level by {@link Perks#level}.
+	 * The power a trim grants, counted as that power's level by {@link Perks#level}. {@code built} is
+	 * false for a power that is designed but not in the game yet; its trim is refused until it is.
 	 */
 	public enum Perk {
-		LIGHTNING("enchantment.bcenchantments.lightning", Perks.LIGHTNING),
-		SHOCKWAVE("enchantment.bcenchantments.shockwave", Perks.SHOCKWAVE),
-		COLD_EDGE("enchantment.bcenchantments.cold_edge", Perks.COLD_EDGE),
-		UPPERCUT("enchantment.bcenchantments.uppercut", Perks.UPPERCUT),
-		CHAINS("enchantment.bcenchantments.chains", Perks.CHAINS),
-		ECHO("enchantment.bcenchantments.echo", Perks.ECHO),
-		WIND_CHARGED("enchantment.bcenchantments.wind_charged", Perks.WIND_CHARGED),
-		GRAVITY("enchantment.bcenchantments.gravity", Perks.GRAVITY),
-		MOMENTUM("enchantment.bcenchantments.momentum", Perks.MOMENTUM),
-		RAMPAGING("enchantment.bcenchantments.rampaging", Perks.RAMPAGING);
+		LIGHTNING(Perks.LIGHTNING, true),
+		SHOCKWAVE(Perks.SHOCKWAVE, true),
+		COLD_EDGE(Perks.COLD_EDGE, true),
+		UPPERCUT(Perks.UPPERCUT, true),
+		CHAINS(Perks.CHAINS, true),
+		ECHO(Perks.ECHO, true),
+		WIND_CHARGED(Perks.WIND_CHARGED, true),
+		GRAVITY(Perks.GRAVITY, true),
+		MOMENTUM(Perks.MOMENTUM, true),
+		RAMPAGING(Perks.RAMPAGING, true),
+		VENOM(Perks.VENOM, false),
+		SANDSTORM(Perks.SANDSTORM, false),
+		PLUNDER(Perks.PLUNDER, false),
+		WITHERING(Perks.WITHERING, false),
+		PHASE(Perks.PHASE, false),
+		SHARED_PAIN(Perks.SHARED_PAIN, false),
+		GUARDING_STRIKE(Perks.GUARDING_STRIKE, false),
+		DAZE(Perks.DAZE, false);
 
-		final String translationKey;
 		final ResourceKey<Enchantment> enchantment;
+		final boolean built;
 
-		Perk(String translationKey, ResourceKey<Enchantment> enchantment) {
-			this.translationKey = translationKey;
+		Perk(ResourceKey<Enchantment> enchantment, boolean built) {
 			this.enchantment = enchantment;
+			this.built = built;
 		}
 
 		public ResourceKey<Enchantment> enchantment() {
 			return this.enchantment;
 		}
+
+		public String id() {
+			return this.enchantment.identifier().getPath();
+		}
+
+		public boolean built() {
+			return this.built;
+		}
+
+		public MutableComponent displayName() {
+			return Component.translatable("enchantment.bcenchantments." + this.id());
+		}
+
+		public static @Nullable Perk of(ResourceKey<Enchantment> key) {
+			for (Perk perk : values()) {
+				if (perk.enchantment.equals(key)) {
+					return perk;
+				}
+			}
+			return null;
+		}
 	}
 
 	/**
-	 * Which power each vanilla trim grants, by its name, its look or the structure it is found in: the
-	 * bolt for Lightning, the breeze's flow for Wind Charged, the warden's ward for Shockwave's sonic
-	 * boom, the eye of ender's pull for Gravity, the ravager-led raids of the sentry for Rampaging.
+	 * Which power each vanilla trim grants, one each, by its name, its look or the structure it is
+	 * found in; {@code POWERS.md} gives the reasons.
 	 */
 	private static final Map<String, Perk> TRIM_PERKS = Map.ofEntries(
 		Map.entry("bolt", Perk.LIGHTNING),
-		Map.entry("flow", Perk.WIND_CHARGED), Map.entry("dune", Perk.WIND_CHARGED),
-		Map.entry("tide", Perk.COLD_EDGE), Map.entry("coast", Perk.COLD_EDGE),
+		Map.entry("flow", Perk.WIND_CHARGED),
+		Map.entry("tide", Perk.COLD_EDGE),
 		Map.entry("silence", Perk.ECHO),
-		Map.entry("ward", Perk.SHOCKWAVE), Map.entry("rib", Perk.SHOCKWAVE),
-		Map.entry("wild", Perk.CHAINS), Map.entry("vex", Perk.CHAINS),
-		Map.entry("eye", Perk.GRAVITY), Map.entry("spire", Perk.GRAVITY),
-		Map.entry("wayfinder", Perk.MOMENTUM), Map.entry("host", Perk.MOMENTUM),
-		Map.entry("snout", Perk.RAMPAGING), Map.entry("sentry", Perk.RAMPAGING),
-		Map.entry("raiser", Perk.UPPERCUT), Map.entry("shaper", Perk.UPPERCUT)
+		Map.entry("ward", Perk.SHOCKWAVE),
+		Map.entry("vex", Perk.CHAINS),
+		Map.entry("eye", Perk.GRAVITY),
+		Map.entry("wayfinder", Perk.MOMENTUM),
+		Map.entry("snout", Perk.RAMPAGING),
+		Map.entry("raiser", Perk.UPPERCUT),
+		Map.entry("wild", Perk.VENOM),
+		Map.entry("dune", Perk.SANDSTORM),
+		Map.entry("coast", Perk.PLUNDER),
+		Map.entry("rib", Perk.WITHERING),
+		Map.entry("spire", Perk.PHASE),
+		Map.entry("host", Perk.SHARED_PAIN),
+		Map.entry("sentry", Perk.GUARDING_STRIKE),
+		Map.entry("shaper", Perk.DAZE)
 	);
 	/** The powers a shield can take from a trim, each working on a blocked hit; see {@code ShieldPowers}. */
 	private static final Set<Perk> SHIELD_PERKS = EnumSet.of(Perk.WIND_CHARGED, Perk.COLD_EDGE);
@@ -133,9 +198,12 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 
 	/**
 	 * What taking the smithing table's result does: the weapon it hands out, how many items it takes
-	 * from the addition slot, and whether it uses up the template.
+	 * from the addition slot, whether it uses up the template, and the experience levels it costs.
 	 */
-	public record Plan(ItemStack result, int additionItems, boolean consumesTemplate, boolean levelUp) {
+	public record Plan(ItemStack result, int additionItems, boolean consumesTemplate, boolean levelUp, int levelCost) {
+		Plan(ItemStack result, int additionItems, boolean consumesTemplate, boolean levelUp) {
+			this(result, additionItems, consumesTemplate, levelUp, 0);
+		}
 	}
 
 	public static void init() {
@@ -182,9 +250,19 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		return TRIM_PERKS.entrySet().stream().filter(entry -> entry.getValue() == perk).map(Map.Entry::getKey).sorted().toList();
 	}
 
+	/** The trim that grants {@code perk}. */
+	public static String trim(Perk perk) {
+		return trims(perk).getFirst();
+	}
+
 	/** The armor trim smithing template item of {@code trim}. */
 	public static Identifier template(String trim) {
 		return Identifier.withDefaultNamespace(trim + TEMPLATE_SUFFIX);
+	}
+
+	/** A trim's name as players read it: {@code bolt} becomes Bolt. */
+	public static String trimName(String trim) {
+		return trim.substring(0, 1).toUpperCase(Locale.ROOT) + trim.substring(1);
 	}
 
 	/** Refinement level of {@code stack}, 0 if it was never refined. */
@@ -193,11 +271,18 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		return refinement == null ? 0 : refinement.level;
 	}
 
+	/** The trim powers on {@code stack}, in the order they were applied. */
+	public static List<Power> powersOf(ItemStack stack) {
+		Refinement refinement = stack.get(COMPONENT);
+		return refinement == null ? List.of() : refinement.powers;
+	}
+
 	public static @Nullable Perk perk(String trim) {
 		return TRIM_PERKS.get(trim);
 	}
 
-	private static @Nullable String trimOf(ItemStack template) {
+	/** The trim of a trim smithing template, or null if {@code template} is none. */
+	public static @Nullable String trimOf(ItemStack template) {
 		String path = BuiltInRegistries.ITEM.getKey(template.getItem()).getPath();
 		if (!path.endsWith(TEMPLATE_SUFFIX)) {
 			return null;
@@ -206,18 +291,53 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		return TRIM_PERKS.containsKey(trim) ? trim : null;
 	}
 
-	public @Nullable Perk perk() {
-		return this.trim.map(Refinement::perk).orElse(null);
+	private @Nullable Power power(Perk perk) {
+		for (Power power : this.powers) {
+			if (power.perk() == perk) {
+				return power;
+			}
+		}
+		return null;
 	}
 
-	/** Level of the power {@code key} granted by the stack's trim refinement, 0 if it grants another or none. */
+	/** Level of the power {@code key} granted by the stack's trims, 0 if it has none. */
 	public static int perkLevel(ItemStack stack, ResourceKey<Enchantment> key) {
-		Refinement refinement = stack.get(COMPONENT);
-		if (refinement == null) {
-			return 0;
+		for (Power power : powersOf(stack)) {
+			Perk perk = power.perk();
+			if (perk != null && key.equals(perk.enchantment)) {
+				return power.level;
+			}
 		}
-		Perk perk = refinement.perk();
-		return perk != null && key.equals(perk.enchantment) ? refinement.perkLevel : 0;
+		return 0;
+	}
+
+	/** Whether the powers {@code a} and {@code b} on {@code stack} are combined with each other. */
+	public static boolean combined(ItemStack stack, ResourceKey<Enchantment> a, ResourceKey<Enchantment> b) {
+		List<Power> powers = powersOf(stack);
+		int first = indexOf(powers, a);
+		int second = indexOf(powers, b);
+		return first >= 0 && second >= 0 && first != second && first / 2 == second / 2;
+	}
+
+	private static int indexOf(List<Power> powers, ResourceKey<Enchantment> key) {
+		for (int i = 0; i < powers.size(); i++) {
+			Perk perk = powers.get(i).perk();
+			if (perk != null && key.equals(perk.enchantment)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/** The power the next trim on {@code stack} would combine with, or null if it would start a new pair. */
+	public static @Nullable Perk unpaired(ItemStack stack) {
+		List<Power> powers = powersOf(stack);
+		return powers.size() % 2 == 1 ? powers.getLast().perk() : null;
+	}
+
+	/** Experience levels the next new power on a weapon holding {@code powers} costs: the first is free. */
+	public static int powerCost(int powers) {
+		return powers == 0 ? 0 : POWER_LEVELS + POWER_LEVELS_STEP * (powers - 1);
 	}
 
 	/**
@@ -240,34 +360,44 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		if (trim == null || current == null || current.level < MAX_LEVEL) {
 			return null;
 		}
-		if (current.trim.isEmpty() && addition.is(Items.ECHO_SHARD)) {
-			Refinement trimmed = current.withPerk(Optional.of(trim), 1);
-			return new Plan(trimmed.applyTo(base), 1, true, true);
+		Perk perk = perk(trim);
+		if (perk == null || !perk.built) {
+			return null;
 		}
-		if (addition.isEmpty() && current.perk() == perk(trim) && current.perkLevel < MAX_PERK) {
-			Refinement raised = current.withPerk(current.trim, current.perkLevel + 1);
-			return new Plan(raised.applyTo(base), 0, true, true);
+		Power owned = current.power(perk);
+		if (owned != null) {
+			// A trim the weapon already has raises its power instead; it never adds the power twice.
+			if (!addition.isEmpty() || owned.level >= MAX_PERK) {
+				return null;
+			}
+			List<Power> raised = new ArrayList<>(current.powers);
+			raised.set(raised.indexOf(owned), new Power(owned.trim, owned.level + 1));
+			return new Plan(current.withPowers(raised).applyTo(base), 0, true, true);
 		}
-		return null;
+		if (!addition.is(Items.ECHO_SHARD)) {
+			return null;
+		}
+		List<Power> added = new ArrayList<>(current.powers);
+		added.add(new Power(trim, 1));
+		return new Plan(current.withPowers(added).applyTo(base), 1, true, true, powerCost(current.powers.size()));
 	}
 
 	/**
 	 * A shield needs no refinement: a trim template of a shield power and an echo shard grant it once,
-	 * and there are no higher levels.
+	 * and there are no higher levels or further powers.
 	 */
 	private static @Nullable Plan shieldPlan(ItemStack template, ItemStack base, ItemStack addition) {
 		String trim = trimOf(template);
-		Refinement current = base.get(COMPONENT);
-		if (trim == null || !onShield(perk(trim)) || current != null && current.trim.isPresent() || !addition.is(Items.ECHO_SHARD)) {
+		if (trim == null || !onShield(perk(trim)) || !powersOf(base).isEmpty() || !addition.is(Items.ECHO_SHARD)) {
 			return null;
 		}
 		ItemStack result = base.copyWithCount(1);
-		result.set(COMPONENT, new Refinement(0, 0, 0, 0.0F, 0.0F, 0.0F, 0.0F, Optional.of(trim), 1));
+		result.set(COMPONENT, new Refinement(0, 0, 0, 0.0F, 0.0F, 0.0F, 0.0F, List.of(new Power(trim, 1))));
 		return new Plan(result, 1, true, true);
 	}
 
 	private static Refinement fresh(int seed, Item item) {
-		return new Refinement(0, 0, rollCost(0, random(seed, item, 0)), 0.0F, 0.0F, 0.0F, 0.0F, Optional.empty(), 0);
+		return new Refinement(0, 0, rollCost(0, random(seed, item, 0)), 0.0F, 0.0F, 0.0F, 0.0F, List.of());
 	}
 
 	private Plan pay(ItemStack base, ItemStack addition, int seed) {
@@ -276,7 +406,7 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		int items = Math.min(addition.getCount(), Mth.positiveCeilDiv(needed, value));
 		int paid = this.gems + items * value;
 		if (paid < this.cost) {
-			Refinement partial = new Refinement(this.level, paid, this.cost, this.damage, this.attackSpeed, this.critChance, this.critDamage, this.trim, this.perkLevel);
+			Refinement partial = new Refinement(this.level, paid, this.cost, this.damage, this.attackSpeed, this.critChance, this.critDamage, this.powers);
 			return new Plan(partial.applyTo(base), items, false, false);
 		}
 
@@ -295,12 +425,12 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		// Gems paid past the cost carry over; the last level has nothing to carry them into.
 		int carried = next < MAX_LEVEL ? paid - this.cost : 0;
 		int cost = next < MAX_LEVEL ? rollCost(next, random) : 0;
-		Refinement raised = new Refinement(next, carried, cost, damage, attackSpeed, critChance, critDamage, this.trim, this.perkLevel);
+		Refinement raised = new Refinement(next, carried, cost, damage, attackSpeed, critChance, critDamage, this.powers);
 		return new Plan(raised.applyTo(base), items, false, true);
 	}
 
-	private Refinement withPerk(Optional<String> trim, int perkLevel) {
-		return new Refinement(this.level, this.gems, this.cost, this.damage, this.attackSpeed, this.critChance, this.critDamage, trim, perkLevel);
+	private Refinement withPowers(List<Power> powers) {
+		return new Refinement(this.level, this.gems, this.cost, this.damage, this.attackSpeed, this.critChance, this.critDamage, powers);
 	}
 
 	private static RandomSource random(int seed, Item item, int level) {
@@ -362,27 +492,39 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		}
 	}
 
-	/** The refinement's tooltip lines, placed under the item's name. */
-	public static void tooltip(ItemStack stack, List<Component> lines) {
+	/**
+	 * The refinement's tooltip lines, placed under the item's name. {@code details} adds each trim
+	 * power's description and how to raise it.
+	 */
+	public static void tooltip(ItemStack stack, List<Component> lines, boolean details) {
 		Refinement refinement = stack.get(COMPONENT);
 		if (refinement == null || lines.isEmpty()) {
 			return;
 		}
 		List<Component> added = new ArrayList<>();
-		Perk perk = refinement.perk();
-		if (perk != null) {
-			String trim = refinement.trim.get();
-			String name = trim.substring(0, 1).toUpperCase(Locale.ROOT) + trim.substring(1);
-			added.add(Component.translatable("refinement.bcenchantments.trimmed", name).withStyle(ChatFormatting.GRAY));
-			if (isShield(stack)) {
-				added.add(Component.literal(" ").append(Component.translatable(perk.translationKey)).withStyle(ChatFormatting.GRAY));
-				added.add(hint(Component.translatable("refinement.bcenchantments.shield." + perk.enchantment.identifier().getPath())));
-			} else {
-				added.add(Component.literal(" ").append(Component.translatable(perk.translationKey)).append(" ")
-					.append(Component.translatable("enchantment.level." + refinement.perkLevel)).withStyle(ChatFormatting.GRAY));
+		if (isShield(stack) && !refinement.powers.isEmpty()) {
+			Power power = refinement.powers.getFirst();
+			Perk perk = power.perk();
+			if (perk != null) {
+				added.add(Component.translatable("refinement.bcenchantments.trimmed", trimName(power.trim)).withStyle(ChatFormatting.GRAY));
+				added.add(Component.literal(" ").append(perk.displayName()).withStyle(ChatFormatting.GRAY));
+				added.add(hint(Component.translatable("refinement.bcenchantments.shield." + perk.id())));
 			}
-			if (refinement.perkLevel < MAX_PERK && isWeapon(stack)) {
-				added.add(hint(Component.translatable("refinement.bcenchantments.upgrade", name)));
+		} else if (!refinement.powers.isEmpty()) {
+			added.add(Component.translatable("refinement.bcenchantments.powers").withStyle(ChatFormatting.GRAY));
+			for (Power power : refinement.powers) {
+				Perk perk = power.perk();
+				if (perk == null) {
+					continue;
+				}
+				added.add(Component.literal(" ").append(perk.displayName()).append(" ")
+					.append(Component.translatable("enchantment.level." + power.level)).withStyle(ChatFormatting.GRAY));
+				if (details) {
+					Synergy.describe("tooltip.bcenchantments.power." + perk.id(), added);
+					if (power.level < MAX_PERK) {
+						added.add(hint(Component.translatable("refinement.bcenchantments.upgrade", trimName(power.trim))));
+					}
+				}
 			}
 		} else if (refinement.level >= MAX_LEVEL) {
 			added.add(level(refinement.level));

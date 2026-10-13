@@ -20,7 +20,11 @@ It does this when the item has a tuned `critical_hit` clip, because Punchy reads
 ## Debt
 
 **The trim → power remap changes existing items.**
-Trims store their name, not their power, so weapons trimmed before a remap grant the new power (2026-10-13: spire, eye, wayfinder, ward, rib, snout, sentry, host moved).
+Trims store their name, not their power, so weapons trimmed before a remap grant the new power. Since the one-power-per-trim remap, dune, coast, rib, spire, host, sentry, shaper and wild grant draft powers that do nothing yet.
+
+**Power enchantments still exist in the registry.** Their JSONs stay so items saved with them still load; they apply to no item (`#bcenchantments:none`), are in no enchanting, loot or trade tag, are hidden from the creative menu (`client/PowerTooltips`), and `Perks.level` ignores them. `/give` or `/enchant` can still make one.
+
+**137 of 153 pairs have no built combination yet.** Such a pair still locks both powers.
 
 **A mace with Uppercut launches on every grounded hit.**
 

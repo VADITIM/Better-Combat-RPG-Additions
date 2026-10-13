@@ -2,7 +2,7 @@
 	"description": {
 		"translate": "enchantment.bcenchantments.uppercut"
 	},
-	"supported_items": "#bcenchantments:uppercut_weapons",
+	"supported_items": "#bcenchantments:none",
 	"weight": 3,
 	"max_level": 3,
 	"min_cost": {

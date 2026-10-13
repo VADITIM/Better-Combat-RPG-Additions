@@ -2,8 +2,7 @@
 	"description": {
 		"translate": "enchantment.bcenchantments.attack_speed"
 	},
-	"supported_items": "#minecraft:enchantable/sharp_weapon",
-	"primary_items": "#minecraft:enchantable/melee_weapon",
+	"supported_items": "#bcenchantments:none",
 	"weight": 5,
 	"max_level": 5,
 	"min_cost": {

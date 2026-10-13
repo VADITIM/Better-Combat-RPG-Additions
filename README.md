@@ -5,11 +5,10 @@ A Fabric mod for Minecraft 26.2 that layers a combat RPG onto vanilla, built on
 
 - **Weapon playstyles**: each weapon kind plays its own way, with its own attacks and animations
   (the spear's four-stab combo, the sword's air crit and uppercut).
-- **Trim Powers**, Dungeons-style: Lightning, Shockwave, Chains, Echo, Cold Edge, Uppercut, Wind Charged,
-  Gravity, Momentum and Rampaging,
+- **Trim Powers**, Dungeons-style: one power for each of the 18 armor trims, combining in pairs,
   reworked from Minecraft Dungeons enchantments.
-- **Vanilla-friendly progression**: refine weapons at the smithing table with emeralds, then turn a
-  finished weapon's trim and an echo shard into a power. Shields take a few powers too.
+- **Vanilla-friendly progression**: refine weapons at the smithing table with emeralds, then add trims
+  and echo shards to a finished weapon for its powers. Shields take a few powers too.
 - **Harder hack-and-slash PvE**: more monsters, softer single hits that ramp up when they keep
   landing, and subtle hidden stat buffs that grow with the player's weapon power.
 
@@ -22,25 +21,28 @@ right slot, with the template slot empty. There are five levels, about 500 emera
 adds attack speed (+0.1 per level, +0.5 at level 5) and one small random boost (damage, critical chance or
 critical damage).
 
-**Powers** are enchantments, from the enchanting table, loot and villagers, and every one can also come from a trim. Lightning, Shockwave, Chains
-and Echo charge over a combo and show as bars under the crosshair; the rest work on every hit.
+**Powers** come only from trims: every armor trim grants its own power on a weapon. Lightning,
+Shockwave, Chains and Echo charge over a combo and show as bars under the crosshair; the rest work on
+every hit.
 
 **Trim Powers.** A weapon at refinement level 5 takes an armor trim template and an echo shard at the
-smithing table and gains that trim's power at level 1. Another template of the same trim, without a
-shard, raises it to 2 and then 3.
+smithing table and gains that trim's power at level 1. A different trim and an echo shard add another
+power for experience levels (20 for the second, 10 more for each after). The same trim again, without a
+shard, raises its power to 2 and then 3. A weapon holds any number of powers.
 
-| Power | Trims |
-|---|---|
-| Lightning | bolt |
-| Wind Charged | flow, dune |
-| Cold Edge | tide, coast |
-| Echo | silence |
-| Shockwave | ward, rib |
-| Chains | wild, vex |
-| Gravity | eye, spire |
-| Momentum | wayfinder, host |
-| Rampaging | snout, sentry |
-| Uppercut | raiser, shaper |
+| Power | Trim | | Power | Trim |
+|---|---|---|---|---|
+| Lightning | bolt | | Uppercut | raiser |
+| Wind Charged | flow | | Venom* | wild |
+| Cold Edge | tide | | Sandstorm* | dune |
+| Echo | silence | | Plunder* | coast |
+| Shockwave | ward | | Withering* | rib |
+| Chains | vex | | Phase* | spire |
+| Gravity | eye | | Shared Pain* | host |
+| Momentum | wayfinder | | Guarding Strike* | sentry |
+| Rampaging | snout | | Daze* | shaper |
+
+\* Designed, not in the game yet; their trims are refused until they are.
 
 **Shield powers.** A shield needs no refinement: a trim template, the shield and an echo shard. Only
 a few powers work on a shield, at one level:
@@ -50,8 +52,10 @@ a few powers work on a shield, at one level:
 | Wind Charged | A gust throws back everything in front of the shield at 30% of a wind charge's strength; every 30 s |
 | Cold Edge | The attacker, if close, is chilled hard; every 10 s |
 
-**Combining powers.** Powers on the same weapon change each other; a trim power counts as well. Active
-combinations show in gold in the tooltip.
+**Combining powers.** Every two powers have a combination. Powers pair up in the order they were put on
+(1st with 2nd, 3rd with 4th, …), and a power already in a combination is locked out of every other. At
+the smithing table, hovering a refined weapon lists what its next trim would make. Active combinations
+show in gold in the tooltip; hold Shift for descriptions. The built ones:
 
 | Combination | Powers | Effect |
 |---|---|---|

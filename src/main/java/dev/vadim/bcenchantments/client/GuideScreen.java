@@ -17,7 +17,6 @@ import net.minecraft.client.gui.screens.inventory.SmithingScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -28,8 +27,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -220,10 +217,13 @@ public final class GuideScreen extends Screen {
 	private List<Block> perks() {
 		List<Block> blocks = new ArrayList<>();
 		blocks.add(new Paragraph(text("perks.intro")));
-		for (ResourceKey<Enchantment> perk : Perks.ALL) {
-			String id = perk.identifier().getPath();
-			boolean charged = Perks.CHARGED.stream().anyMatch(charge -> charge.enchantment() == perk);
-			blocks.add(new Entry(List.of(book(perk)), Component.translatable("enchantment.bcenchantments." + id),
+		for (Refinement.Perk perk : Refinement.Perk.values()) {
+			if (!perk.built()) {
+				continue;
+			}
+			String id = perk.id();
+			boolean charged = Perks.CHARGED.stream().anyMatch(charge -> charge.enchantment() == perk.enchantment());
+			blocks.add(new Entry(List.of(icon(perk.enchantment())), perk.displayName(),
 				Theme.perkColor(id), charged ? text("perks.charged") : null, text("perk." + id), List.of()));
 		}
 		return blocks;
@@ -236,14 +236,14 @@ public final class GuideScreen extends Screen {
 		List<Block> blocks = new ArrayList<>();
 		blocks.add(new Recipe(template, sword, new ItemStack(Items.ECHO_SHARD), sword, text("trims.first")));
 		blocks.add(new Recipe(template, sword, ItemStack.EMPTY, sword, text("trims.raise")));
+		blocks.add(new Recipe(item(Refinement.template("flow")), sword, new ItemStack(Items.ECHO_SHARD), sword, text("trims.combine")));
 		blocks.add(new Paragraph(text("trims.which")));
 		for (Refinement.Perk perk : Refinement.Perk.values()) {
-			List<String> trims = Refinement.trims(perk);
-			List<ItemStack> templates = trims.stream().map(trim -> item(Refinement.template(trim))).toList();
-			String id = perk.enchantment().identifier().getPath();
-			String names = String.join(", ", trims.stream().map(trim -> trim.substring(0, 1).toUpperCase(Locale.ROOT) + trim.substring(1)).toList());
-			blocks.add(new Entry(List.of(book(perk.enchantment())), Component.translatable("enchantment.bcenchantments." + id),
-				Theme.perkColor(id), null, Component.literal(names), templates));
+			String trim = Refinement.trim(perk);
+			String id = perk.id();
+			Component subtitle = perk.built() ? null : text("trims.coming");
+			blocks.add(new Entry(List.of(item(Refinement.template(trim))), perk.displayName(),
+				Theme.perkColor(id), subtitle, Component.literal(Refinement.trimName(trim)), List.of()));
 		}
 		ItemStack shield = new ItemStack(Items.SHIELD);
 		ItemStack trimmedShield = shield.copy();
@@ -266,7 +266,7 @@ public final class GuideScreen extends Screen {
 		List<Block> blocks = new ArrayList<>();
 		blocks.add(new Paragraph(text("combining.intro")));
 		for (Synergy synergy : Synergy.values()) {
-			List<ItemStack> books = new ArrayList<>(synergy.perks().stream().map(this::book).toList());
+			List<ItemStack> books = new ArrayList<>(synergy.perks().stream().map(this::icon).toList());
 			List<String> names = new ArrayList<>(synergy.perks().stream()
 				.map(perk -> Component.translatable("enchantment.bcenchantments." + perk.identifier().getPath()).getString()).toList());
 			if (synergy.refined()) {
@@ -290,14 +290,10 @@ public final class GuideScreen extends Screen {
 		return item == Items.AIR ? ItemStack.EMPTY : new ItemStack(item);
 	}
 
-	/** An enchanted book holding {@code perk}, or a plain one if the world does not know it. */
-	private ItemStack book(ResourceKey<Enchantment> perk) {
-		if (minecraft == null || minecraft.level == null) {
-			return new ItemStack(Items.ENCHANTED_BOOK);
-		}
-		return minecraft.level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(perk)
-			.map(holder -> EnchantmentHelper.createBook(new EnchantmentInstance(holder, 1)))
-			.orElseGet(() -> new ItemStack(Items.ENCHANTED_BOOK));
+	/** The trim template that grants {@code perk}. */
+	private ItemStack icon(ResourceKey<Enchantment> perk) {
+		Refinement.Perk power = Refinement.Perk.of(perk);
+		return power == null ? new ItemStack(Items.ENCHANTED_BOOK) : item(Refinement.template(Refinement.trim(power)));
 	}
 
 	@Override

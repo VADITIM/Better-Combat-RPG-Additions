@@ -6,17 +6,16 @@ import dev.vadim.bcenchantments.progression.Refinement;
 import java.util.List;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 /**
- * The Dungeons-style perks. Each is a data-driven enchantment ({@code data/bcenchantments/enchantment})
- * that a trim refinement can grant as well; the code behind it registers its own hooks in {@link #init}.
- * A new perk needs its enchantment JSON, a key here, a line in {@link #ALL}, and its hooks. Perks
+ * The Dungeons-style perks, shown to players as Trim Powers. Each comes only from a trim (see
+ * {@link Refinement}); the keys still name enchantments so old items and the registry agree, but no
+ * book of one can be had. The code behind each registers its own hooks in {@link #init}. A new perk
+ * needs a key here, a line in {@link #ALL}, a {@link Refinement.Perk} with its trim, and its hooks. Perks
  * that change each other on the same weapon are listed in {@link Synergy}.
  */
 public final class Perks {
@@ -30,8 +29,17 @@ public final class Perks {
 	public static final ResourceKey<Enchantment> GRAVITY = key("gravity");
 	public static final ResourceKey<Enchantment> MOMENTUM = key("momentum");
 	public static final ResourceKey<Enchantment> RAMPAGING = key("rampaging");
+	// Designed, not built yet: their trims are refused until they are (Refinement.Perk#built).
+	public static final ResourceKey<Enchantment> VENOM = key("venom");
+	public static final ResourceKey<Enchantment> SANDSTORM = key("sandstorm");
+	public static final ResourceKey<Enchantment> PLUNDER = key("plunder");
+	public static final ResourceKey<Enchantment> WITHERING = key("withering");
+	public static final ResourceKey<Enchantment> PHASE = key("phase");
+	public static final ResourceKey<Enchantment> SHARED_PAIN = key("shared_pain");
+	public static final ResourceKey<Enchantment> GUARDING_STRIKE = key("guarding_strike");
+	public static final ResourceKey<Enchantment> DAZE = key("daze");
 
-	/** Every perk, for anything that weighs how strong a weapon is. */
+	/** Every built perk, for anything that weighs how strong a weapon is. */
 	public static final List<ResourceKey<Enchantment>> ALL = List.of(LIGHTNING, SHOCKWAVE, COLD_EDGE, UPPERCUT, CHAINS, ECHO, WIND_CHARGED,
 		GRAVITY, MOMENTUM, RAMPAGING);
 
@@ -65,17 +73,13 @@ public final class Perks {
 		return ResourceKey.create(Registries.ENCHANTMENT, RpgAdditions.id(name));
 	}
 
-	/** Level of {@code key} on {@code stack}, counting a trim refinement's power, read from its components so it works on either side without a registry lookup. */
+	/**
+	 * Level of {@code key} on {@code stack}, from its trims, read from its components so it works on
+	 * either side without a registry lookup. Powers come only from trims: an old enchantment of one
+	 * left on an item counts for nothing.
+	 */
 	public static int level(ItemStack stack, ResourceKey<Enchantment> key) {
-		// A trim refinement grants its power as if the weapon were enchanted with it; the higher of the two counts.
-		int level = Refinement.perkLevel(stack, key);
-		ItemEnchantments enchantments = stack.getEnchantments();
-		for (Holder<Enchantment> holder : enchantments.keySet()) {
-			if (holder.is(key)) {
-				return Math.max(level, enchantments.getLevel(holder));
-			}
-		}
-		return level;
+		return Refinement.perkLevel(stack, key);
 	}
 
 	/** Sum of every perk's level on {@code stack}: 0 for a plain weapon. */

@@ -36,6 +36,10 @@ This project uses V/AS (base register), cut down for a game. The user's rules be
 
 - No soft or feathered shadows.
 
+## Tooltip details
+
+Holding Shift shows a short description under a weapon's trim power and each combination (`tooltip.bcenchantments.power.*` / `.synergy.*`, split on `\n`). Keep each line under about 40 characters; a new power or combination needs one.
+
 ## Field Guide
 
 The smithing table's **?** button opens `client/GuideScreen`. Update it whenever a power, trim, recipe or combination changes, along with `lang/en_us.json`, `README.md` and `docs/POWERS.md`.

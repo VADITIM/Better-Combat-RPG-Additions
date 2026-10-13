@@ -9,11 +9,13 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Named combinations: perks on the same weapon that change each other. Each one is active when the
- * weapon has every perk it lists, at any level, and is fully refined if it asks for that; the perks
- * check for it where they behave differently.
+ * Named combinations: perks on the same weapon that change each other. A pair is active when its two
+ * powers are combined with each other on the weapon (see {@link Refinement}: powers pair up in the
+ * order they were applied); Frenzy only needs Echo on a fully refined weapon. The perks check for it
+ * where they behave differently.
  * <ul>
  * <li>Chained Lightning: Chains strikes the enemies it would bind with half-power lightning and roots them briefly.</li>
  * <li>Charged Lightning: Lightning bursts like a wind charge where it strikes.</li>
@@ -64,16 +66,33 @@ public enum Synergy {
 		this.perks = List.of(perks);
 	}
 
+	/**
+	 * Whether the combination is active on {@code stack}: for a pair, its two powers must be combined
+	 * with each other there, which a power already combined with another can no longer be.
+	 */
 	public boolean on(ItemStack stack) {
-		if (this.refined && Refinement.levelOf(stack) < Refinement.MAX_LEVEL) {
+		if (stack.isEmpty() || this.refined && Refinement.levelOf(stack) < Refinement.MAX_LEVEL) {
 			return false;
+		}
+		if (this.perks.size() == 2) {
+			return Refinement.combined(stack, this.perks.get(0), this.perks.get(1));
 		}
 		for (ResourceKey<Enchantment> perk : this.perks) {
 			if (Perks.level(stack, perk) <= 0) {
 				return false;
 			}
 		}
-		return !stack.isEmpty();
+		return true;
+	}
+
+	/** The pair combination of {@code a} and {@code b}, or null if they have none yet. */
+	public static @Nullable Synergy of(ResourceKey<Enchantment> a, ResourceKey<Enchantment> b) {
+		for (Synergy synergy : values()) {
+			if (synergy.perks.size() == 2 && synergy.perks.contains(a) && synergy.perks.contains(b) && !a.equals(b)) {
+				return synergy;
+			}
+		}
+		return null;
 	}
 
 	public String id() {
@@ -93,8 +112,12 @@ public enum Synergy {
 		return Component.translatable("synergy.bcenchantments." + this.name);
 	}
 
-	/** The weapon's active synergies as tooltip lines, placed under the item's name. */
-	public static void tooltip(ItemStack stack, List<Component> lines) {
+	/**
+	 * The weapon's active synergies as tooltip lines, placed under the item's name. With
+	 * {@code details} each gets its short description; without, a weapon with a trim power or a
+	 * synergy gets a hint that Shift shows them.
+	 */
+	public static void tooltip(ItemStack stack, List<Component> lines, boolean details) {
 		if (lines.isEmpty()) {
 			return;
 		}
@@ -102,8 +125,22 @@ public enum Synergy {
 		for (Synergy synergy : values()) {
 			if (synergy.on(stack)) {
 				added.add(synergy.displayName().withStyle(ChatFormatting.GOLD));
+				if (details) {
+					describe("tooltip.bcenchantments.synergy." + synergy.name, added);
+				}
 			}
 		}
+		boolean trimPower = Refinement.isWeapon(stack) && !Refinement.powersOf(stack).isEmpty();
+		if (!details && (trimPower || !added.isEmpty())) {
+			added.add(Component.translatable("tooltip.bcenchantments.shift").withStyle(ChatFormatting.DARK_GRAY));
+		}
 		lines.addAll(1, added);
+	}
+
+	/** The description under {@code key} as indented tooltip lines, one per line of the translation. */
+	public static void describe(String key, List<Component> into) {
+		for (String line : Component.translatable(key).getString().split("\n")) {
+			into.add(Component.literal("  " + line).withStyle(ChatFormatting.DARK_GRAY));
+		}
 	}
 }
