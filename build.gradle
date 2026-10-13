@@ -2,6 +2,10 @@ plugins {
 	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 }
 
+base {
+	archivesName = 'trim-enchantments'
+}
+
 repositories {
 	maven { url = 'https://api.modrinth.com/maven' }
 }

@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.progression.Refinement;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -88,8 +89,8 @@ public final class ShieldPowers {
 			entity.setDeltaMovement(motion.x + push.x, Math.max(motion.y, WIND_LIFT), motion.z + push.z);
 			entity.hurtMarked = true;
 		}
-		world.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, front.x, front.y, front.z, 1, 0.0, 0.0, 0.0, 0.0);
-		world.sendParticles(ParticleTypes.GUST, front.x, front.y, front.z, 6, 0.6, 0.4, 0.6, 0.0);
+		Particles.send(world, ParticleTypes.GUST_EMITTER_SMALL, front.x, front.y, front.z, 1, 0.0, 0.0, 0.0, 0.0);
+		Particles.send(world, ParticleTypes.GUST, front.x, front.y, front.z, 6, 0.6, 0.4, 0.6, 0.0);
 		world.playSound((Entity) null, front.x, front.y, front.z, SoundEvents.WIND_CHARGE_BURST, SoundSource.PLAYERS, 0.8F, 1.2F);
 	}
 }

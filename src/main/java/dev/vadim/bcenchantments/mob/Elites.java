@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.mob;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.TrimEnchantments;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -154,7 +155,7 @@ public final class Elites {
 			}
 			Affix affix = affix(mob);
 			if (affix != null) {
-				world.sendParticles(affix.particle, mob.getX(), mob.getY() + mob.getBbHeight() * 0.6, mob.getZ(), 2, 0.25, 0.35, 0.25, 0.0);
+				Particles.send(world, affix.particle, mob.getX(), mob.getY() + mob.getBbHeight() * 0.6, mob.getZ(), 2, 0.25, 0.35, 0.25, 0.0);
 			}
 			if (mob.entityTags().contains(CAPTAIN)) {
 				rally(world, mob);

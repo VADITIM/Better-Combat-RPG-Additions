@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.SwingResult;
 import java.util.function.Predicate;
 import net.minecraft.core.particles.ParticleTypes;
@@ -62,7 +63,7 @@ public final class Gravity {
 			}
 		}
 		if (pulled && loud) {
-			world.sendParticles(ParticleTypes.PORTAL, center.x, center.y + 0.8, center.z, 16, 0.3, 0.4, 0.3, 0.6);
+			Particles.send(world, ParticleTypes.PORTAL, center.x, center.y + 0.8, center.z, 16, 0.3, 0.4, 0.3, 0.6);
 			world.playSound((Entity) null, center.x, center.y, center.z, SoundEvents.ENDER_EYE_DEATH, SoundSource.PLAYERS, 0.6F, 0.6F);
 		}
 	}
@@ -76,7 +77,7 @@ public final class Gravity {
 		Vec3 motion = toward.normalize().scale(speed);
 		enemy.setDeltaMovement(motion.x, Math.max(enemy.getDeltaMovement().y, 0.1), motion.z);
 		enemy.hurtMarked = true;
-		world.sendParticles(ParticleTypes.REVERSE_PORTAL, enemy.getX(), enemy.getY(0.5), enemy.getZ(), 6, 0.2, 0.3, 0.2, 0.05);
+		Particles.send(world, ParticleTypes.REVERSE_PORTAL, enemy.getX(), enemy.getY(0.5), enemy.getZ(), 6, 0.2, 0.3, 0.2, 0.05);
 		return true;
 	}
 }

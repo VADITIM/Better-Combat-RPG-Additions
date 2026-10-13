@@ -196,6 +196,11 @@ public final class ComboHud implements HudElement {
 		updatedAt = now;
 	}
 
+	/** Whether the player's combo is running, which keeps enemies' combo damage trails up. */
+	public static boolean comboActive() {
+		return combo > 0;
+	}
+
 	/** Ends the combo; {@code miss} when a swing missed rather than the window running out. */
 	private static void breakCombo(long now, boolean miss) {
 		brokenCombo = combo;

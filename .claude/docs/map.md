@@ -6,15 +6,15 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 
 | Folder | Purpose | Entry points |
 |---|---|---|
-| `/` | Mod entry: wires every system's `init` | `TrimEnchantments` |
-| `client/` | Client entry; the HUD, settings, Field Guide and Punchy clips | `TrimEnchantmentsClient`, `ComboHud`, `HudSettingsScreen`, `GuideScreen`, `Theme`, `PunchyClips`, `PunchySpear` |
+| `/` | Mod entry: wires every system's `init`; every mod particle goes through `Particles.send` | `TrimEnchantments`, `Particles` |
+| `client/` | Client entry; the HUD, settings, Field Guide and Punchy clips | `TrimEnchantmentsClient`, `ComboHud`, `EnemyHealthBars` (health bars pinned beside hurt enemies), `HudSettingsScreen`, `ForgeScreen` (weapon forge for testing), `GuideScreen`, `SmithingPanel` (the info window left of the smithing table, toggled like the recipe book), `Theme`, `PunchyClips`, `PunchySpear`, `UpdraftInput` (right click for Updraft's air move), `ParticleFilter` (minimal particles) |
 | `combat/` | Server swing tracking, hooks, rolled crits, the Better Combat switch | `ComboTracker`, `CombatHooks`, `CriticalHits`, `BetterCombatSwitch` |
-| `perk/` | Every power, the combinations and the shield powers | `Perks` (registration), `Synergy`, `ShieldPowers`, one class per power |
-| `progression/` | Refinement, trim powers and their pairing at the smithing table | `Refinement` |
+| `perk/` | Every power, the combinations and the shield powers | `Perks` (registration), `Synergy`, `ShieldPowers`, one class per power; `Updraft` (the right-click air moves) and `MaceTempest` for combinations that need their own |
+| `progression/` | Refinement, trim powers and their pairing at the smithing table | `Refinement`, `Forge` (testing shortcut: server side of the weapon forge) |
 | `weapon/` | How each weapon kind plays | `WeaponStyles` (registry), `SwordStyle`, `SpearStyle`, `MaceStyle` |
 | `mob/` | The monster overhaul | `MobBalance` (all numbers), `MobScaling`, `Omen` (ominous difficulty and loot), `Elites` (elites and captains), `Place` (spawn-spot multiplier), `HitChain`, `SpawnDensity` |
 | `vanilla/` | Reworked vanilla enchantments | `FireAspect` |
-| `network/` | Server-to-client payloads | `ComboHudPayload`, `CritRollPayload` |
+| `network/` | Payloads | `ComboHudPayload`, `CritRollPayload`, `ParticlePayload`; client to server: `ForgePayload`, `AirMovePayload` |
 | `mixin/` | Hooks into vanilla and Better Combat | listed in `bcenchantments.mixins.json` |
 | `mixin/punchy/` | `@Pseudo` hooks into Punchy, client only | listed in `bcenchantments.punchy.mixins.json` |
 
@@ -53,5 +53,6 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 | A combination | `perk/Synergy`, then the class it affects, then `synergy.*.desc` in the lang file |
 | Monster numbers | `mob/MobBalance` |
 | An attack, combo or animation | `weapon/`, `weapon_attributes`, `tools/animations.py`; follow `rules/animations.md` |
-| HUD look | `client/Theme`, `client/ComboHud` |
+| HUD look | `client/Theme`, `client/ComboHud`, `client/EnemyHealthBars` |
 | Field Guide pages | `client/GuideScreen`, `guide.*` lang keys |
+| Smithing side panel (stats, next step, possible combinations) | `client/SmithingPanel`, `panel.*` lang keys; drawn, laid out and toggled from `mixin/SmithingScreenMixin` |

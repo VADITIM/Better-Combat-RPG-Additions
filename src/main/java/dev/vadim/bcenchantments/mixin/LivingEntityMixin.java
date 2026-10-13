@@ -1,11 +1,14 @@
 package dev.vadim.bcenchantments.mixin;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import dev.vadim.bcenchantments.combat.ComboTracker;
 import dev.vadim.bcenchantments.mob.MobScaling;
 import dev.vadim.bcenchantments.perk.ShieldPowers;
+import dev.vadim.bcenchantments.perk.Updraft;
 import dev.vadim.bcenchantments.weapon.WeaponStyles;
 import net.bettercombat.api.AttackHand;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * Scales the knockback of a swing's hits by its weapon style, such as the spear's: none for the stabs,
  * a hard push for the heavy thrust. Also keeps scaled monsters dying to the same falls as before, and
- * sets off a trimmed shield's power when it blocks a hit.
+ * sets off a trimmed shield's power when it blocks a hit, and keeps Lunge on the ground unless Updraft
+ * launched the player.
  */
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
@@ -43,6 +47,13 @@ public abstract class LivingEntityMixin {
 	@ModifyVariable(method = "hurtServer", at = @At("HEAD"), argsOnly = true)
 	private float bcenchantments$scaledFall(float amount, ServerLevel level, DamageSource source) {
 		return MobScaling.fallDamage((LivingEntity) (Object) this, source, amount);
+	}
+
+	/** No Lunge in the air, except after an Updraft launch. */
+	@WrapWithCondition(method = "postPiercingAttack", at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;doPostPiercingAttackEffects(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)V"))
+	private boolean bcenchantments$groundedLunge(ServerLevel level, LivingEntity entity) {
+		return !(entity instanceof ServerPlayer player) || Updraft.lungeAllowed(player);
 	}
 
 	@Inject(method = "applyItemBlocking", at = @At("HEAD"))

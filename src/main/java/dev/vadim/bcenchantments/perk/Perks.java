@@ -7,6 +7,7 @@ import java.util.List;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -54,6 +55,8 @@ public final class Perks {
 		CombatHooks.onDirectHit(ColdEdge::onDirectHit);
 		CombatHooks.onServerTick(ColdEdge::tick);
 		CombatHooks.onSwing(Uppercut::onSwing);
+		Updraft.init();
+		CombatHooks.onServerTick(Updraft::tick);
 		CombatHooks.onServerTick(Shockwave::tick);
 		CombatHooks.onServerTick(Control::tick);
 		CombatHooks.onServerTick(Impact::tick);
@@ -67,6 +70,8 @@ public final class Perks {
 		CombatHooks.onKill(Rampaging::onKill);
 		CombatHooks.onServerTick(Rampaging::tick);
 		ServerLivingEntityEvents.AFTER_DAMAGE.register(MaceTempest::afterDamage);
+		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) ->
+			!(entity instanceof ServerPlayer player && (Updraft.forgivesFall(player, source) || Uppercut.forgivesFall(player, source))));
 	}
 
 	private static ResourceKey<Enchantment> key(String name) {

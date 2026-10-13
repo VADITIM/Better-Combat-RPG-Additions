@@ -36,12 +36,6 @@ public final class Control {
 		hold(target, ticks);
 	}
 
-	/** Lets {@code target} rise for {@code riseTicks}, then hangs it in the air, stunned, for {@code hangTicks}. */
-	static void suspend(LivingEntity target, int riseTicks, int hangTicks) {
-		Hold hold = hold(target, riseTicks + hangTicks);
-		hold.hangFrom = now + riseTicks;
-	}
-
 	private static Hold hold(LivingEntity target, int ticks) {
 		Hold hold = HELD.computeIfAbsent(target, t -> new Hold());
 		hold.until = Math.max(hold.until, now + ticks);

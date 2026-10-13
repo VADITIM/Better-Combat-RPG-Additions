@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.CombatHooks;
 import dev.vadim.bcenchantments.combat.ComboTracker;
 import dev.vadim.bcenchantments.combat.SwingResult;
@@ -91,8 +92,8 @@ public final class Echo implements ChargedPerk {
 			if (target.hurtServer(world, world.damageSources().playerAttack(player), damage)) {
 				struck.add(target);
 			}
-			world.sendParticles(ParticleTypes.SCULK_CHARGE_POP, target.getX(), target.getY(0.5), target.getZ(), 8, 0.3, 0.4, 0.3, 0.02);
-			world.sendParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getY(0.5), target.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
+			Particles.send(world, ParticleTypes.SCULK_CHARGE_POP, target.getX(), target.getY(0.5), target.getZ(), 8, 0.3, 0.4, 0.3, 0.02);
+			Particles.send(world, ParticleTypes.SWEEP_ATTACK, target.getX(), target.getY(0.5), target.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
 		}
 		if (resonance > 0.0F && swing.primary().isAlive()) {
 			Lightning.strike(player, swing.weapon(), swing.primary(), resonance);

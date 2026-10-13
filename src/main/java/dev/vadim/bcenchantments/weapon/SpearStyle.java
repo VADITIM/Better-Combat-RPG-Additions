@@ -12,8 +12,9 @@ import net.minecraft.world.item.ItemStack;
  * two fast stabs from the right and the left, a centred stab a little later, and a heavy thrust
  * from above. Better Combat gives every swing of a weapon the same length, so each stab scales the
  * attack cooldown here instead; the fast stabs are cheaper and the heavy one costs the most. Their
- * damage multipliers even it out to about the weapon's normal damage per second. Only the heavy thrust
- * knocks back, harder than a normal hit, and it is the spear's launcher for Uppercut.
+ * damage multipliers even it out to about the weapon's normal damage per second. The two fast stabs
+ * nudge the target a little, the centred stab pushes nothing, and the heavy thrust knocks back harder
+ * than a normal hit; it is the spear's launcher for Uppercut.
  */
 public final class SpearStyle implements WeaponStyle {
 	public static final SpearStyle INSTANCE = new SpearStyle();
@@ -31,8 +32,14 @@ public final class SpearStyle implements WeaponStyle {
 		HEAVY, 1.4F
 	);
 
-	/** The heavy thrust's knockback, relative to a normal hit's; the stabs before it push nothing. */
+	/** Every stab is this much faster than the cooldowns above (+75%). */
+	private static final float SPEED = 1.75F;
+
+	/** The heavy thrust's knockback, relative to a normal hit's. */
 	private static final double HEAVY_KNOCKBACK = 2.2;
+
+	/** The two fast stabs give a small nudge; the centred stab pushes nothing. */
+	private static final double STAB_KNOCKBACK = 0.3;
 
 	private SpearStyle() {
 	}
@@ -58,13 +65,16 @@ public final class SpearStyle implements WeaponStyle {
 
 	@Override
 	public float cooldownFactor(String animation) {
-		return COOLDOWN.getOrDefault(animation, 1.0F);
+		return COOLDOWN.getOrDefault(animation, 1.0F) / SPEED;
 	}
 
 	@Override
 	public double knockbackFactor(String animation) {
 		if (HEAVY.equals(animation)) {
 			return HEAVY_KNOCKBACK;
+		}
+		if (STAB_RIGHT.equals(animation) || STAB_LEFT.equals(animation)) {
+			return STAB_KNOCKBACK;
 		}
 		return isSpearAttack(animation) ? 0.0 : 1.0;
 	}

@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.vadim.bcenchantments.combat.ComboTracker;
 import dev.vadim.bcenchantments.combat.CriticalHits;
 import dev.vadim.bcenchantments.mob.HitChain;
-import dev.vadim.bcenchantments.perk.Uppercut;
+import dev.vadim.bcenchantments.perk.Updraft;
 import dev.vadim.bcenchantments.weapon.WeaponStyles;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,11 +44,15 @@ public abstract class PlayerMixin {
 		return HitChain.scale((Player) (Object) this, source, amount);
 	}
 
-	@Inject(method = "attack", at = @At("HEAD"))
+	@Inject(method = "attack", at = @At("HEAD"), cancellable = true)
 	private void bcenchantments$beforeAttack(Entity target, CallbackInfo ci) {
 		if ((Object) this instanceof ServerPlayer player) {
+			// No hit lands during Updraft's air move, whichever hand swung.
+			if (Updraft.busy(player)) {
+				ci.cancel();
+				return;
+			}
 			ComboTracker.beforeAttack(player, target);
-			Uppercut.beforeAttack(player);
 		}
 	}
 

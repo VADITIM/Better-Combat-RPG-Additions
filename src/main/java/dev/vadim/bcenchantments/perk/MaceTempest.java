@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -51,9 +52,9 @@ final class MaceTempest {
 		}
 		BlockState floor = world.getBlockState(target.blockPosition().below());
 		if (!floor.isAir()) {
-			world.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, floor), impact.x, impact.y + 0.1, impact.z, 12, RADIUS * 0.4, 0.05, RADIUS * 0.4, 0.15);
+			Particles.send(world, new BlockParticleOption(ParticleTypes.BLOCK, floor), impact.x, impact.y + 0.1, impact.z, 12, RADIUS * 0.4, 0.05, RADIUS * 0.4, 0.15);
 		}
-		world.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, impact.x, impact.y + 0.2, impact.z, 1, 0.0, 0.0, 0.0, 0.0);
+		Particles.send(world, ParticleTypes.GUST_EMITTER_SMALL, impact.x, impact.y + 0.2, impact.z, 1, 0.0, 0.0, 0.0, 0.0);
 		world.playSound((Entity) null, impact.x, impact.y, impact.z, SoundEvents.WIND_CHARGE_BURST, SoundSource.PLAYERS, 0.7F, 0.8F);
 	}
 }

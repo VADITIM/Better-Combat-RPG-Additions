@@ -31,8 +31,10 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jspecify.annotations.Nullable;
@@ -63,8 +65,8 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 	/** Cost of each level before its ±10% roll; all five come to about 500 gems. */
 	private static final int[] BASE_COST = {60, 80, 100, 120, 140};
 	private static final float COST_SPREAD = 0.1F;
-	/** Attack speed every refinement level adds; level 5 matches the old Attack Speed V. */
-	private static final float ATTACK_SPEED_PER_LEVEL = 0.1F;
+	/** Attack speed every refinement level adds, +0.25 at level 5. */
+	public static final float ATTACK_SPEED_PER_LEVEL = 0.05F;
 	/** Experience levels for a weapon's second power, and how much each further one adds. */
 	private static final int POWER_LEVELS = 20;
 	private static final int POWER_LEVELS_STEP = 10;
@@ -335,6 +337,68 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		return powers.size() % 2 == 1 ? powers.getLast().perk() : null;
 	}
 
+	/**
+	 * Why {@code perk} cannot go on {@code base} next to {@code taken} (the powers already chosen), as a
+	 * language key, or null if it can: a shield takes one of its few powers, the Uppercut needs a weapon that
+	 * launches, and a power that is not built yet or already chosen is refused.
+	 */
+	public static @Nullable String lockedReason(Perk perk, ItemStack base, List<Power> taken) {
+		if (!perk.built) {
+			return "forge.bcenchantments.locked.unbuilt";
+		}
+		for (Power power : taken) {
+			if (power.perk() == perk) {
+				return null;
+			}
+		}
+		if (isShield(base)) {
+			if (!onShield(perk)) {
+				return "forge.bcenchantments.locked.shield";
+			}
+			return taken.isEmpty() ? null : "forge.bcenchantments.locked.shield_one";
+		}
+		if (perk == Perk.UPPERCUT && !launches(base)) {
+			return "forge.bcenchantments.locked.uppercut";
+		}
+		return null;
+	}
+
+	/** Whether {@code base} is a weapon whose weapon style launches: swords, spears and the mace. */
+	private static boolean launches(ItemStack base) {
+		return base.is(ItemTags.SWORDS) || base.getItem() instanceof MaceItem
+			|| BuiltInRegistries.ITEM.getKey(base.getItem()).getPath().endsWith("_spear");
+	}
+
+	/**
+	 * A fully refined copy of {@code base} carrying {@code powers} in that order, as if every trim had
+	 * been applied at the smithing table; null if the weapon or any power is refused (see
+	 * {@link #lockedReason}), a power repeats, or a level is out of range.
+	 */
+	public static @Nullable ItemStack forge(ItemStack base, List<Power> powers) {
+		if (!isBase(base)) {
+			return null;
+		}
+		List<Power> taken = new ArrayList<>();
+		for (Power power : powers) {
+			Perk perk = power.perk();
+			if (perk == null || power.level < 1 || power.level > (isShield(base) ? 1 : MAX_PERK)
+				|| taken.stream().anyMatch(other -> other.perk() == perk)
+				|| lockedReason(perk, base, isShield(base) ? List.of() : taken) != null) {
+				return null;
+			}
+			taken.add(power);
+		}
+		if (isShield(base)) {
+			if (taken.size() > 1) {
+				return null;
+			}
+			ItemStack result = base.copyWithCount(1);
+			result.set(COMPONENT, new Refinement(0, 0, 0, 0.0F, 0.0F, 0.0F, 0.0F, taken));
+			return result;
+		}
+		return new Refinement(MAX_LEVEL, 0, 0, 0.0F, 0.0F, 0.0F, 0.0F, taken).applyTo(base);
+	}
+
 	/** Experience levels the next new power on a weapon holding {@code powers} costs: the first is free. */
 	public static int powerCost(int powers) {
 		return powers == 0 ? 0 : POWER_LEVELS + POWER_LEVELS_STEP * (powers - 1);
@@ -394,6 +458,18 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		ItemStack result = base.copyWithCount(1);
 		result.set(COMPONENT, new Refinement(0, 0, 0, 0.0F, 0.0F, 0.0F, 0.0F, List.of(new Power(trim, 1))));
 		return new Plan(result, 1, true, true);
+	}
+
+	/**
+	 * The refinement on {@code base}, or for a weapon never refined, the one its first emerald would
+	 * start, with the cost {@code seed} rolls for it; null if {@code base} is not a weapon.
+	 */
+	public static @Nullable Refinement current(ItemStack base, int seed) {
+		if (!isWeapon(base)) {
+			return null;
+		}
+		Refinement refinement = base.get(COMPONENT);
+		return refinement != null ? refinement : fresh(seed, base.getItem());
 	}
 
 	private static Refinement fresh(int seed, Item item) {

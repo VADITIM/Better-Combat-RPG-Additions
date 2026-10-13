@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
  * <ul>
  * <li>Chained Lightning: Chains strikes the enemies it would bind with half-power lightning and roots them briefly.</li>
  * <li>Charged Lightning: Lightning bursts like a wind charge where it strikes.</li>
- * <li>Updraft: Uppercut sends the player and the target straight up, the player a block above, while the target hangs stunned; a mace then smashes as if from six blocks.</li>
+ * <li>Updraft: Uppercut sends the player and the target straight up, the player twice as high, both falling normally; right click in the air slams a mace, dives a sword or, after the launch, lunges a spear through enemies ({@link Updraft}).</li>
  * <li>Frozen Chains: everything Chains binds is chilled.</li>
  * <li>Frost Burst: a death's wind burst chills what it catches.</li>
  * <li>Resonance: an Echo strike sparks a quarter-power lightning bolt on its target.</li>

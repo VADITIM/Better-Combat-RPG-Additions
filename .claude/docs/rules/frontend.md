@@ -15,7 +15,7 @@ This project uses V/AS (base register), cut down for a game. The user's rules be
 **Text and colour**
 
 - **Minecraft font only,** at native size or a whole multiple of it. No half sizes, letter-spacing or forced-uppercase micro-labels.
-- **The accent is monochrome black** (`Theme.ACCENT`). Minecraft and V/AS colours don't fit. Only the Lightning and Shockwave bars, and red for a miss, keep colour.
+- **The accent is monochrome black** (`Theme.ACCENT`). Minecraft and V/AS colours don't fit. Only the Lightning and Shockwave bars, red for a miss, and the heart red of enemy health bars (`Theme.HEALTH`) keep colour.
 
 **Motion**
 
@@ -32,6 +32,14 @@ This project uses V/AS (base register), cut down for a game. The user's rules be
 - Filled blocks are plain colour with no border.
 - Spent or leaving blocks snap away one after another. They never fade.
 
+**Enemy health bars** (`client/EnemyHealthBars`)
+
+- Pinned to the right of a hurt or targeted monster's head, as the camera sees it, in line of sight; projected onto the HUD, so they keep one size. Clear up to 5 blocks, fading out by 12.
+- An upright bar, 2 by 16 GUI pixels inside a dark hairline frame, red filling from the bottom. No heart.
+- Damage within a combo stays as a white trail above the red: the last hit bright white, earlier hits softer. The trail holds while the player's combo runs (or 0.45 s after a hit) and then drains to the red in 0.16 s.
+- A dead mob's bar goes at once, with no leave.
+- Each hit's damage number rises out of a random point inside the mob, fixed in the world and projected onto the HUD like the bars, then fades fast.
+
 **Shadows**
 
 - No soft or feathered shadows.
@@ -46,4 +54,8 @@ Holding Shift shows a short description under a weapon's trim power and each com
 
 ## Field Guide
 
-The smithing table's **?** button opens `client/GuideScreen`. Update it whenever a power, trim, recipe or combination changes, along with `lang/en_us.json`, `README.md` and `docs/POWERS.md`.
+The smithing table's **?** button, on the table's right under the panel toggle, opens `client/GuideScreen`. Update it whenever a power, trim, recipe or combination changes, along with `lang/en_us.json`, `README.md` and `docs/POWERS.md`.
+
+## Smithing panel
+
+The window on the smithing table's left (`client/SmithingPanel`), half again the table's height and centred on it, works like the recipe book: a toggle on the table's right ("<" / ">") opens and closes it, and when open it pushes the table right so the two are centred together (`SmithingScreenMixin` moves `leftPos`). It stays as the player left it for the session. It reads the middle slot: stats (with the value the current inputs would give after an arrow), refinement progress, trim powers, their pairs, what the inputs do now or why they do nothing, the next step and its cost, and the trims the player carries, each with what its power does on its own. Clicking one lists every combination it is part of, with the partner, its trim and what it does (faint where this weapon can no longer take the partner). It takes its numbers from `Refinement` and `Synergy`, so it follows them on its own; a new rule for what the table accepts needs a `panel.bcenchantments.why.*` line.

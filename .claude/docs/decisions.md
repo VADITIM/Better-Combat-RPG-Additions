@@ -20,7 +20,7 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 **Combat**
 
 - **Air crit replaces the airborne sword slams.** The sword combo stays Better Combat's own. A swing in the air that rolls a crit becomes a centred, two-handed overhead strike. *Rejected:* the earlier 3rd-swing one-handed and two-handed slams; the user wanted the combo untouched.
-- **Updraft + mace:** after the launch, the next mace swing in the air smashes as if from 6 blocks. Player and target go straight up, the player one block above the target. *Why:* the mace gets a unique two-beat trait. Slow Falling resets `fallDistance`, so it is set by hand before the attack.
+- **Updraft's air move is on right click, one per weapon kind.** Player and target go straight up, the player twice the height of a block above the target, with no Slow Falling and no hanging target. In the air, right click with the Updraft weapon (main hand first, else off hand): the mace slams down fast and smashes the ground for 1.5× a mace smash from that height; the sword dives straight down and cuts everything around the landing (+10% damage per block fallen, up to 10); the spear lunges along the look and strikes what it passes through. Once per airtime, from any jump or fall, not only after the launch; except the spear's lunge, which needs an Updraft launch and a spear without Lunge (with Lunge, the enchantment does the lunge after a launch). Lunge never fires in the air otherwise (`LivingEntityMixin`), so a spear cannot chain lunges off a plain jump. Left click stays a normal attack, except while a move runs (a slam or dive until it lands, a lunge for 10 ticks): then no attack lands and the other hand cannot be used, so the move is the triggering hand's only action. *Rejected:* the earlier mace-only rule where the next left click in the air smashed as if from 6 blocks; the user wanted left click normal and a move for every weapon.
 - **Chains roots for 0.7 s instead of pulling.** *Rejected:* the pull felt uncontrolled.
 - **Tempest throws enemies much harder** and deals knockback damage on wall impact (`perk/Impact`).
 - **Shatter:** +15% lightning damage to slowed enemies, ×2 to frozen ones. Kills spread chill to up to 6 enemies within 2 blocks.
@@ -31,7 +31,7 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 - **Every trim maps to a fitting power, and every power has trims.** The mapping is thematic: by where the trim is found and what it looks like (`POWERS.md`). *Open:* whether the user wants 18 distinct powers instead.
 - **"Perks" are called "Trim Powers" / "Powers"** for players. Code identifiers keep `perk`.
 - **Shield trims:** a trim, the shield and an echo shard, with no refinement and one level. Only Wind Charged (gust, 30% of a wind charge, 30 s) and Cold Edge (chill the attacker, 10 s). *Why "only a few":* the user's request. Cold Edge was added as the second one and is open to removal.
-- **Attack Speed stopped being a power.** Refinement grants +0.1 per level, the old maximum at level 5. *Why:* better build-crafting. Frenzy became Echo + Refinement 5.
+- **Attack Speed stopped being a power.** Refinement grants +0.05 per level, +0.25 at level 5 (it was +0.1, halved on 2026-10-13 so refinement stays a small bonus; the spear got its speed back in its own style, +75%). *Why:* better build-crafting. Frenzy became Echo + Refinement 5.
 - **Fire Aspect stacks burn** (+1 stack per melee hit, max 5, 0.2 hearts/s per stack, 4 s per level after the last hit). Armor stands never burn. *Why:* vanilla Fire Aspect is too strong on the first hit.
 
 **Power effects**
@@ -50,6 +50,7 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 **Settings and guide**
 
 - **Better Combat switch** in settings, so vanilla sweeping farms work. Implemented as `getAttributes → null`, which restores vanilla attacks and sweeping. *Rejected for now:* BC's `CombatFlags`, which keeps the sweep suppressed.
+- **Minimal particles is a client setting.** The server wraps the mod's particle packets so each client thins them by its own setting: bursts keep a fifth (at least one), lone particles in lines and rings one in three, gust emitters become one small gust. `WindBurst` now sends its gust emitter directly instead of a silent, pushless explosion, so it can be thinned too.
 - **Field Guide screen behind a "?" button** on the smithing table, replacing a command.
 
 **Naming**

@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.combat.SwingResult;
 import java.util.Iterator;
@@ -86,7 +87,7 @@ final class ColdEdge {
 			speed.addOrUpdateTransientModifier(new AttributeModifier(MODIFIER, -SLOW[chill.level - 1], AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 		}
 		if (target.level() instanceof ServerLevel world) {
-			world.sendParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getY(0.6), target.getZ(), 6, target.getBbWidth() * 0.4, target.getBbHeight() * 0.3, target.getBbWidth() * 0.4, 0.05);
+			Particles.send(world, ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getY(0.6), target.getZ(), 6, target.getBbWidth() * 0.4, target.getBbHeight() * 0.3, target.getBbWidth() * 0.4, 0.05);
 			world.playSound((Entity) null, target.getX(), target.getY(), target.getZ(), SoundEvents.POWDER_SNOW_HIT, SoundSource.PLAYERS, 0.6F, 1.4F);
 		}
 	}
@@ -117,7 +118,7 @@ final class ColdEdge {
 				target.setTicksFrozen(Math.max(target.getTicksFrozen(), target.getTicksRequiredToFreeze() + 2));
 			}
 			if (now % 4 == 0 && target.level() instanceof ServerLevel world) {
-				world.sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getY(0.6), target.getZ(), 1, target.getBbWidth() * 0.4, target.getBbHeight() * 0.3, target.getBbWidth() * 0.4, 0.01);
+				Particles.send(world, ParticleTypes.SNOWFLAKE, target.getX(), target.getY(0.6), target.getZ(), 1, target.getBbWidth() * 0.4, target.getBbHeight() * 0.3, target.getBbWidth() * 0.4, 0.01);
 			}
 		}
 	}

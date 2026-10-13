@@ -22,6 +22,8 @@
 		"ItemLayerRenderStateMixin",
 		"ItemModelResolverMixin",
 		"ItemStackRenderStateMixin",
+		"MinecraftMixin",
+		"SlashParticleUtilMixin",
 		"SmithingScreenMixin"
 	],
 	"injectors": {

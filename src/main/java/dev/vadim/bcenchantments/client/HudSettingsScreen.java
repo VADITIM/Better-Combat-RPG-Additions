@@ -136,7 +136,7 @@ public final class HudSettingsScreen extends Screen {
 				shown.add(setting);
 			}
 		}
-		int contentHeight = TITLE_HEIGHT + 2 * (LAYOUT_CARD_HEIGHT + CARD_GAP) + shown.size() * (SLIDER_CARD_HEIGHT + CARD_GAP) + BUTTON_HEIGHT;
+		int contentHeight = TITLE_HEIGHT + 3 * (LAYOUT_CARD_HEIGHT + CARD_GAP) + shown.size() * (SLIDER_CARD_HEIGHT + CARD_GAP) + BUTTON_HEIGHT + CARD_GAP + BUTTON_HEIGHT;
 		int y0 = Math.max(MARGIN, (height - contentHeight - 2 * PADDING) / 2);
 		int y1 = y0 + contentHeight + 2 * PADDING;
 
@@ -152,6 +152,8 @@ public final class HudSettingsScreen extends Screen {
 
 		combatCard(g, now, inner0, y, inner1, mouseX, mouseY, order++, leave);
 		y += LAYOUT_CARD_HEIGHT + CARD_GAP;
+		particlesCard(g, now, inner0, y, inner1, mouseX, mouseY, order++, leave);
+		y += LAYOUT_CARD_HEIGHT + CARD_GAP;
 		layoutCard(g, now, inner0, y, inner1, mouseX, mouseY, order++, leave);
 		y += LAYOUT_CARD_HEIGHT + CARD_GAP;
 		int cardOrder = 0;
@@ -161,6 +163,8 @@ public final class HudSettingsScreen extends Screen {
 		}
 		order += cardOrder;
 
+		forgeButton(g, now, inner0, y, inner1, mouseX, mouseY, order++, leave);
+		y += BUTTON_HEIGHT + CARD_GAP;
 		footer(g, now, inner0, y, inner1, mouseX, mouseY, order, leave);
 		g.pose().popMatrix();
 	}
@@ -215,8 +219,9 @@ public final class HudSettingsScreen extends Screen {
 		g.pose().popMatrix();
 	}
 
-	/** Better Combat on or off, for farms that need vanilla attacks. */
-	private void combatCard(GuiGraphicsExtractor g, long now, int x0, int y, int x1, int mouseX, int mouseY, int order, float leave) {
+	/** A two-way switch card: the left half sets the value to true, the right half to false. */
+	private void switchCard(GuiGraphicsExtractor g, long now, int x0, int y, int x1, int mouseX, int mouseY, int order, float leave,
+		String key, String trueKey, String falseKey, Supplier<Boolean> getter, Consumer<Boolean> setter) {
 		float alpha = enter(now, openedAt, order) * (1.0F - leave);
 		if (alpha <= 0.0F) {
 			return;
@@ -225,18 +230,31 @@ public final class HudSettingsScreen extends Screen {
 		g.pose().pushMatrix();
 		g.pose().translate(dx, 0.0F);
 		card(g, x0, y, x1, y + LAYOUT_CARD_HEIGHT, alpha, false);
-		g.text(font, Component.translatable("screen.bcenchantments.settings.better_combat"), x0 + 6, y + 5, Theme.argb(alpha, Theme.TEXT_MUTED), false);
+		g.text(font, Component.translatable(key), x0 + 6, y + 5, Theme.argb(alpha, Theme.TEXT_MUTED), false);
 		int top = y + 16;
 		int middle = (x0 + x1) / 2;
-		toggle(g, true, "screen.bcenchantments.settings.on", x0 + 6, top, middle - 1, mouseX, mouseY, alpha, dx);
-		toggle(g, false, "screen.bcenchantments.settings.off", middle + 1, top, x1 - 6, mouseX, mouseY, alpha, dx);
+		toggle(g, getter.get(), true, setter, trueKey, x0 + 6, top, middle - 1, mouseX, mouseY, alpha, dx);
+		toggle(g, !getter.get(), false, setter, falseKey, middle + 1, top, x1 - 6, mouseX, mouseY, alpha, dx);
 		g.pose().popMatrix();
 	}
 
-	private void toggle(GuiGraphicsExtractor g, boolean on, String key, int x0, int y0, int x1, int mouseX, int mouseY, float alpha, float dx) {
+	/** Better Combat on or off, for farms that need vanilla attacks. */
+	private void combatCard(GuiGraphicsExtractor g, long now, int x0, int y, int x1, int mouseX, int mouseY, int order, float leave) {
+		switchCard(g, now, x0, y, x1, mouseX, mouseY, order, leave, "screen.bcenchantments.settings.better_combat",
+			"screen.bcenchantments.settings.on", "screen.bcenchantments.settings.off", () -> values.betterCombat, on -> values.betterCombat = on);
+	}
+
+	/** All of the mod's particles, or just a little of each effect. */
+	private void particlesCard(GuiGraphicsExtractor g, long now, int x0, int y, int x1, int mouseX, int mouseY, int order, float leave) {
+		switchCard(g, now, x0, y, x1, mouseX, mouseY, order, leave, "screen.bcenchantments.settings.particles",
+			"screen.bcenchantments.settings.particles.all", "screen.bcenchantments.settings.particles.minimal",
+			() -> !values.minimalParticles, all -> values.minimalParticles = !all);
+	}
+
+	private void toggle(GuiGraphicsExtractor g, boolean selected, boolean value, Consumer<Boolean> setter, String key,
+		int x0, int y0, int x1, int mouseX, int mouseY, float alpha, float dx) {
 		int y1 = y0 + 12;
-		boolean selected = values.betterCombat == on;
-		Hit hit = new Hit(Math.round(x0 + dx), y0, Math.round(x1 + dx), y1, () -> values.betterCombat = on, null);
+		Hit hit = new Hit(Math.round(x0 + dx), y0, Math.round(x1 + dx), y1, () -> setter.accept(value), null);
 		hits.add(hit);
 		boolean hovered = hit.contains(mouseX, mouseY);
 		int down = hit.sameAs(pressed) ? 1 : 0;
@@ -341,6 +359,19 @@ public final class HudSettingsScreen extends Screen {
 		Theme.hairline(g, middle + 2, y + down, x1, y + BUTTON_HEIGHT, Theme.argb(alpha, hovered ? Theme.TEXT_BRIGHT : Theme.TEXT_MUTED));
 		String text = Component.translatable("screen.bcenchantments.settings.save").getString();
 		g.text(font, text, (middle + 2 + x1 - font.width(text)) / 2, y + 4 + down, Theme.argb(alpha, Theme.ON_ACCENT), false);
+		g.pose().popMatrix();
+	}
+
+	private void forgeButton(GuiGraphicsExtractor g, long now, int x0, int y, int x1, int mouseX, int mouseY, int order, float leave) {
+		float alpha = enter(now, openedAt, order) * (1.0F - leave);
+		if (alpha <= 0.0F) {
+			return;
+		}
+		float dx = offset(now, openedAt, order);
+		g.pose().pushMatrix();
+		g.pose().translate(dx, 0.0F);
+		button(g, Component.translatable("screen.bcenchantments.settings.forge").getString(), x0, y, x1, y + BUTTON_HEIGHT,
+			mouseX, mouseY, alpha, dx, () -> minecraft.gui.setScreen(new ForgeScreen(this)));
 		g.pose().popMatrix();
 	}
 

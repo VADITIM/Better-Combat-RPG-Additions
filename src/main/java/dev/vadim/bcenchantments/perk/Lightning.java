@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.SwingResult;
 import java.util.List;
 import net.minecraft.core.particles.ParticleTypes;
@@ -125,7 +126,7 @@ public final class Lightning implements ChargedPerk {
 			ColdEdge.chill(target, cold);
 		}
 		ServerLevel world = player.level();
-		world.sendParticles(ParticleTypes.SNOWFLAKE, victim.getX(), victim.getY(0.5), victim.getZ(), 20, 0.5, 0.4, 0.5, 0.1);
+		Particles.send(world, ParticleTypes.SNOWFLAKE, victim.getX(), victim.getY(0.5), victim.getZ(), 20, 0.5, 0.4, 0.5, 0.1);
 		world.playSound((Entity) null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 0.7F, 1.2F);
 	}
 
@@ -135,7 +136,7 @@ public final class Lightning implements ChargedPerk {
 		for (LivingEntity near : Targets.enemiesNear(player, target.position(), SHATTER_RADIUS, target)) {
 			ColdEdge.chill(near, cold);
 		}
-		world.sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getY(0.5), target.getZ(), 30, 0.4, 0.5, 0.4, 0.15);
+		Particles.send(world, ParticleTypes.SNOWFLAKE, target.getX(), target.getY(0.5), target.getZ(), 30, 0.4, 0.5, 0.4, 0.15);
 		world.playSound((Entity) null, target.getX(), target.getY(), target.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0F, 0.8F);
 	}
 }

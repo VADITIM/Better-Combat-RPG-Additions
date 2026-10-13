@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.TrimEnchantments;
 import java.util.Iterator;
 import java.util.Map;
@@ -52,7 +53,7 @@ final class Rampaging {
 		if (current == null) {
 			player.level().playSound((Entity) null, player.getX(), player.getY(), player.getZ(), SoundEvents.RAVAGER_ROAR, SoundSource.PLAYERS, 0.4F, 1.5F);
 		}
-		player.level().sendParticles(ParticleTypes.ANGRY_VILLAGER, player.getX(), player.getY(1.1), player.getZ(), 2, 0.3, 0.2, 0.3, 0.0);
+		Particles.send(player.level(), ParticleTypes.ANGRY_VILLAGER, player.getX(), player.getY(1.1), player.getZ(), 2, 0.3, 0.2, 0.3, 0.0);
 		RAMPAGING.put(player, player.tickCount + TICKS);
 	}
 

@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.SwingResult;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,10 +51,10 @@ public final class Shockwave implements ChargedPerk {
 	private static final double TEMPEST_LIFT = 0.3;
 	private static final float[] TEMPEST_DAMAGE = {4.0F, 6.0F, 8.0F};
 	private static final int TEMPEST_TRACK_TICKS = 25;
-	/** Singularity: reach of the pull around a point this far ahead of the blade, and its share of Gravity's pull. */
+	/** Singularity: reach of the pull around a point this far ahead of the wave's centre (none), and its share of Gravity's pull. */
 	private static final double SINGULARITY_RADIUS = 4.0;
-	private static final double SINGULARITY_LEAD = 1.5;
-	private static final double SINGULARITY_PULL = 0.8;
+	private static final double SINGULARITY_LEAD = 0.0;
+	private static final double SINGULARITY_PULL = 1.2;
 
 	private static final class Wave {
 		final ServerPlayer owner;
@@ -142,7 +143,7 @@ public final class Shockwave implements ChargedPerk {
 			double angle = Math.PI * 2.0 * i / 6.0;
 			double x = player.getX() + Math.cos(angle) * 1.2;
 			double z = player.getZ() + Math.sin(angle) * 1.2;
-			world.sendParticles(ParticleTypes.POOF, x, player.getY() + 0.1, z, 0, Math.cos(angle), 0.05, Math.sin(angle), 0.15);
+			Particles.send(world, ParticleTypes.POOF, x, player.getY() + 0.1, z, 0, Math.cos(angle), 0.05, Math.sin(angle), 0.15);
 		}
 		ground(world, player.position().add(0.0, HEIGHT, 0.0), 6, 1.2);
 	}
@@ -177,7 +178,7 @@ public final class Shockwave implements ChargedPerk {
 					target.push(wave.dir.x * PUSH, 0.25, wave.dir.z * PUSH);
 				}
 				target.hurtMarked = true;
-				wave.level.sendParticles(ParticleTypes.CRIT, target.getX(), target.getY(0.5), target.getZ(), 4, 0.3, 0.3, 0.3, 0.3);
+				Particles.send(wave.level, ParticleTypes.CRIT, target.getX(), target.getY(0.5), target.getZ(), 4, 0.3, 0.3, 0.3, 0.3);
 			}
 
 			if (wave.gravity > 0.0) {
@@ -209,16 +210,16 @@ public final class Shockwave implements ChargedPerk {
 			double t = k / 2.0;
 			Vec3 p = wave.pos.add(wave.side.scale(t * HALF_WIDTH)).subtract(wave.dir.scale(t * t * 0.8));
 			double lift = (1.0 - t * t) * 0.2;
-			world.sendParticles(ParticleTypes.END_ROD, p.x, p.y + lift, p.z, 1, 0.02, 0.02, 0.02, 0.0);
+			Particles.send(world, ParticleTypes.END_ROD, p.x, p.y + lift, p.z, 1, 0.02, 0.02, 0.02, 0.0);
 			if ((k & 1) != 0) {
-				world.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.x, p.y + lift, p.z, 1, 0.05, 0.08, 0.05, 0.05);
+				Particles.send(world, ParticleTypes.ELECTRIC_SPARK, p.x, p.y + lift, p.z, 1, 0.05, 0.08, 0.05, 0.05);
 			}
 		}
-		world.sendParticles(ParticleTypes.SWEEP_ATTACK, wave.pos.x, wave.pos.y, wave.pos.z, 0, 0.0, 0.0, 0.0, 0.0);
+		Particles.send(world, ParticleTypes.SWEEP_ATTACK, wave.pos.x, wave.pos.y, wave.pos.z, 0, 0.0, 0.0, 0.0, 0.0);
 		// A trail of wind behind the blade, two steps in five.
 		if (Math.round(wave.travelled / SPEED) % 5 < 2) {
 			Vec3 tail = wave.pos.subtract(wave.dir.scale(0.8));
-			world.sendParticles(ParticleTypes.SMALL_GUST, tail.x, tail.y, tail.z, 1, 0.4, 0.1, 0.4, 0.0);
+			Particles.send(world, ParticleTypes.SMALL_GUST, tail.x, tail.y, tail.z, 1, 0.4, 0.1, 0.4, 0.0);
 		}
 		ground(world, wave.pos, 3, HALF_WIDTH * 0.5);
 	}
@@ -230,14 +231,14 @@ public final class Shockwave implements ChargedPerk {
 		if (state.isAir()) {
 			return;
 		}
-		world.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), pos.x, floor.getY() + 1.05, pos.z, count, spread, 0.05, spread, 0.15);
-		world.sendParticles(new BlockParticleOption(ParticleTypes.DUST_PILLAR, state), pos.x, floor.getY() + 1.0, pos.z, Math.max(1, count / 3), spread, 0.0, spread, 0.0);
+		Particles.send(world, new BlockParticleOption(ParticleTypes.BLOCK, state), pos.x, floor.getY() + 1.05, pos.z, count, spread, 0.05, spread, 0.15);
+		Particles.send(world, new BlockParticleOption(ParticleTypes.DUST_PILLAR, state), pos.x, floor.getY() + 1.0, pos.z, Math.max(1, count / 3), spread, 0.0, spread, 0.0);
 	}
 
 	private static void shatter(Wave wave) {
 		Vec3 p = wave.pos;
-		wave.level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, p.x, p.y, p.z, 1, 0.0, 0.0, 0.0, 0.0);
-		wave.level.sendParticles(ParticleTypes.END_ROD, p.x, p.y, p.z, 5, 0.3, 0.3, 0.3, 0.12);
+		Particles.send(wave.level, ParticleTypes.GUST_EMITTER_SMALL, p.x, p.y, p.z, 1, 0.0, 0.0, 0.0, 0.0);
+		Particles.send(wave.level, ParticleTypes.END_ROD, p.x, p.y, p.z, 5, 0.3, 0.3, 0.3, 0.12);
 		wave.level.playSound((Entity) null, p.x, p.y, p.z, SoundEvents.WIND_CHARGE_BURST, SoundSource.PLAYERS, 0.6F, 1.3F);
 	}
 }

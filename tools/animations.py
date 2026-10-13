@@ -127,14 +127,19 @@ s3 = stab([
     (0.35, AIM, [-1, -3, -18], GRIP, L),
     (0.45, AIM, [-1, -3, -16.5], GRIP, C),
 ])
-# 4: heavy. Raised overhead with the tip tilted down, a beat at the top, then driven down and
-# forward, jolting on impact and staying planted before it comes back. Hit at 0.45.
+# 4: heavy. A short coil down, then the hand is hauled up and back with the tip angled down at the
+# target, held a beat, and driven down and forward along the aim line. It overshoots, jolts back on
+# impact and stays planted before it comes back. Hit at 0.45, just right of centre like stab 1.
+# The grip never turns off GRIP: Punchy rotates the grip about a pivot the slide has already moved
+# past the hand, so any other grip angle swings the spear off the hand and leaves it floating.
 s4 = stab([
-    (0.25, [-27, 0, -30], [-1, 4.5, 0], [130, 0, 0], C),
-    (0.37, [-30, 0, -30], [-1, 5.5, 1.5], [128, 0, 0], L),
-    (0.45, [-10, 0, -30], [0, 1, -16], [150, 0, 0], L),
-    (0.5, [-12, 0, -30], [0, 1.8, -14.5], [148, 0, 0], C),
-    (0.66, [-11, 0, -30], [0, 1.4, -15], [148, 0, 0], C),
+    (0.1,  [20, -4, -36], [-2, 1, 2.5], GRIP, C),
+    (0.28, [27, 4, -54], [-3, 7.5, 5], GRIP, C),
+    (0.38, [30, 5, -57], [-3, 8.5, 6], GRIP, L),
+    (0.45, [6, 9.1, -76], [-4, -2, -20], GRIP, L),
+    (0.48, [11, 9.1, -74], [-4, 0.5, -15], GRIP, L),
+    (0.53, [8, 9.1, -75], [-4, -1, -17.5], GRIP, C),
+    (0.68, [9, 9.1, -75], [-4, -0.8, -16.5], GRIP, C),
 ])
 
 def spear_clip(rot, pos, grip, grip_pos, length=1.0, timeline=None):

@@ -67,7 +67,7 @@ preset that other files can name as `"parent"`. Our seven vanilla spears are one
       "conditions": ["NOT_MOUNTED"],
       "swing_sound": {"id": "bettercombat:spear_stab", "pitch": 1.15},
       "impact_sound": {"id": "..."},
-      "trail_particles": [ {"particle_type": "stab", "x_addition": 0.12, "y_addition": -0.12,
+      "trail_particles": [ {"particle_type": "stab", "x_addition": 0.57, "y_addition": 0.08,
                             "z_addition": 0, "local_yaw": 0, "pitch_addition": 0, "roll_set": 0} ]
     } ] } }
 ```
@@ -173,6 +173,16 @@ the weapon's attack speed (this is how the uppercut and air-crit clips play toda
 
 **Spear grip:** the spear the user knows comes from the "Untitled Punchies" pack's `attack_spear`,
 with the grip turned [90, 0, 0] and slid [0, −9, 0]. Without the slide the spear renders reversed.
+**Never turn the grip's x off 90 in a stab.** Punchy rotates the grip about its pivot after the slide
+has moved it past the hand, so any other angle swings the spear off the hand and it floats (the
+heavy thrust did this at 130–150°). Angle the spear with the arm's rotation and position instead.
+**Spear trail placement.** BC spawns a stab trail at `eye − 0.25 + y_addition`, `x_addition` to the
+right (negative is left), then pushes it `attack range − 1.25` blocks along the look (about 2.75 for
+the spear). At that distance a small offset lands on the crosshair: 0.12 is about 2°. Set each
+attack's offsets to where the spear tip is at the hit, at a 70° FOV: about 0.57 right for an arm at
+x −4, about 0.34 for x −1, and negative for the left stab. Positive `y_addition` raises the trail.
+Minecraft draws the hand at a fixed 70° FOV, so `SlashParticleUtilMixin` scales the offsets by the
+player's FOV for their own first-person spear trails. Other players see the offsets as written.
 
 ## 6. `tools/animations.py`: the source of truth
 

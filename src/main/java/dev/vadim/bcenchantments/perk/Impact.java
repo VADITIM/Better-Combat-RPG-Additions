@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -91,9 +92,9 @@ final class Impact {
 			}
 		}
 		if (wall != null) {
-			world.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, wall), at.x, at.y, at.z, 20, 0.3, 0.4, 0.3, 0.15);
+			Particles.send(world, new BlockParticleOption(ParticleTypes.BLOCK, wall), at.x, at.y, at.z, 20, 0.3, 0.4, 0.3, 0.15);
 		}
-		world.sendParticles(ParticleTypes.CRIT, at.x, at.y, at.z, 12, 0.3, 0.3, 0.3, 0.3);
+		Particles.send(world, ParticleTypes.CRIT, at.x, at.y, at.z, 12, 0.3, 0.3, 0.3, 0.3);
 		world.playSound((Entity) null, at.x, at.y, at.z, SoundEvents.MACE_SMASH_GROUND, SoundSource.PLAYERS, 0.9F, 1.1F);
 	}
 }

@@ -6,14 +6,11 @@ import dev.vadim.bcenchantments.progression.Refinement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.SmithingScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -45,9 +42,6 @@ public final class GuideScreen extends Screen {
 	private static final int GAP = 8;
 	private static final int LINE = 10;
 	private static final int SCROLL_STEP = 20;
-	/** The smithing table's own size, which places the button beside it. */
-	private static final int SMITHING_WIDTH = 176;
-	private static final int SMITHING_HEIGHT = 166;
 
 	private enum Tab {
 		REFINING, PERKS, TRIMS, COMBINING;
@@ -164,19 +158,12 @@ public final class GuideScreen extends Screen {
 		this.tabs = new List[Tab.values().length];
 	}
 
-	/** Puts the guide's button beside every smithing table. */
-	static void register() {
-		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-			if (!(screen instanceof SmithingScreen)) {
-				return;
-			}
-			int left = (width - SMITHING_WIDTH) / 2;
-			int top = (height - SMITHING_HEIGHT) / 2;
-			Screens.getWidgets(screen).add(Button.builder(Component.literal("?"), button -> client.gui.setScreen(new GuideScreen(screen)))
-				.bounds(left + SMITHING_WIDTH + 4, top, 20, 20)
-				.tooltip(Tooltip.create(Component.translatable("guide.bcenchantments.open")))
-				.build());
-		});
+	/** The guide's button, which the smithing table puts beside itself ({@code SmithingScreenMixin}). */
+	public static Button button(Screen parent, int x, int y) {
+		return Button.builder(Component.literal("?"), button -> Minecraft.getInstance().gui.setScreen(new GuideScreen(parent)))
+			.bounds(x, y, 20, 20)
+			.tooltip(Tooltip.create(Component.translatable("guide.bcenchantments.open")))
+			.build();
 	}
 
 	@Override

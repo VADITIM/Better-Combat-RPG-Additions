@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.SwingResult;
 import java.util.List;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -131,7 +132,7 @@ public final class Chains implements ChargedPerk {
 		int steps = Math.max(2, (int) (a.distanceTo(b) / 0.3));
 		for (int i = 0; i <= steps; i++) {
 			Vec3 p = a.lerp(b, i / (double) steps);
-			world.sendParticles(LINK, p.x, p.y, p.z, 1, 0.0, 0.0, 0.0, 0.0);
+			Particles.send(world, LINK, p.x, p.y, p.z, 1, 0.0, 0.0, 0.0, 0.0);
 		}
 	}
 }

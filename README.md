@@ -14,6 +14,8 @@ on it at the smithing table and it gains that trim's **Trim Power**; put on two 
 - **Harder hack-and-slash PvE**: more monsters, softer single hits that ramp up when they keep
   landing, and subtle hidden stat buffs that grow with the player's weapon power.
 - **Visible powers**: each trim power plays its own animation on the weapon's pixels, in the inventory and in hand.
+- **Enemy health bars**: a small upright bar beside each hurt monster's head shows its health, with the damage of
+  the current combo held in white until the combo ends.
 - **Elites and captains**: some monsters spawn as elites whose hits slow, weaken or strip armor.
   Captains wear an ominous banner and hurry and shield the monsters around them.
 - **Harder by place**: mild near world spawn, harder underground, in the Deep Dark, the Nether and the End.
@@ -26,7 +28,7 @@ In game, the **?** button beside the smithing table opens the Field Guide, with 
 
 **Refining.** At a smithing table, put a weapon in the middle slot and emeralds or emerald blocks in the
 right slot, with the template slot empty. There are five levels, about 500 emeralds in all. Each
-adds attack speed (+0.1 per level, +0.5 at level 5) and one small random boost (damage, critical chance or
+adds attack speed (+0.05 per level, +0.25 at level 5) and one small random boost (damage, critical chance or
 critical damage).
 
 **Powers** come only from trims: every armor trim grants its own power on a weapon. Lightning,
@@ -69,7 +71,7 @@ show in gold in the tooltip; hold Shift for descriptions. The built ones:
 |---|---|---|
 | Chained Lightning | Chains + Lightning | Bound enemies are struck by half-power lightning and briefly rooted instead |
 | Charged Lightning | Lightning + Wind Charged | Lightning bursts like a wind charge |
-| Updraft | Uppercut + Wind Charged | Player and target go straight up, the player a block above, while the target hangs stunned; with a mace the next swing in the air smashes as if from 6 blocks |
+| Updraft | Uppercut + Wind Charged | Player and target go straight up, the player twice as high as a block above it, both falling normally. Right click in the air: the mace slams down for a 1.5× smash, the sword dives and cuts around where it lands, the spear (after a launch, without Lunge) lunges through enemies. Lunge works in the air only after a launch |
 | Frozen Chains | Chains + Cold Edge | Bound enemies are chilled |
 | Frost Burst | Cold Edge + Wind Charged | Death bursts chill what they catch |
 | Resonance | Echo + Lightning | Echoes spark a quarter-power bolt |

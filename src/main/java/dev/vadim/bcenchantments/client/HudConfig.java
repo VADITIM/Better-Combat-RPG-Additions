@@ -42,6 +42,8 @@ public final class HudConfig {
 		public float chargeBarScale = 0.75F;
 		/** Off turns Better Combat's attacks off entirely, for farms that need vanilla sweeping. */
 		public boolean betterCombat = true;
+		/** Thins every particle this mod spawns down to a little of each effect. */
+		public boolean minimalParticles = false;
 
 		public Values copy() {
 			Values copy = new Values();
@@ -51,6 +53,7 @@ public final class HudConfig {
 			copy.chargeBarSideY = chargeBarSideY;
 			copy.chargeBarScale = chargeBarScale;
 			copy.betterCombat = betterCombat;
+			copy.minimalParticles = minimalParticles;
 			return copy;
 		}
 	}

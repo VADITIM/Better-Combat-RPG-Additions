@@ -32,4 +32,18 @@ final class Targets {
 		found.sort(Comparator.comparingDouble(e -> e.distanceToSqr(center)));
 		return found;
 	}
+
+	/**
+	 * Hostile mobs whose box comes within {@code reach} of the player's own box sideways ({@code below} down,
+	 * a little up), nearest first. Measured edge to edge, so a short reach still hits what stands against the player.
+	 */
+	static List<LivingEntity> enemiesAround(ServerPlayer player, double reach, double below) {
+		AABB own = player.getBoundingBox();
+		AABB box = new AABB(own.minX - reach, own.minY - below, own.minZ - reach, own.maxX + reach, own.maxY + 0.5, own.maxZ + reach);
+		Vec3 center = player.position();
+		List<LivingEntity> found = player.level().getEntitiesOfClass(LivingEntity.class, box,
+			e -> e instanceof Enemy && harmable(player, e));
+		found.sort(Comparator.comparingDouble(e -> e.distanceToSqr(center)));
+		return found;
+	}
 }

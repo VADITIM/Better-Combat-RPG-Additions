@@ -35,6 +35,9 @@ public final class Theme {
 	public static final int CHAINS = 0x9FB0BE;
 	public static final int ECHO = 0xA98BFF;
 	public static final int DANGER = 0xFF6B6B;
+	/** Enemy health bars, in the red of vanilla's hearts, with the lighter top row its bars carry. */
+	public static final int HEALTH = 0xD32020;
+	public static final int HEALTH_LIGHT = 0xFF5050;
 
 	public static final float PANEL_ALPHA = 0.85F;
 

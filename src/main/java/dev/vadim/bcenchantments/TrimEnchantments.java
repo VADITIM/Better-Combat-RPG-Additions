@@ -5,7 +5,9 @@ import dev.vadim.bcenchantments.combat.CriticalHits;
 import dev.vadim.bcenchantments.mob.MobScaling;
 import dev.vadim.bcenchantments.network.ComboHudPayload;
 import dev.vadim.bcenchantments.network.CritRollPayload;
+import dev.vadim.bcenchantments.network.ParticlePayload;
 import dev.vadim.bcenchantments.perk.Perks;
+import dev.vadim.bcenchantments.progression.Forge;
 import dev.vadim.bcenchantments.progression.Refinement;
 import dev.vadim.bcenchantments.vanilla.FireAspect;
 import dev.vadim.bcenchantments.weapon.WeaponStyles;
@@ -27,8 +29,10 @@ public class TrimEnchantments implements ModInitializer {
 	public void onInitialize() {
 		PayloadTypeRegistry.clientboundPlay().register(ComboHudPayload.TYPE, ComboHudPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(CritRollPayload.TYPE, CritRollPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(ParticlePayload.TYPE, ParticlePayload.CODEC);
 		CriticalHits.init();
 		Refinement.init();
+		Forge.init();
 		WeaponStyles.init();
 		Perks.init();
 		MobScaling.init();

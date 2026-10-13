@@ -31,7 +31,7 @@ V/AS: this project uses the **base** register, cut down for a game. The cut-down
 ./gradlew build -q
 ```
 ```bash
-cp build/libs/bcenchantments-0.1.0.jar "/c/Users/vadim/AppData/Roaming/ModrinthApp/profiles/Main 1.0.0/mods/"
+cp build/libs/trim-enchantments-0.1.0.jar "/c/Users/vn/AppData/Roaming/ModrinthApp/profiles/Main 1.0.0/mods/"
 ```
 ```bash
 python tools/animations.py src/main/resources

@@ -42,13 +42,13 @@ Every two powers have one combination: 18 powers, 153 combinations, 17 for each 
 |---|---|---|
 | Chained Lightning | Chains + Lightning | Bound enemies get half-power bolts and a 0.5 s root instead |
 | Charged Lightning | Lightning + Wind Charged | Bolt bursts like a wind charge (plain Lightning has no knockback) |
-| Updraft | Uppercut + Wind Charged | You and the target go straight up, you one block above, while it hangs stunned 1.5 s. **Mace:** next swing in the air smashes as if from 6 blocks |
+| Updraft | Uppercut + Wind Charged | You and the target go straight up, you twice as high as a block above it; neither hangs, both fall normally. **Right click in the air** (once per airtime, either hand; left click stays normal, but while the move runs, until a slam or dive lands or for 0.5 s of a lunge, no attack lands and the other hand is disabled): **mace** slams down fast and smashes the ground within 0.75 blocks of your body's edge for 1.5× a mace smash from that height; **sword** dives straight down, 25% slower than the slam (start speed and gravity), and hits everything within 3 blocks for its attack damage +10% per block fallen (max +100%); **spear**, only after an Updraft launch and only without the Lunge enchantment, lunges along the look (speed 1.2, Lunge I's hunger), hitting every enemy it passes through once for its attack damage (enchantment bonuses and on-hit effects apply) and pushing them along. Lunge itself works in the air only after an Updraft launch. Slam and dive landings take no fall damage; each move costs 1 durability |
 | Frozen Chains | Chains + Cold Edge | Bound enemies are chilled |
 | Frost Burst | Cold Edge + Wind Charged | Death bursts chill |
 | Resonance | Echo + Lightning | Echoes spark a quarter-power bolt |
 | Tempest | Shockwave + Wind Charged | Shockwave throws enemies much harder; hitting a wall deals 4 / 6 / 8 knockback damage. **Mace:** a smash also hurts enemies within 2.5 blocks of the impact for 30% of its damage |
 | Frenzy | Echo + Refinement 5 | Echo every 3rd swing (not a pair: any weapon with Echo, since trims need refinement 5) |
-| Singularity | Gravity + Shockwave | The wave drags enemies within 4 blocks of the point just ahead of it into its path (80% of Gravity's pull) |
+| Singularity | Gravity + Shockwave | The wave drags enemies within 4 blocks of the wave's own centre into its path (120% of Gravity's pull) |
 | Black Hole | Gravity + Chains | Every bound enemy pulls the free enemies within 3.5 blocks in |
 | Cyclone | Gravity + Wind Charged | Kills pull enemies within 5 blocks in; the burst goes off 0.3 s later |
 | Launch | Momentum + Uppercut | A launching swing after a run-up throws the targets ×1.3 higher, and you go up after them |
@@ -291,7 +291,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Weapon | Style |
 |---|---|
 | Sword | Normal Better Combat combo. Air crit: any swing in the air that rolls a crit becomes a two-handed, centred overhead strike. 3rd swing on the ground becomes a rising cut with Uppercut |
-| Spear | Four-stab combo; heavy thrust launches |
+| Spear | Four-stab combo, every stab +75% faster; the first two stabs knock back 0.3× a normal hit, the third none, the heavy thrust 2.2× and launches |
 | Mace | Swing on the ground launches with Uppercut; swing in the air is the mace smash (Tempest splashes it) |
 
 ## Vanilla changes
@@ -307,11 +307,11 @@ Smithing table, empty template slot, weapon in the middle, emeralds or emerald b
 
 | Level | Cost (±10%) | Attack speed | Random boost |
 |---|---|---|---|
-| 1 | 60 | +0.1 | damage, crit chance or crit damage |
-| 2 | 80 | +0.2 | " |
-| 3 | 100 | +0.3 | " |
-| 4 | 120 | +0.4 | " |
-| 5 | 140 | +0.5 | " |
+| 1 | 60 | +0.05 | damage, crit chance or crit damage |
+| 2 | 80 | +0.1 | " |
+| 3 | 100 | +0.15 | " |
+| 4 | 120 | +0.2 | " |
+| 5 | 140 | +0.25 | " |
 
 ## Trim Powers
 

@@ -7,7 +7,10 @@ The Better Combat and Punchy traps are in `rules/animations.md` § 8.
 ## Combat
 
 **Under Slow Falling, a mace never smashes.**
-`LivingEntity.aiStep` resets `fallDistance` under Slow Falling. Updraft sets it by hand in `Uppercut.beforeAttack`.
+`LivingEntity.aiStep` resets `fallDistance` under Slow Falling. Updraft's right-click slam does not rely on it: `Updraft` measures the fall from the height where the slam started.
+
+**A right click right after a Better Combat swing never reaches the server.**
+`AttackInteractor.onDoItemUse` cancels `Minecraft.startUseItem` while the weapon is in its upswing or below `1 − upswing` of its cooldown, which is the whole moment after an Uppercut launch. So Updraft's air move does not go through `UseItemCallback`: `UpdraftInput` reads the use key at the start of the client tick and sends `AirMovePayload`. `MinecraftMixin` has priority 100 so its cancels run before Better Combat's hooks on the same methods.
 
 **A mace swing triggers its smash only above 1.5 blocks of fall, and never while gliding.**
 That is vanilla's `MaceItem.canSmashAttack`. `getAttackDamageBonus` reads `fallDistance` directly.

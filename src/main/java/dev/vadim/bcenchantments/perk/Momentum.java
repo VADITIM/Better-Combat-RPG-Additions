@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.perk;
 
+import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.ComboTracker;
 import dev.vadim.bcenchantments.combat.SwingResult;
 import dev.vadim.bcenchantments.weapon.WeaponStyles;
@@ -93,7 +94,7 @@ public final class Momentum {
 			Vec3 motion = target.getDeltaMovement();
 			target.setDeltaMovement(motion.x * 0.3 + dir.x * PUSH[level - 1], Math.max(motion.y, LIFT), motion.z * 0.3 + dir.z * PUSH[level - 1]);
 			target.hurtMarked = true;
-			world.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY(0.3), target.getZ(), 6, 0.2, 0.2, 0.2, 0.05);
+			Particles.send(world, ParticleTypes.CLOUD, target.getX(), target.getY(0.3), target.getZ(), 6, 0.2, 0.2, 0.2, 0.05);
 		}
 	}
 
@@ -107,7 +108,7 @@ public final class Momentum {
 			Vec3 motion = player.getDeltaMovement();
 			player.setDeltaMovement(motion.x * 0.3, boosted * LAUNCH_FOLLOW, motion.z * 0.3);
 			player.hurtMarked = true;
-			player.level().sendParticles(ParticleTypes.GUST_EMITTER_SMALL, player.getX(), player.getY(), player.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
+			Particles.send(player.level(), ParticleTypes.GUST_EMITTER_SMALL, player.getX(), player.getY(), player.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
 		}
 		return boosted;
 	}
@@ -127,7 +128,7 @@ public final class Momentum {
 		player.hurtMarked = true;
 		player.resetFallDistance();
 		ServerLevel world = player.level();
-		world.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, player.getX(), player.getY() + 0.5, player.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
+		Particles.send(world, ParticleTypes.GUST_EMITTER_SMALL, player.getX(), player.getY() + 0.5, player.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
 		world.playSound((Entity) null, player.getX(), player.getY(), player.getZ(), SoundEvents.WIND_CHARGE_BURST, SoundSource.PLAYERS, 0.8F, 1.2F);
 	}
 

@@ -14,11 +14,13 @@
 ```
 Better Combat attack request
   └ ServerNetworkMixin → ComboTracker.beginSwing        (AttackHand, combo count, cursor target)
-      └ PlayerMixin.attack HEAD/RETURN → ComboTracker.before/afterAttack, Uppercut.beforeAttack
+      └ PlayerMixin.attack HEAD/RETURN → ComboTracker.before/afterAttack
       └ ComboTracker.endSwing → SwingResult → CombatHooks.onSwing listeners
                                             → charge ChargedPerks → fire → ComboHudPayload to client
 Damage events → CombatHooks.onDirectHit / onKill (Fabric AFTER_DAMAGE / AFTER_DEATH)
-Server tick   → CombatHooks.onServerTick (ColdEdge, Shockwave, Control, Impact, Rampaging); Momentum tracks sprinting on its own server tick
+Server tick   → CombatHooks.onServerTick (ColdEdge, Updraft, Shockwave, Control, Impact, Rampaging); Momentum tracks sprinting on its own server tick
+Right click   → client/UpdraftInput (start of client tick) → AirMovePayload → Updraft.start (the air move)
+                While it runs: MinecraftMixin + AttackInteractorMixin drop clicks and swings on the client; PlayerMixin.attack and UseItemCallback refuse them on the server
 ```
 
 **Adding a power:**
@@ -58,3 +60,4 @@ Server tick   → CombatHooks.onServerTick (ColdEdge, Shockwave, Control, Impact
 |---|---|
 | HUD settings and the Better Combat switch | `config/bcenchantments-client.json`, through `HudConfig` |
 | Switch → registry | `TrimEnchantmentsClient` copies the switch into the static `BetterCombatSwitch` every client tick; `WeaponRegistryMixin` reads it |
+| Minimal particles | The server sends every mod particle through `Particles.send` as a `ParticlePayload` (a wrapped vanilla particle packet; clients without the mod get the plain packet). `client/ParticleFilter` thins it when `HudConfig.minimalParticles` is on, then hands it to vanilla's `handleParticleEvent`. Use `Particles.send`, never `ServerLevel.sendParticles`, for new effects |

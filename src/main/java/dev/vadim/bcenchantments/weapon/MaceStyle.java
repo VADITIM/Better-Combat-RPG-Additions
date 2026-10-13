@@ -6,7 +6,7 @@ import net.minecraft.world.item.MaceItem;
 
 /**
  * The mace: a swing from the ground launches with Uppercut, and a swing from the air stays the
- * mace's own smash. With Updraft that makes it a two-beat weapon: launch, then slam from above.
+ * mace's own smash. With Updraft that makes it a two-beat weapon: launch, then right click to slam down.
  */
 public final class MaceStyle implements WeaponStyle {
 	public static final MaceStyle INSTANCE = new MaceStyle();
