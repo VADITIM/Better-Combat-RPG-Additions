@@ -1,0 +1,52 @@
+# gradle
+
+.gradle/
+build/
+out/
+classes/
+
+# eclipse
+
+*.launch
+
+# idea
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# vscode
+
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+
+# macos
+
+*.DS_Store
+
+# fabric
+
+run/
+
+# java
+
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
+
+# run
+run/
+
+# V/AS is fetched from GitHub, never committed
+.claude/skills/vas/
+
+# Local Claude Code config and skills
+.claude/
+
+# Third-party jars are not redistributed
+libs/*.jar

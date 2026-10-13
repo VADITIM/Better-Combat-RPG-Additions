@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "bcenchantments",
+	"version": "${version}",
+	"name": "Better Combat: RPG Additions",
+	"description": "Minecraft Dungeons-style perks, weapon playstyles, vanilla-friendly weapon progression and a harder, hack-and-slash PvE, built on Better Combat and Punchy.",
+	"authors": [
+		"vadim"
+	],
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.vadim.bcenchantments.RpgAdditions"
+		],
+		"client": [
+			"dev.vadim.bcenchantments.client.RpgAdditionsClient"
+		],
+		"modmenu": [
+			"dev.vadim.bcenchantments.client.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		"bcenchantments.mixins.json",
+		"bcenchantments.punchy.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*",
+		"bettercombat": ">=3.2.2",
+		"punchy": "*"
+	}
+}

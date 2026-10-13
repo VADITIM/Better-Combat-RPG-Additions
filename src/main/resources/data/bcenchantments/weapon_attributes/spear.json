@@ -1,0 +1,55 @@
+{
+	"attributes": {
+		"range_bonus": 1,
+		"two_handed": false,
+		"category": "spear",
+		"attacks": [
+			{
+				"hitbox": "FORWARD_BOX",
+				"damage_multiplier": 0.65,
+				"angle": 0,
+				"upswing": 0.5,
+				"animation": "bcenchantments:spear_stab_right",
+				"swing_sound": {"id": "bettercombat:spear_stab", "pitch": 1.15},
+				"trail_particles": [
+					{"particle_type": "stab", "x_addition": 0.12, "y_addition": -0.12, "z_addition": 0.0, "local_yaw": 0.0, "pitch_addition": 0.0, "roll_set": 0.0}
+				]
+			},
+			{
+				"hitbox": "FORWARD_BOX",
+				"damage_multiplier": 0.65,
+				"angle": 0,
+				"upswing": 0.5,
+				"animation": "bcenchantments:spear_stab_left",
+				"swing_sound": {"id": "bettercombat:spear_stab", "pitch": 1.2},
+				"trail_particles": [
+					{"particle_type": "stab", "x_addition": -0.12, "y_addition": -0.12, "z_addition": 0.0, "local_yaw": 0.0, "pitch_addition": 0.0, "roll_set": 0.0}
+				]
+			},
+			{
+				"hitbox": "FORWARD_BOX",
+				"damage_multiplier": 1.0,
+				"angle": 0,
+				"upswing": 0.7,
+				"animation": "bcenchantments:spear_stab_center",
+				"swing_sound": {"id": "bettercombat:spear_stab", "pitch": 0.95},
+				"trail_particles": [
+					{"particle_type": "stab", "x_addition": 0.0, "y_addition": -0.15, "z_addition": 0.0, "local_yaw": 0.0, "pitch_addition": 0.0, "roll_set": 0.0}
+				]
+			},
+			{
+				"hitbox": "FORWARD_BOX",
+				"damage_multiplier": 1.4,
+				"movement_speed_multiplier": 0.8,
+				"angle": 0,
+				"upswing": 0.9,
+				"animation": "bcenchantments:spear_heavy",
+				"swing_sound": {"id": "bettercombat:claymore_stab", "pitch": 0.85},
+				"trail_particles": [
+					{"particle_type": "stab", "x_addition": 0.0, "y_addition": 0.05, "z_addition": 0.0, "local_yaw": 0.0, "pitch_addition": 15.0, "roll_set": 0.0},
+					{"particle_type": "stab", "x_addition": 0.0, "y_addition": -0.1, "z_addition": 0.15, "local_yaw": 0.0, "pitch_addition": 15.0, "roll_set": 0.0}
+				]
+			}
+		]
+	}
+}

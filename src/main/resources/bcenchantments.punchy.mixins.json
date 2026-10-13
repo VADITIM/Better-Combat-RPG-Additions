@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "dev.vadim.bcenchantments.mixin.punchy",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"PunchyAttackStateMachineMixin",
+		"PunchyCustomAnimationResolverMixin",
+		"PunchySpearStateMachineMixin"
+	],
+	"injectors": {
+		"defaultRequire": 0
+	}
+}
