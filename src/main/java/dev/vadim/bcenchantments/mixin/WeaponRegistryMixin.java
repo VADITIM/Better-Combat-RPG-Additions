@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.mixin;
 
+import dev.vadim.bcenchantments.combat.BetterCombatSwitch;
 import java.util.Map;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.api.component.BetterCombatDataComponents;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Punchy hides spears from Better Combat in first person, by having the registry's lookup by item id
  * answer null for them, so it can play its own spear stab. That also cuts the server of a singleplayer
  * world off from them. The spear has its own combo now, so spears are looked up past that here.
+ * With {@link BetterCombatSwitch} off, nothing has attributes at all.
  */
 @Mixin(value = WeaponRegistry.class, remap = false)
 public abstract class WeaponRegistryMixin {
@@ -30,6 +32,10 @@ public abstract class WeaponRegistryMixin {
 
 	@Inject(method = "getAttributes(Lnet/minecraft/world/item/ItemStack;)Lnet/bettercombat/api/WeaponAttributes;", at = @At("HEAD"), cancellable = true)
 	private static void bcenchantments$spearAttributes(ItemStack stack, CallbackInfoReturnable<WeaponAttributes> cir) {
+		if (BetterCombatSwitch.disabled()) {
+			cir.setReturnValue(null);
+			return;
+		}
 		if (stack == null || stack.isEmpty() || stack.has(BetterCombatDataComponents.WEAPON_PRESET_ID)) {
 			return;
 		}

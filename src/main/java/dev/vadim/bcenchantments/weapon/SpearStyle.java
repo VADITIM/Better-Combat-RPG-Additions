@@ -4,6 +4,7 @@ import dev.vadim.bcenchantments.RpgAdditions;
 import java.util.Map;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.logic.WeaponRegistry;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -69,7 +70,7 @@ public final class SpearStyle implements WeaponStyle {
 	}
 
 	@Override
-	public boolean launches(String animation) {
+	public boolean launches(Player player, String animation) {
 		return HEAVY.equals(animation);
 	}
 }

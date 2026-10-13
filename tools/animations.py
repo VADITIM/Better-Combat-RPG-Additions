@@ -47,41 +47,8 @@ up_grip = [
     (0.9,  [0, 0, 0], C),
 ]
 
-# Slam: arm whips overhead, hangs for a beat at the top of the jump, then hammers straight down,
-# jolts on impact and stays planted before recovering.
-sl_rot = [
-    (0.0,  [0, 0, 0], C),
-    (0.07, [-80, 0, 12], C),
-    (0.15, [-94, 0, 14], L),
-    (0.21, [72, 0, -4], L),
-    (0.24, [58, 0, -3], L),
-    (0.28, [70, 0, -4], C),
-    (0.55, [65, 0, -4], C),
-    (0.8,  [-12, 0, 2], C),
-    (1.05, [0, 0, 0], C),
-]
-sl_pos = [
-    (0.0,  [0, 0, 0], C),
-    (0.07, [1, 9, 5], C),
-    (0.15, [1, 11, 6], L),
-    (0.21, [0, -13, -22], L),
-    (0.24, [0, -10.5, -20], L),
-    (0.28, [0, -14, -22], C),
-    (0.55, [0, -13, -21], C),
-    (0.8,  [0, 2, 0], C),
-    (1.05, [0, 0, 0], C),
-]
-sl_grip = [
-    (0.0,  [0, 0, 0], C),
-    (0.07, [-25, 0, 0], C),
-    (0.15, [-30, 0, 0], L),
-    (0.21, [50, 0, 0], L),
-    (0.55, [48, 0, 0], C),
-    (0.9,  [0, 0, 0], C),
-]
-
-# Critical slam: both hands on the grip, pulled in to the middle of the screen, a higher windup
-# and a heavier impact than the one-handed slam.
+# Air crit: both hands on the grip, pulled in to the middle of the screen, a high windup and a
+# heavy strike straight down. Played for any sword swing in the air that rolled a critical hit.
 cr_rot = [
     (0.0,  [0, 0, 0], C),
     (0.08, [-88, -14, 8], C),
@@ -194,9 +161,8 @@ ret_grip_pos = [(0.0, GRIP_POS, L), (0.033, [2, -3, 0], L), (0.65, [0, 0, 0], L)
 
 punchy = {"format_version": "1.8.0", "animations": {
     "bcenchantments_uppercut": clip(up_rot, up_pos, up_grip, 1.0),
-    "bcenchantments_slam": clip(sl_rot, sl_pos, sl_grip, 1.05),
     # dual_handed makes Punchy animate the off arm with its own track instead of leaving it idle.
-    "bcenchantments_slam_crit": clip(cr_rot, cr_pos, cr_grip, 1.15, "dual_handed;anim_speed_1;"),
+    "bcenchantments_air_crit": clip(cr_rot, cr_pos, cr_grip, 1.15, "dual_handed;anim_speed_1;"),
     # "attack" in the names lets Punchy treat them as attacks (sprint and fall blending).
     "bcenchantments_spear_attack_1": spear_clip(*s1),
     "bcenchantments_spear_attack_2": spear_clip(*s2),
@@ -254,80 +220,38 @@ uppercut = emote("uppercut", "One handed rising uppercut", [
     }),
 ])
 
-slam = emote("slam", "One handed jumping slam", [
-    (8, "EASEOUTQUAD", {
-        "rightArm": {"pitch": -3.6, "yaw": 0.3, "roll": 0.2, "z": 1.6},
-        "rightItem": {"pitch": 0.05, "roll": -0.14, "x": -0.55, "y": 0.09, "yaw": -0.41, "z": -0.27},
-        "leftArm": {"pitch": -2.4, "roll": -0.4},
-        "torso": {"pitch": 0.5},
-        "head": {"pitch": -0.3},
-        "rightLeg": {"pitch": -0.9},
-        "leftLeg": {"pitch": -0.5},
-    }),
-    (10, "EASEINQUAD", {
-        "rightArm": {"pitch": -1.2, "yaw": -0.4, "roll": 0.2, "z": -2.2},
-        "rightItem": {"pitch": -0.29, "roll": -0.24, "x": -0.23, "y": 0.2, "yaw": -0.4, "z": -1.92},
-        "leftArm": {"pitch": 0.4, "yaw": -1.0, "roll": -1.2},
-        "torso": {"pitch": -1.2, "z": -0.4},
-        "head": {"pitch": 0.5},
-        "rightLeg": {"pitch": -0.4},
-        "leftLeg": {"pitch": -1.1},
-    }),
-    (11, "EASEOUTQUAD", {
-        "rightArm": {"pitch": -0.9, "z": -2.0},
-        "rightItem": {"z": -0.9, "y": 1.0},
-        "torso": {"pitch": -1.3},
-    }),
-    (13, "EASEINOUTQUAD", {
-        "rightArm": {"pitch": -1.1, "z": -2.1},
-        "rightItem": {"z": -1.92, "y": 0.2},
-        "torso": {"pitch": -1.15},
-    }),
-    (20, "EASEINOUTQUAD", {
-        "rightArm": {"pitch": -1.1, "z": -2.1},
-        "torso": {"pitch": -1.1},
-        "leftLeg": {"pitch": -1.0},
-    }),
-])
-
-slam_crit = emote("slam_crit", "Two handed critical jumping slam", [
-    (8, "EASEOUTQUAD", {
-        "rightArm": {"pitch": -3.8, "yaw": 0.41, "roll": 0.25, "z": 1.67},
-        "leftArm": {"pitch": -3.77, "yaw": -0.51, "roll": -0.32, "z": 1.67},
-        "rightItem": {"pitch": 0.05, "roll": -0.14, "x": -0.55, "y": 0.09, "yaw": -0.41, "z": -0.27},
-        "torso": {"pitch": 0.6},
-        "head": {"pitch": -0.35},
-        "rightLeg": {"pitch": -1.0},
+# Air crit: both arms mirrored so the hands meet on the centre line, the sword straight overhead,
+# then brought straight down the middle to point ahead and below.
+air_crit = emote("air_crit", "Two handed centred overhead strike, swung down in the air on a critical hit", [
+    (7, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -3.0, "yaw": 0.42, "roll": 0.0, "z": 1.0},
+        "leftArm": {"pitch": -3.0, "yaw": -0.42, "roll": 0.0, "z": 1.0},
+        "rightItem": {"pitch": 0.0, "yaw": 0.0, "roll": 0.0, "x": -0.6, "y": 0.0, "z": 0.0},
+        "torso": {"pitch": 0.35},
+        "head": {"pitch": -0.25},
+        "rightLeg": {"pitch": -0.6},
         "leftLeg": {"pitch": -0.6},
     }),
     (10, "EASEINQUAD", {
-        "rightArm": {"pitch": -2.0, "yaw": -0.28, "roll": 0.44, "y": 2.25, "z": -2.08},
-        "leftArm": {"pitch": -2.05, "yaw": 0.35, "roll": -0.44, "y": 2.51, "z": -2.12},
-        "rightItem": {"pitch": -0.29, "roll": -0.24, "x": -0.23, "y": 0.2, "yaw": -0.4, "z": -1.92},
-        "torso": {"pitch": -1.5, "z": -0.3},
-        "head": {"pitch": 0.6},
-        "rightLeg": {"pitch": -0.5},
-        "leftLeg": {"pitch": -1.3},
+        "rightArm": {"pitch": -1.1, "yaw": 0.5, "roll": 0.0, "z": -1.6},
+        "leftArm": {"pitch": -1.1, "yaw": -0.5, "roll": 0.0, "z": -1.6},
+        "rightItem": {"pitch": -0.3, "yaw": 0.0, "roll": 0.0, "x": -0.6, "y": 0.2, "z": -1.0},
+        "torso": {"pitch": -0.7},
+        "head": {"pitch": 0.4},
+        "rightLeg": {"pitch": -0.3},
+        "leftLeg": {"pitch": -0.3},
     }),
-    (11, "EASEOUTQUAD", {
-        "rightArm": {"pitch": -1.7},
-        "leftArm": {"pitch": -1.75},
-        "rightItem": {"z": -0.9, "y": 1.0},
-        "torso": {"pitch": -1.65},
-    }),
-    (13, "EASEINOUTQUAD", {
-        "rightArm": {"pitch": -1.95},
-        "leftArm": {"pitch": -2.0},
-        "rightItem": {"z": -1.92, "y": 0.2},
-        "torso": {"pitch": -1.5},
+    (12, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -0.9},
+        "leftArm": {"pitch": -0.9},
+        "torso": {"pitch": -0.8},
     }),
     (20, "EASEINOUTQUAD", {
-        "rightArm": {"pitch": -1.95},
-        "leftArm": {"pitch": -2.0},
-        "torso": {"pitch": -1.45},
-        "leftLeg": {"pitch": -1.2},
+        "rightArm": {"pitch": -0.95},
+        "leftArm": {"pitch": -0.95},
+        "torso": {"pitch": -0.75},
     }),
-])
+], begin=7)
 
 # Spear combo, one-handed. Better Combat speeds the animation up through the upswing so the hit
 # always lands at endTick / 2, so every thrust sits at tick 10. Arm x/y/z are absolute (rest -5, 2, 0).
@@ -445,8 +369,7 @@ spear_4 = emote("spear_heavy", "Heavy downward spear thrust", [
 p = os.path.join(res, "assets/bcenchantments/player_animations")
 os.makedirs(p, exist_ok=True)
 json.dump(uppercut, open(os.path.join(p, "uppercut.json"), "w"), indent=1)
-json.dump(slam, open(os.path.join(p, "slam.json"), "w"), indent=1)
-json.dump(slam_crit, open(os.path.join(p, "slam_crit.json"), "w"), indent=1)
+json.dump(air_crit, open(os.path.join(p, "air_crit.json"), "w"), indent=1)
 for anim in (spear_1, spear_2, spear_3, spear_4):
     json.dump(anim, open(os.path.join(p, anim["name"] + ".json"), "w"), indent=1)
 print("ok")

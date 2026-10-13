@@ -40,6 +40,8 @@ public final class HudConfig {
 		public float chargeBarSideY = 0.0F;
 		/** Size of the charge bars; 1.0 makes each block 4 by 1 GUI pixels. */
 		public float chargeBarScale = 0.75F;
+		/** Off turns Better Combat's attacks off entirely, for farms that need vanilla sweeping. */
+		public boolean betterCombat = true;
 
 		public Values copy() {
 			Values copy = new Values();
@@ -48,6 +50,7 @@ public final class HudConfig {
 			copy.chargeBarSideX = chargeBarSideX;
 			copy.chargeBarSideY = chargeBarSideY;
 			copy.chargeBarScale = chargeBarScale;
+			copy.betterCombat = betterCombat;
 			return copy;
 		}
 	}

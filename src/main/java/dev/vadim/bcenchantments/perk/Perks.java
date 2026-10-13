@@ -14,20 +14,23 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 /**
  * The Dungeons-style perks. Each is a data-driven enchantment ({@code data/bcenchantments/enchantment})
  * that a trim refinement can grant as well; the code behind it registers its own hooks in {@link #init}.
- * A new perk needs its enchantment JSON, a key here, a line in {@link #ALL}, and its hooks.
+ * A new perk needs its enchantment JSON, a key here, a line in {@link #ALL}, and its hooks. Perks
+ * that change each other on the same weapon are listed in {@link Synergy}.
  */
 public final class Perks {
 	public static final ResourceKey<Enchantment> LIGHTNING = key("lightning");
 	public static final ResourceKey<Enchantment> SHOCKWAVE = key("shockwave");
 	public static final ResourceKey<Enchantment> COLD_EDGE = key("cold_edge");
 	public static final ResourceKey<Enchantment> UPPERCUT = key("uppercut");
-	public static final ResourceKey<Enchantment> ATTACK_SPEED = key("attack_speed");
+	public static final ResourceKey<Enchantment> CHAINS = key("chains");
+	public static final ResourceKey<Enchantment> ECHO = key("echo");
+	public static final ResourceKey<Enchantment> WIND_CHARGED = key("wind_charged");
 
 	/** Every perk, for anything that weighs how strong a weapon is. */
-	public static final List<ResourceKey<Enchantment>> ALL = List.of(LIGHTNING, SHOCKWAVE, COLD_EDGE, UPPERCUT, ATTACK_SPEED);
+	public static final List<ResourceKey<Enchantment>> ALL = List.of(LIGHTNING, SHOCKWAVE, COLD_EDGE, UPPERCUT, CHAINS, ECHO, WIND_CHARGED);
 
 	/** Perks that charge up over a combo, in the order the HUD shows their rows. Both sides index into this list. */
-	public static final List<ChargedPerk> CHARGED = List.of(Lightning.INSTANCE, Shockwave.INSTANCE);
+	public static final List<ChargedPerk> CHARGED = List.of(Lightning.INSTANCE, Shockwave.INSTANCE, Chains.INSTANCE, Echo.INSTANCE);
 
 	private Perks() {
 	}
@@ -38,6 +41,10 @@ public final class Perks {
 		CombatHooks.onServerTick(ColdEdge::tick);
 		CombatHooks.onSwing(Uppercut::onSwing);
 		CombatHooks.onServerTick(Shockwave::tick);
+		CombatHooks.onServerTick(Control::tick);
+		CombatHooks.onServerTick(Impact::tick);
+		CombatHooks.onKill(WindCharged::onKill);
+		CombatHooks.onKill(Lightning::onKill);
 	}
 
 	private static ResourceKey<Enchantment> key(String name) {

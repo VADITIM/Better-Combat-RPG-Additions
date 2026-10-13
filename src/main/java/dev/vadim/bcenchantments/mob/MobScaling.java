@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,14 +20,16 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
 
 /**
- * Hidden stat buffs for monsters, scaled by local difficulty and by how strong the nearby players'
- * weapons are, so perked weapons meet sturdier enemies instead of trivialising them. A monster is
+ * Hidden stat buffs for monsters. Health and damage are rolled per monster; armor and knockback
+ * resistance scale with local difficulty and with how strong the nearby players' weapons are, so
+ * powered weapons meet sturdier enemies instead of trivialising them. A monster is
  * scaled once, the first time it joins the world; the modifiers are permanent, so they are saved with
  * it and mark it as done. Fall damage grows with the added health, so mob farms still kill at the
  * same drop height.
  */
 public final class MobScaling {
 	private static final Identifier HEALTH = RpgAdditions.id("mob_health");
+	private static final Identifier DAMAGE = RpgAdditions.id("mob_damage");
 	private static final Identifier ARMOR = RpgAdditions.id("mob_armor");
 	private static final Identifier KNOCKBACK_RESISTANCE = RpgAdditions.id("mob_knockback_resistance");
 
@@ -50,7 +53,9 @@ public final class MobScaling {
 
 		float healthShare = mob.getHealth() / mob.getMaxHealth();
 		add(mob, Attributes.MAX_HEALTH, HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_BASE,
-			MobBalance.HEALTH_BASE + MobBalance.HEALTH_PER_DIFFICULTY * difficulty + MobBalance.HEALTH_PER_POWER * power);
+			MobBalance.HEALTH_MAX * bell(mob.getRandom()));
+		add(mob, Attributes.ATTACK_DAMAGE, DAMAGE, AttributeModifier.Operation.ADD_MULTIPLIED_BASE,
+			MobBalance.DAMAGE_MAX * mob.getRandom().nextDouble());
 		add(mob, Attributes.ARMOR, ARMOR, AttributeModifier.Operation.ADD_VALUE,
 			MobBalance.ARMOR_BASE + MobBalance.ARMOR_PER_DIFFICULTY * difficulty + MobBalance.ARMOR_PER_POWER * power);
 		add(mob, Attributes.KNOCKBACK_RESISTANCE, KNOCKBACK_RESISTANCE, AttributeModifier.Operation.ADD_VALUE,
@@ -58,6 +63,11 @@ public final class MobScaling {
 				+ MobBalance.KNOCKBACK_RESISTANCE_PER_POWER * power);
 		// Keeps the share of health it had, so a fresh spawn starts full and a hurt one stays as hurt.
 		mob.setHealth(healthShare * mob.getMaxHealth());
+	}
+
+	/** A roll in [0, 1] that lands near the middle most often: the mean of three even rolls. */
+	private static double bell(RandomSource random) {
+		return (random.nextDouble() + random.nextDouble() + random.nextDouble()) / 3.0;
 	}
 
 	/** Fall damage on a scaled monster, raised by as much as its health was, so it dies from the same height as before. */

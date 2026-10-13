@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * A slam is swung while falling, which Punchy treats as a critical hit and answers with its critical
+ * An air crit is swung while falling, which Punchy treats as a critical hit and answers with its critical
  * clip before it asks for the Better Combat one. Skip the critical clip while a special attack waits.
  */
 @Pseudo

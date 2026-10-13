@@ -4,7 +4,6 @@ import dev.vadim.bcenchantments.network.ComboHudPayload;
 import dev.vadim.bcenchantments.perk.ChargedPerk;
 import dev.vadim.bcenchantments.perk.Perks;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -39,7 +38,7 @@ public final class ComboTracker {
 
 	private static final class Streak {
 		int lastCombo = Integer.MIN_VALUE;
-		long lastSwingTick;
+		long lastHitTick;
 		int combo;
 		final HandStreak mainHand = new HandStreak();
 		final HandStreak offHand = new HandStreak();
@@ -127,10 +126,9 @@ public final class ComboTracker {
 		// Better Combat counts swings of both hands up together and starts over at 0 after a pause, so a gap means the combo broke.
 		boolean chained = swingCombo == streak.lastCombo + 1;
 		long tick = player.level().getGameTime();
-		long paused = tick - streak.lastSwingTick;
+		long sinceHit = tick - streak.lastHitTick;
 		int window = comboWindowTicks(player);
 		boolean swapped = !own.weapon.isEmpty() && !ItemStack.isSameItem(weapon, own.weapon);
-		streak.lastSwingTick = tick;
 		streak.lastCombo = swingCombo;
 		own.weapon = weapon.copy();
 		own.attacks = hand.combo().total();
@@ -139,8 +137,8 @@ public final class ComboTracker {
 			streak.combo = 0;
 		}
 		for (int i = 0; i < Perks.CHARGED.size(); i++) {
-			int grace = Perks.CHARGED.get(i).graceTicks();
-			boolean alive = chained || grace != ChargedPerk.BREAKS_WITH_COMBO && paused <= window + grace;
+			int keep = Perks.CHARGED.get(i).keepTicks(window);
+			boolean alive = chained || keep != ChargedPerk.BREAKS_WITH_COMBO && sinceHit <= keep;
 			if (!alive) {
 				streak.mainHand.charges[i] = 0;
 				streak.offHand.charges[i] = 0;
@@ -149,7 +147,11 @@ public final class ComboTracker {
 		// A miss or a new weapon only costs the hand that swung; the other hand keeps its charge.
 		if (hits.isEmpty() || swapped) {
 			streak.combo = 0;
-			Arrays.fill(own.charges, 0);
+			for (int i = 0; i < Perks.CHARGED.size(); i++) {
+				if (swapped || Perks.CHARGED.get(i).resetsOnMiss()) {
+					own.charges[i] = 0;
+				}
+			}
 		}
 		if (hits.isEmpty()) {
 			sync(player, streak, hand.isOffHand(), 0);
@@ -157,6 +159,7 @@ public final class ComboTracker {
 		}
 
 		streak.combo++;
+		streak.lastHitTick = tick;
 		LivingEntity primary = hits.get(0);
 		for (LivingEntity hit : hits) {
 			// The cursor target wins over whatever else the sweep caught.
@@ -166,23 +169,48 @@ public final class ComboTracker {
 		}
 		SwingResult swing = new SwingResult(player, hand, weapon, hits, primary);
 		CombatHooks.swing(swing);
+		sync(player, streak, hand.isOffHand(), charge(own, swing, null));
+	}
 
+	/**
+	 * Counts an extra attack that landed outside a swing, such as an Echo, toward the hand's charged
+	 * perks, leaving out {@code source}. It runs no swing effects, so no perk applies twice.
+	 */
+	public static void countExtraAttack(ServerPlayer player, AttackHand hand, List<LivingEntity> hits, ChargedPerk source) {
+		Streak streak = STREAKS.get(player);
+		if (streak == null || hits.isEmpty()) {
+			return;
+		}
+		HandStreak own = hand.isOffHand() ? streak.offHand : streak.mainHand;
+		if (!ItemStack.isSameItem(hand.itemStack(), own.weapon)) {
+			return;
+		}
+		streak.lastHitTick = player.level().getGameTime();
+		SwingResult extra = new SwingResult(player, hand, hand.itemStack(), hits, hits.get(0));
+		sync(player, streak, hand.isOffHand(), charge(own, extra, source));
+	}
+
+	/** Advances every charged perk but {@code skip} by {@code swing}, fires the full ones and returns their bits. */
+	private static int charge(HandStreak own, SwingResult swing, ChargedPerk skip) {
 		int fired = 0;
 		for (int i = 0; i < Perks.CHARGED.size(); i++) {
 			ChargedPerk perk = Perks.CHARGED.get(i);
-			int level = Perks.level(weapon, perk.enchantment());
+			if (perk == skip) {
+				continue;
+			}
+			int level = Perks.level(swing.weapon(), perk.enchantment());
 			if (level <= 0) {
 				own.charges[i] = 0;
 				continue;
 			}
 			own.charges[i] = perk.advance(own.charges[i], swing);
-			if (own.charges[i] >= perk.required(own.attacks)) {
+			if (own.charges[i] >= perk.required(swing.weapon(), own.attacks)) {
 				own.charges[i] = 0;
 				perk.fire(swing, level);
 				fired |= 1 << i;
 			}
 		}
-		sync(player, streak, hand.isOffHand(), fired);
+		return fired;
 	}
 
 	/** How long Better Combat waits after a swing before it drops the combo, worked out the way its client does. */
@@ -208,8 +236,15 @@ public final class ComboTracker {
 		List<ComboHudPayload.Charge> charges = new ArrayList<>(Perks.CHARGED.size());
 		for (int i = 0; i < Perks.CHARGED.size(); i++) {
 			ChargedPerk perk = Perks.CHARGED.get(i);
-			int max = Perks.level(held, perk.enchantment()) > 0 ? perk.required(attacks) : 0;
-			charges.add(new ComboHudPayload.Charge(same && max > 0 ? own.charges[i] : 0, max, (fired & 1 << i) != 0));
+			if (Perks.level(held, perk.enchantment()) <= 0) {
+				charges.add(new ComboHudPayload.Charge(0, 0, (fired & 1 << i) != 0));
+				continue;
+			}
+			// The charge is scaled onto the row's blocks, which may be fewer than the charge it needs.
+			int required = perk.required(held, attacks);
+			int segments = perk.segments(held, attacks);
+			int value = same ? Math.min(own.charges[i], required) * segments / required : 0;
+			charges.add(new ComboHudPayload.Charge(value, segments, (fired & 1 << i) != 0));
 		}
 		return charges;
 	}

@@ -17,6 +17,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -25,7 +26,9 @@ import net.minecraft.world.phys.Vec3;
 /**
  * A crescent slash that flies out where the player looks, like a sword beam, after three swings in
  * a row that each hit three or more enemies. It cuts through everything in its path once, kicks up
- * the ground it passes over like the Dungeons shockwave, and breaks on walls.
+ * the ground it passes over like the Dungeons shockwave, and breaks on walls. With
+ * {@link Synergy#TEMPEST} it throws what it hits much harder, and an enemy slammed into a wall takes
+ * knockback damage.
  */
 public final class Shockwave implements ChargedPerk {
 	static final Shockwave INSTANCE = new Shockwave();
@@ -42,6 +45,11 @@ public final class Shockwave implements ChargedPerk {
 	private static final double HALF_WIDTH = 1.6;
 	private static final double HEIGHT = 0.9;
 	private static final double PUSH = 0.6;
+	/** Tempest: how hard the wave throws, and the wall damage for levels 1 to 3. */
+	private static final double TEMPEST_PUSH = 1.4;
+	private static final double TEMPEST_LIFT = 0.3;
+	private static final float[] TEMPEST_DAMAGE = {4.0F, 6.0F, 8.0F};
+	private static final int TEMPEST_TRACK_TICKS = 25;
 
 	private static final class Wave {
 		final ServerPlayer owner;
@@ -50,11 +58,13 @@ public final class Shockwave implements ChargedPerk {
 		final Vec3 side;
 		final double range;
 		final float damage;
+		/** Tempest's wall damage, 0 without it. */
+		final float slam;
 		final Set<Entity> hit = new HashSet<>();
 		Vec3 pos;
 		double travelled;
 
-		Wave(ServerPlayer owner, ServerLevel level, Vec3 pos, Vec3 dir, int enchantLevel) {
+		Wave(ServerPlayer owner, ServerLevel level, Vec3 pos, Vec3 dir, int enchantLevel, boolean tempest) {
 			this.owner = owner;
 			this.level = level;
 			this.pos = pos;
@@ -62,6 +72,7 @@ public final class Shockwave implements ChargedPerk {
 			this.side = new Vec3(-dir.z, 0.0, dir.x);
 			this.range = RANGE[enchantLevel - 1];
 			this.damage = DAMAGE[enchantLevel - 1];
+			this.slam = tempest ? TEMPEST_DAMAGE[enchantLevel - 1] : 0.0F;
 		}
 	}
 
@@ -81,13 +92,13 @@ public final class Shockwave implements ChargedPerk {
 	}
 
 	@Override
-	public int required(int attacks) {
+	public int required(ItemStack weapon, int attacks) {
 		return SWINGS;
 	}
 
 	@Override
-	public int graceTicks() {
-		return STREAK_GRACE_TICKS;
+	public int keepTicks(int comboWindowTicks) {
+		return comboWindowTicks + STREAK_GRACE_TICKS;
 	}
 
 	/** Only swings that each hit a crowd count; one that does not starts the streak over. */
@@ -98,10 +109,10 @@ public final class Shockwave implements ChargedPerk {
 
 	@Override
 	public void fire(SwingResult swing, int level) {
-		launch(swing.player(), level);
+		launch(swing.player(), level, Synergy.TEMPEST.on(swing.weapon()));
 	}
 
-	private static void launch(ServerPlayer player, int level) {
+	private static void launch(ServerPlayer player, int level, boolean tempest) {
 		level = Math.min(level, DAMAGE.length);
 		ServerLevel world = player.level();
 		Vec3 look = player.getLookAngle();
@@ -113,7 +124,7 @@ public final class Shockwave implements ChargedPerk {
 		}
 		dir = dir.normalize();
 		Vec3 start = player.position().add(0.0, HEIGHT, 0.0).add(dir.scale(0.6));
-		WAVES.add(new Wave(player, world, start, dir, level));
+		WAVES.add(new Wave(player, world, start, dir, level, tempest));
 
 		world.playSound((Entity) null, start.x, start.y, start.z, SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 0.6F);
 		world.playSound((Entity) null, start.x, start.y, start.z, SoundEvents.TRIDENT_RIPTIDE_1, SoundSource.PLAYERS, 0.7F, 1.4F);
@@ -151,7 +162,12 @@ public final class Shockwave implements ChargedPerk {
 				wave.hit.add(target);
 				target.invulnerableTime = 0;
 				target.hurtServer(wave.level, wave.level.damageSources().playerAttack(wave.owner), wave.damage);
-				target.push(wave.dir.x * PUSH, 0.25, wave.dir.z * PUSH);
+				if (wave.slam > 0.0F) {
+					target.setDeltaMovement(wave.dir.x * TEMPEST_PUSH, TEMPEST_LIFT, wave.dir.z * TEMPEST_PUSH);
+					Impact.track(target, wave.owner, wave.slam, TEMPEST_TRACK_TICKS);
+				} else {
+					target.push(wave.dir.x * PUSH, 0.25, wave.dir.z * PUSH);
+				}
 				target.hurtMarked = true;
 				wave.level.sendParticles(ParticleTypes.CRIT, target.getX(), target.getY(0.5), target.getZ(), 10, 0.3, 0.3, 0.3, 0.3);
 			}

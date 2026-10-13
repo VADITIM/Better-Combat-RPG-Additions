@@ -1,0 +1,19 @@
+{
+	"description": {
+		"translate": "enchantment.bcenchantments.wind_charged"
+	},
+	"supported_items": "#minecraft:enchantable/weapon",
+	"primary_items": "#minecraft:enchantable/melee_weapon",
+	"weight": 4,
+	"max_level": 3,
+	"min_cost": {
+		"base": 10,
+		"per_level_above_first": 10
+	},
+	"max_cost": {
+		"base": 60,
+		"per_level_above_first": 10
+	},
+	"anvil_cost": 2,
+	"slots": ["mainhand", "offhand"]
+}

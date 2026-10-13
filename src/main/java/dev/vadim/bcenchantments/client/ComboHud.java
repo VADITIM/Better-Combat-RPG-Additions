@@ -202,9 +202,9 @@ public final class ComboHud implements HudElement {
 		brokeAt = now;
 		missed = miss;
 		combo = 0;
-		// Perks with a grace period keep their charge past the combo until that runs out too.
+		// Other perks keep their charge past the combo until their own time runs out.
 		for (Hand hand : new Hand[] {MAIN_HAND, OFF_HAND}) {
-			hand.drop(perk -> perk.graceTicks() == ChargedPerk.BREAKS_WITH_COMBO);
+			hand.drop(perk -> perk.keepTicks(0) == ChargedPerk.BREAKS_WITH_COMBO);
 		}
 	}
 
@@ -225,7 +225,7 @@ public final class ComboHud implements HudElement {
 			breakCombo(now, false);
 		}
 		for (Hand hand : new Hand[] {MAIN_HAND, OFF_HAND}) {
-			hand.drop(perk -> perk.graceTicks() != ChargedPerk.BREAKS_WITH_COMBO && graceExpired(perk.graceTicks(), now));
+			hand.drop(perk -> expired(perk, now));
 			for (Row row : hand.rows) {
 				row.advance(dt, now);
 			}
@@ -475,13 +475,15 @@ public final class ComboHud implements HudElement {
 		return Mth.clamp(1.0F - (now - updatedAt) / (float) FALLBACK_WINDOW_MS, 0.0F, 1.0F);
 	}
 
-	/** Whether a grace period of {@code graceTicks} after Better Combat's combo window has run out. */
-	private static boolean graceExpired(int graceTicks, long now) {
+	/** Whether {@code perk}'s charge has outlived its time since the last swing; never for one that breaks with the combo. */
+	private static boolean expired(ChargedPerk perk, long now) {
 		ComboClock.Source clock = ComboClock.source;
 		if (clock != null && clock.bcenchantments$comboReset() > 0) {
-			return clock.bcenchantments$lastAttacked() > clock.bcenchantments$comboReset() + graceTicks;
+			int keep = perk.keepTicks(clock.bcenchantments$comboReset());
+			return keep != ChargedPerk.BREAKS_WITH_COMBO && clock.bcenchantments$lastAttacked() > keep;
 		}
-		return now - updatedAt > FALLBACK_WINDOW_MS + graceTicks * 50L;
+		int keep = perk.keepTicks((int) (FALLBACK_WINDOW_MS / 50L));
+		return keep != ChargedPerk.BREAKS_WITH_COMBO && now - updatedAt > keep * 50L;
 	}
 
 	private static float approach(float value, float target, float step) {

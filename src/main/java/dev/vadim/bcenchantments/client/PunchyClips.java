@@ -10,7 +10,7 @@ import net.minecraft.world.InteractionHand;
 /**
  * First-person clips for the special attacks when Punchy draws the arms. Punchy's Better Combat compat
  * stops Better Combat's own first-person animation and plays a clip of its own, chosen by combo index,
- * so the clip for a slam or uppercut is handed to it here. The clips live in
+ * so the clip for an air crit or uppercut is handed to it here. The clips live in
  * {@code assets/minecraft/punchy/animations/bcenchantments.animation.json}. Punchy is optional, so it
  * is only reached through reflection.
  */
@@ -29,10 +29,8 @@ public final class PunchyClips {
 		String animation = hand.attack().animation();
 		if (SwordStyle.UPPERCUT.equals(animation)) {
 			pending = "bcenchantments_uppercut";
-		} else if (SwordStyle.SLAM_CRIT.equals(animation)) {
-			pending = "bcenchantments_slam_crit";
-		} else if (SwordStyle.SLAM.equals(animation)) {
-			pending = "bcenchantments_slam";
+		} else if (SwordStyle.AIR_CRIT.equals(animation)) {
+			pending = "bcenchantments_air_crit";
 		} else {
 			pending = null;
 		}

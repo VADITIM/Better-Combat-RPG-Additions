@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Lets each weapon style swap in its own attacks, such as the slam and uppercut, on the client and the server alike. */
+/** Lets each weapon style swap in its own attacks, such as the air crit and uppercut, on the client and the server alike. */
 @Mixin(PlayerAttackHelper.class)
 public abstract class PlayerAttackHelperMixin {
 	@Inject(method = "getCurrentAttack", at = @At("RETURN"), cancellable = true)

@@ -21,7 +21,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Weapon refinement on the smithing table: a weapon in the base slot takes gems, an echo shard with a
- * trim template, or a trim template alone, as described in {@link Refinement}.
+ * trim template, or a trim template alone, and a shield takes a trim template with an echo shard, as
+ * described in {@link Refinement}.
  */
 @Mixin(SmithingMenu.class)
 public abstract class SmithingMenuMixin extends ItemCombinerMenu {
@@ -37,7 +38,7 @@ public abstract class SmithingMenuMixin extends ItemCombinerMenu {
 
 	@ModifyArg(method = "createInputSlotDefinitions", at = @At(value = "INVOKE", target = WITH_SLOT, ordinal = 1), index = 3)
 	private static Predicate<ItemStack> bcenchantments$acceptWeapons(Predicate<ItemStack> vanilla) {
-		return vanilla.or(Refinement::isWeapon);
+		return vanilla.or(Refinement::isBase);
 	}
 
 	@ModifyArg(method = "createInputSlotDefinitions", at = @At(value = "INVOKE", target = WITH_SLOT, ordinal = 2), index = 3)
@@ -47,7 +48,7 @@ public abstract class SmithingMenuMixin extends ItemCombinerMenu {
 
 	@Inject(method = "canMoveIntoInputSlots", at = @At("HEAD"), cancellable = true)
 	private void bcenchantments$shiftClick(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-		if (Refinement.isWeapon(stack) && !this.getSlot(1).hasItem() || Refinement.isAddition(stack) && !this.getSlot(2).hasItem()) {
+		if (Refinement.isBase(stack) && !this.getSlot(1).hasItem() || Refinement.isAddition(stack) && !this.getSlot(2).hasItem()) {
 			cir.setReturnValue(true);
 		}
 	}

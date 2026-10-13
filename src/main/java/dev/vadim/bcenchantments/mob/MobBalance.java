@@ -8,7 +8,7 @@ package dev.vadim.bcenchantments.mob;
 final class MobBalance {
 	// Spawning: more monsters at once, so encounters are crowds rather than stragglers.
 	/** Multiplier on the monster spawn cap (vanilla 70 per player area). */
-	static final float MONSTER_CAP_MULTIPLIER = 1.5F;
+	static final float MONSTER_CAP_MULTIPLIER = 1.8F;
 
 	// Pressure damage: a single hit is softened, but hits that keep coming hurt more and more.
 	/** Share of its damage a monster's first hit in a chain deals. */
@@ -28,10 +28,13 @@ final class MobBalance {
 	/** Power above this adds nothing more. */
 	static final int MAX_POWER = 12;
 
-	/** Max health added, as a share of the monster's own. */
-	static final double HEALTH_BASE = 0.15;
-	static final double HEALTH_PER_DIFFICULTY = 0.25;
-	static final double HEALTH_PER_POWER = 0.05;
+	/**
+	 * Most max health added, as a share of the monster's own. Each monster rolls between none and this,
+	 * middling bonuses common and the extremes rare.
+	 */
+	static final double HEALTH_MAX = 0.30;
+	/** Most attack damage added, as a share of the monster's own, rolled evenly. */
+	static final double DAMAGE_MAX = 0.15;
 
 	/** Armor points added. */
 	static final double ARMOR_BASE = 1.0;

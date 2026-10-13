@@ -32,8 +32,8 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
  * Critical hits by chance instead of by falling. Every weapon carries a critical chance as an
  * attribute modifier, so later upgrades only have to add to it. Vanilla's jump crit is gone: whether
  * a swing crits is rolled once per hand ahead of time and synced to the client, so the client already
- * knows while choosing the swing's animation (the airborne slam turns two-handed on a crit), and every
- * hit of one Better Combat swing shares the same roll.
+ * knows while choosing the swing's animation (a sword swung in the air on a crit becomes the
+ * two-handed air crit), and every hit of one Better Combat swing shares the same roll.
  */
 public final class CriticalHits {
 	public static final Holder<Attribute> CRITICAL_CHANCE = register("critical_chance",

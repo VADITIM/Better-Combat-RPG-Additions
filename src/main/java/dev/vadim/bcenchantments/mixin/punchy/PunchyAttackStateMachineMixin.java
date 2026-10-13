@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Hands Punchy the slam or uppercut clip in place of its next attack clip. The clip goes in through
+ * Hands Punchy the air crit or uppercut clip in place of its next attack clip. The clip goes in through
  * Punchy's custom-attack lookup rather than its Better Combat one: Punchy keeps the off arm still for
- * any two-handed clip that comes from the Better Combat lookup, which would leave the critical slam's
+ * any two-handed clip that comes from the Better Combat lookup, which would leave the air crit's
  * left hand frozen.
  */
 @Pseudo

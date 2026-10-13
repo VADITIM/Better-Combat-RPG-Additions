@@ -32,6 +32,8 @@ public final class Theme {
 	/** Enchantment colours, kept because the charge bars are told apart by them. */
 	public static final int LIGHTNING = 0xFFDD1B;
 	public static final int SHOCKWAVE = 0x2EE6FF;
+	public static final int CHAINS = 0x9FB0BE;
+	public static final int ECHO = 0xA98BFF;
 	public static final int DANGER = 0xFF6B6B;
 
 	public static final float PANEL_ALPHA = 0.85F;
@@ -48,6 +50,8 @@ public final class Theme {
 		return switch (perk) {
 			case "lightning" -> LIGHTNING;
 			case "shockwave" -> SHOCKWAVE;
+			case "chains" -> CHAINS;
+			case "echo" -> ECHO;
 			default -> TEXT_BRIGHT;
 		};
 	}

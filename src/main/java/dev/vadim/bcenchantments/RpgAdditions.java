@@ -7,6 +7,7 @@ import dev.vadim.bcenchantments.network.ComboHudPayload;
 import dev.vadim.bcenchantments.network.CritRollPayload;
 import dev.vadim.bcenchantments.perk.Perks;
 import dev.vadim.bcenchantments.progression.Refinement;
+import dev.vadim.bcenchantments.vanilla.FireAspect;
 import dev.vadim.bcenchantments.weapon.WeaponStyles;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -31,6 +32,7 @@ public class RpgAdditions implements ModInitializer {
 		Perks.init();
 		MobScaling.init();
 		CombatHooks.init();
+		FireAspect.init();
 	}
 
 	public static Identifier id(String path) {

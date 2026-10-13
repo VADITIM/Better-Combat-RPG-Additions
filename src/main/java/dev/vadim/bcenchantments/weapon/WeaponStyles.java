@@ -20,6 +20,7 @@ public final class WeaponStyles {
 		// Spears before swords: a modded spear could carry the sword tag too.
 		register(SpearStyle.INSTANCE);
 		register(SwordStyle.INSTANCE);
+		register(MaceStyle.INSTANCE);
 	}
 
 	public static void register(WeaponStyle style) {
@@ -66,9 +67,9 @@ public final class WeaponStyles {
 		return style == null ? 1.0 : style.knockbackFactor(swing.attack().animation());
 	}
 
-	public static boolean launches(AttackHand swing) {
+	public static boolean launches(Player player, AttackHand swing) {
 		WeaponStyle style = of(swing.itemStack());
-		return style != null && style.launches(swing.attack().animation());
+		return style != null && style.launches(player, swing.attack().animation());
 	}
 
 	private static boolean shapesCooldown(ItemStack stack) {

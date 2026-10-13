@@ -37,7 +37,7 @@ public interface WeaponStyle {
 	}
 
 	/** Whether the attack throws what it hits into the air when the weapon has Uppercut. */
-	default boolean launches(String animation) {
+	default boolean launches(Player player, String animation) {
 		return false;
 	}
 }

@@ -12,25 +12,24 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The sword's third swing changes with the situation:
+ * The sword keeps Better Combat's combo, with two special swings on top:
  * <ul>
- * <li>Slam: swung while airborne, it comes down in an overhead slam, two-handed when the swing rolled
- * a critical hit, one-handed otherwise.</li>
- * <li>Uppercut: on the ground, with the Uppercut perk, it becomes a rising cut that launches what it hits.</li>
+ * <li>Air crit: any swing in the air that rolled a critical hit becomes a two-handed strike, the
+ * sword held over the centre of the head and brought straight down.</li>
+ * <li>Uppercut: on the ground, with the Uppercut power, the third swing becomes a rising cut that
+ * launches what it hits.</li>
  * </ul>
  */
 public final class SwordStyle implements WeaponStyle {
 	public static final SwordStyle INSTANCE = new SwordStyle();
 
 	public static final String UPPERCUT = RpgAdditions.MOD_ID + ":uppercut";
-	public static final String SLAM = RpgAdditions.MOD_ID + ":slam";
-	public static final String SLAM_CRIT = RpgAdditions.MOD_ID + ":slam_crit";
+	public static final String AIR_CRIT = RpgAdditions.MOD_ID + ":air_crit";
 
 	private static final int SPECIAL_SWING = 3;
-	// Weapon trails, taken from Better Combat's own one-handed uppercut, one-handed slam and two-handed slam.
+	// Weapon trails, after Better Combat's own one-handed uppercut and two-handed slam; the air crit's is centred.
 	private static final List<ParticlePlacement> UPPERCUT_TRAIL = List.of(new ParticlePlacement("slash90", 0.0F, -0.1F, 0.0F, 0.0F, 0.0F, 75.0F));
-	private static final List<ParticlePlacement> SLAM_TRAIL = List.of(new ParticlePlacement("slash90", 0.05F, -0.1F, 0.0F, 45.0F, 0.0F, -85.0F));
-	private static final List<ParticlePlacement> SLAM_CRIT_TRAIL = List.of(new ParticlePlacement("slash180", 0.1F, -0.1F, 0.0F, 45.0F, 0.0F, -86.0F));
+	private static final List<ParticlePlacement> AIR_CRIT_TRAIL = List.of(new ParticlePlacement("slash180", 0.0F, -0.1F, 0.0F, 45.0F, 0.0F, -90.0F));
 
 	private SwordStyle() {
 	}
@@ -42,20 +41,20 @@ public final class SwordStyle implements WeaponStyle {
 
 	@Override
 	public AttackHand replace(Player player, AttackHand hand) {
-		if (hand.isOffHand() || hand.combo().current() != SPECIAL_SWING) {
+		if (hand.isOffHand()) {
 			return hand;
 		}
 		if (isAirborne(player)) {
-			return CriticalHits.next(player, false) ? with(hand, SLAM_CRIT, 60.0, SLAM_CRIT_TRAIL) : with(hand, SLAM, 60.0, SLAM_TRAIL);
+			return CriticalHits.next(player, false) ? with(hand, AIR_CRIT, 60.0, AIR_CRIT_TRAIL) : hand;
 		}
-		if (Perks.level(hand.itemStack(), Perks.UPPERCUT) > 0) {
+		if (hand.combo().current() == SPECIAL_SWING && Perks.level(hand.itemStack(), Perks.UPPERCUT) > 0) {
 			return with(hand, UPPERCUT, 70.0, UPPERCUT_TRAIL);
 		}
 		return hand;
 	}
 
 	@Override
-	public boolean launches(String animation) {
+	public boolean launches(Player player, String animation) {
 		return UPPERCUT.equals(animation);
 	}
 

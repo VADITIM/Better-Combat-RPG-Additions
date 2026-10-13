@@ -136,7 +136,7 @@ public final class HudSettingsScreen extends Screen {
 				shown.add(setting);
 			}
 		}
-		int contentHeight = TITLE_HEIGHT + LAYOUT_CARD_HEIGHT + CARD_GAP + shown.size() * (SLIDER_CARD_HEIGHT + CARD_GAP) + BUTTON_HEIGHT;
+		int contentHeight = TITLE_HEIGHT + 2 * (LAYOUT_CARD_HEIGHT + CARD_GAP) + shown.size() * (SLIDER_CARD_HEIGHT + CARD_GAP) + BUTTON_HEIGHT;
 		int y0 = Math.max(MARGIN, (height - contentHeight - 2 * PADDING) / 2);
 		int y1 = y0 + contentHeight + 2 * PADDING;
 
@@ -150,6 +150,8 @@ public final class HudSettingsScreen extends Screen {
 		title(g, now, inner0 + offset(now, openedAt, order), y, enter(now, openedAt, order++) * (1.0F - leave));
 		y += TITLE_HEIGHT;
 
+		combatCard(g, now, inner0, y, inner1, mouseX, mouseY, order++, leave);
+		y += LAYOUT_CARD_HEIGHT + CARD_GAP;
 		layoutCard(g, now, inner0, y, inner1, mouseX, mouseY, order++, leave);
 		y += LAYOUT_CARD_HEIGHT + CARD_GAP;
 		int cardOrder = 0;
@@ -211,6 +213,39 @@ public final class HudSettingsScreen extends Screen {
 		segment(g, HudConfig.ChargeLayout.UNDER_CROSSHAIR, "screen.bcenchantments.settings.layout.under", x0 + 6, top, middle - 1, mouseX, mouseY, alpha, dx);
 		segment(g, HudConfig.ChargeLayout.BESIDE_CROSSHAIR, "screen.bcenchantments.settings.layout.beside", middle + 1, top, x1 - 6, mouseX, mouseY, alpha, dx);
 		g.pose().popMatrix();
+	}
+
+	/** Better Combat on or off, for farms that need vanilla attacks. */
+	private void combatCard(GuiGraphicsExtractor g, long now, int x0, int y, int x1, int mouseX, int mouseY, int order, float leave) {
+		float alpha = enter(now, openedAt, order) * (1.0F - leave);
+		if (alpha <= 0.0F) {
+			return;
+		}
+		float dx = offset(now, openedAt, order);
+		g.pose().pushMatrix();
+		g.pose().translate(dx, 0.0F);
+		card(g, x0, y, x1, y + LAYOUT_CARD_HEIGHT, alpha, false);
+		g.text(font, Component.translatable("screen.bcenchantments.settings.better_combat"), x0 + 6, y + 5, Theme.argb(alpha, Theme.TEXT_MUTED), false);
+		int top = y + 16;
+		int middle = (x0 + x1) / 2;
+		toggle(g, true, "screen.bcenchantments.settings.on", x0 + 6, top, middle - 1, mouseX, mouseY, alpha, dx);
+		toggle(g, false, "screen.bcenchantments.settings.off", middle + 1, top, x1 - 6, mouseX, mouseY, alpha, dx);
+		g.pose().popMatrix();
+	}
+
+	private void toggle(GuiGraphicsExtractor g, boolean on, String key, int x0, int y0, int x1, int mouseX, int mouseY, float alpha, float dx) {
+		int y1 = y0 + 12;
+		boolean selected = values.betterCombat == on;
+		Hit hit = new Hit(Math.round(x0 + dx), y0, Math.round(x1 + dx), y1, () -> values.betterCombat = on, null);
+		hits.add(hit);
+		boolean hovered = hit.contains(mouseX, mouseY);
+		int down = hit.sameAs(pressed) ? 1 : 0;
+		Theme.box(g, x0, y0 + down, x1, y1, selected ? Theme.argb(alpha, Theme.ACCENT) : Theme.argb(alpha * Theme.PANEL_ALPHA, Theme.SUNKEN));
+		int ring = selected ? Theme.TEXT_MUTED : hovered ? Theme.BORDER_HOVER : Theme.BORDER_CONTROL;
+		Theme.hairline(g, x0, y0 + down, x1, y1, Theme.argb(alpha, ring));
+		String text = Component.translatable(key).getString();
+		int color = selected ? Theme.ON_ACCENT : hovered ? Theme.TEXT_BODY : Theme.TEXT_MUTED;
+		g.text(font, text, (x0 + x1 - font.width(text)) / 2, y0 + 2 + down, Theme.argb(alpha, color), false);
 	}
 
 	/** One half of the layout switch: the selected half is the black slab with light text. */

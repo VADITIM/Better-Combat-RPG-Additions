@@ -23,14 +23,14 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * Hits chill their targets for a moment. On a sweeping weapon (a sword) everything the swing catches
- * is chilled, on anything else only the direct hit. A target kept chilled for six seconds freezes
+ * is chilled, on anything else only the direct hit. A target kept chilled for three seconds freezes
  * like it stood in powder snow until the chill runs out.
  */
 final class ColdEdge {
 	/** Movement speed taken off for levels 1 to 3. */
 	private static final float[] SLOW = {0.10F, 0.25F, 0.40F};
 	private static final int DURATION_TICKS = 25;
-	private static final int FREEZE_AFTER_TICKS = 120;
+	private static final int FREEZE_AFTER_TICKS = 60;
 	private static final Identifier MODIFIER = RpgAdditions.id("cold_edge");
 	private static final TagKey<Item> SWEEPING = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("minecraft", "enchantable/sweeping"));
 
@@ -67,7 +67,7 @@ final class ColdEdge {
 		}
 	}
 
-	private static void chill(LivingEntity target, int level) {
+	static void chill(LivingEntity target, int level) {
 		if (!target.isAlive()) {
 			return;
 		}
@@ -89,6 +89,11 @@ final class ColdEdge {
 			world.sendParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getY(0.6), target.getZ(), 6, target.getBbWidth() * 0.4, target.getBbHeight() * 0.3, target.getBbWidth() * 0.4, 0.05);
 			world.playSound((Entity) null, target.getX(), target.getY(), target.getZ(), SoundEvents.POWDER_SNOW_HIT, SoundSource.PLAYERS, 0.6F, 1.4F);
 		}
+	}
+
+	/** Whether Cold Edge is slowing {@code target} right now. */
+	static boolean chilled(LivingEntity target) {
+		return CHILLED.containsKey(target);
 	}
 
 	static void tick() {

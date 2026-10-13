@@ -6,6 +6,7 @@
 		"ArmorStandMixin",
 		"LivingEntityMixin",
 		"MobCategoryMixin",
+		"MobMixin",
 		"PlayerAttackHelperMixin",
 		"PlayerMixin",
 		"ServerNetworkMixin",
