@@ -21,9 +21,14 @@ import net.minecraft.world.item.enchantment.Enchantment;
  * <li>Frozen Chains: everything Chains binds is chilled.</li>
  * <li>Frost Burst: a death's wind burst chills what it catches.</li>
  * <li>Resonance: an Echo strike sparks a quarter-power lightning bolt on its target.</li>
- * <li>Tempest: a Shockwave throws enemies much harder, and one slammed into a wall takes knockback damage.</li>
+ * <li>Tempest: a Shockwave throws enemies much harder, and one slammed into a wall takes knockback damage. A mace's smash also hurts the enemies within 2.5 blocks of the impact for 30% of its damage.</li>
  * <li>Frenzy: on a fully refined weapon, at its top attack speed, Echo strikes every third swing instead of every fourth.</li>
  * <li>Shatter: the weapon's lightning deals double damage to an enemy already frozen solid, and chills those around it; 15% more to one only slowed. Kills spread chill to the enemies around.</li>
+ * <li>Singularity: a Shockwave drags the enemies beside its path into it.</li>
+ * <li>Black Hole: every enemy Chains binds pulls the enemies around it in.</li>
+ * <li>Cyclone: a kill draws the enemies around it in before its wind burst goes off.</li>
+ * <li>Launch: a launching swing after a run-up throws the targets higher and the player up after them.</li>
+ * <li>Blast Step: a kill by a swing after a run-up bursts the player onward.</li>
  * </ul>
  */
 public enum Synergy {
@@ -35,7 +40,12 @@ public enum Synergy {
 	RESONANCE("resonance", Perks.ECHO, Perks.LIGHTNING),
 	TEMPEST("tempest", Perks.SHOCKWAVE, Perks.WIND_CHARGED),
 	FRENZY("frenzy", true, Perks.ECHO),
-	SHATTER("shatter", Perks.COLD_EDGE, Perks.LIGHTNING);
+	SHATTER("shatter", Perks.COLD_EDGE, Perks.LIGHTNING),
+	SINGULARITY("singularity", Perks.GRAVITY, Perks.SHOCKWAVE),
+	BLACK_HOLE("black_hole", Perks.GRAVITY, Perks.CHAINS),
+	CYCLONE("cyclone", Perks.GRAVITY, Perks.WIND_CHARGED),
+	LAUNCH("launch", Perks.MOMENTUM, Perks.UPPERCUT),
+	BLAST_STEP("blast_step", Perks.MOMENTUM, Perks.WIND_CHARGED);
 
 	private final String name;
 	private final List<ResourceKey<Enchantment>> perks;

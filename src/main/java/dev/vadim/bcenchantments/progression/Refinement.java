@@ -92,7 +92,10 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		UPPERCUT("enchantment.bcenchantments.uppercut", Perks.UPPERCUT),
 		CHAINS("enchantment.bcenchantments.chains", Perks.CHAINS),
 		ECHO("enchantment.bcenchantments.echo", Perks.ECHO),
-		WIND_CHARGED("enchantment.bcenchantments.wind_charged", Perks.WIND_CHARGED);
+		WIND_CHARGED("enchantment.bcenchantments.wind_charged", Perks.WIND_CHARGED),
+		GRAVITY("enchantment.bcenchantments.gravity", Perks.GRAVITY),
+		MOMENTUM("enchantment.bcenchantments.momentum", Perks.MOMENTUM),
+		RAMPAGING("enchantment.bcenchantments.rampaging", Perks.RAMPAGING);
 
 		final String translationKey;
 		final ResourceKey<Enchantment> enchantment;
@@ -108,17 +111,21 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 	}
 
 	/**
-	 * Which power each vanilla trim grants, by where the trim is found and what it looks like: storm and
-	 * sky for Lightning, wind for Wind Charged, the deep dark's echo shards for Echo, and so on.
+	 * Which power each vanilla trim grants, by its name, its look or the structure it is found in: the
+	 * bolt for Lightning, the breeze's flow for Wind Charged, the warden's ward for Shockwave's sonic
+	 * boom, the eye of ender's pull for Gravity, the ravager-led raids of the sentry for Rampaging.
 	 */
 	private static final Map<String, Perk> TRIM_PERKS = Map.ofEntries(
-		Map.entry("bolt", Perk.LIGHTNING), Map.entry("spire", Perk.LIGHTNING), Map.entry("eye", Perk.LIGHTNING),
-		Map.entry("flow", Perk.WIND_CHARGED), Map.entry("dune", Perk.WIND_CHARGED), Map.entry("wayfinder", Perk.WIND_CHARGED),
-		Map.entry("rib", Perk.SHOCKWAVE), Map.entry("snout", Perk.SHOCKWAVE),
+		Map.entry("bolt", Perk.LIGHTNING),
+		Map.entry("flow", Perk.WIND_CHARGED), Map.entry("dune", Perk.WIND_CHARGED),
 		Map.entry("tide", Perk.COLD_EDGE), Map.entry("coast", Perk.COLD_EDGE),
-		Map.entry("silence", Perk.ECHO), Map.entry("ward", Perk.ECHO),
+		Map.entry("silence", Perk.ECHO),
+		Map.entry("ward", Perk.SHOCKWAVE), Map.entry("rib", Perk.SHOCKWAVE),
 		Map.entry("wild", Perk.CHAINS), Map.entry("vex", Perk.CHAINS),
-		Map.entry("sentry", Perk.UPPERCUT), Map.entry("raiser", Perk.UPPERCUT), Map.entry("shaper", Perk.UPPERCUT), Map.entry("host", Perk.UPPERCUT)
+		Map.entry("eye", Perk.GRAVITY), Map.entry("spire", Perk.GRAVITY),
+		Map.entry("wayfinder", Perk.MOMENTUM), Map.entry("host", Perk.MOMENTUM),
+		Map.entry("snout", Perk.RAMPAGING), Map.entry("sentry", Perk.RAMPAGING),
+		Map.entry("raiser", Perk.UPPERCUT), Map.entry("shaper", Perk.UPPERCUT)
 	);
 	/** The powers a shield can take from a trim, each working on a blocked hit; see {@code ShieldPowers}. */
 	private static final Set<Perk> SHIELD_PERKS = EnumSet.of(Perk.WIND_CHARGED, Perk.COLD_EDGE);

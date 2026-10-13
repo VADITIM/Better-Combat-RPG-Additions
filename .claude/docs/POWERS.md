@@ -14,6 +14,9 @@ Trim Powers (Powers for short) are enchantments that a trim can also grant. Leve
 | Echo | Charged | Every 4th swing its targets are struck again 0.3 s later; counts toward other bars, triggers no perks | 50 / 65 / 80% of the swing | sharp weapons | Dungeons *Echo* |
 | Cold Edge | On hit | Hits slow; 3 s of chill freezes the target solid (freeze damage). Swords chill everything the swing hits | −10 / 25 / 40% speed | sharp weapons | Dungeons *Freezing* |
 | Wind Charged | On kill | Kills burst like a wind charge (2.5 blocks), hurting and pushing | 3 / 4 / 5 dmg | sharp weapons, mace | Dungeons *Exploding* + vanilla wind charge |
+| Gravity | On hit | Every landed swing pulls the enemies around the struck target toward it | radius 3 / 4 / 5 blocks, pull 0.35 / 0.45 / 0.55 | weapons | Dungeons *Gravity* |
+| Momentum | Run-up | Sprint ≥ 0.4 s, then land a swing within 0.5 s: its targets are thrown back hard. Spent by that swing | knockback 0.5 / 0.7 / 0.9 | weapons | Original |
+| Rampaging | On kill | Killing a monster grants attack speed for 4 s, refreshed by every further kill | +20 / 30 / 40% attack speed | weapons | Dungeons *Rampaging* |
 | Uppercut | On hit | Sword's 3rd swing, spear's heavy thrust or a mace swung from the ground launches the target | launch 0.55 / 0.7 / 0.85 | swords, mace (spear via trim) | Original |
 
 ## Combinations
@@ -28,8 +31,13 @@ Active when the weapon has every listed power (enchantment or trim, any level). 
 | Frozen Chains | Chains + Cold Edge | Bound enemies are chilled |
 | Frost Burst | Cold Edge + Wind Charged | Death bursts chill |
 | Resonance | Echo + Lightning | Echoes spark a quarter-power bolt |
-| Tempest | Shockwave + Wind Charged | Shockwave throws enemies much harder; hitting a wall deals 4 / 6 / 8 knockback damage |
+| Tempest | Shockwave + Wind Charged | Shockwave throws enemies much harder; hitting a wall deals 4 / 6 / 8 knockback damage. **Mace:** a smash also hurts enemies within 2.5 blocks of the impact for 30% of its damage |
 | Frenzy | Echo + Refinement 5 | Echo every 3rd swing |
+| Singularity | Gravity + Shockwave | The wave drags enemies within 4 blocks of the point just ahead of it into its path (80% of Gravity's pull) |
+| Black Hole | Gravity + Chains | Every bound enemy pulls the free enemies within 3.5 blocks in |
+| Cyclone | Gravity + Wind Charged | Kills pull enemies within 5 blocks in; the burst goes off 0.3 s later |
+| Launch | Momentum + Uppercut | A launching swing after a run-up throws the targets ×1.3 higher, and you go up after them |
+| Blast Step | Momentum + Wind Charged | A kill by a swing after a run-up bursts you onward (once per swing) |
 | Shatter | Cold Edge + Lightning | Bolts deal +15% to slowed enemies, ×2 to frozen ones (which also chills nearby enemies). Kills spread chill to up to 6 enemies within 2 blocks |
 
 Chained Lightning + Wind Charged: enemies killed by the chain bolts burst.
@@ -40,7 +48,7 @@ Chained Lightning + Wind Charged: enemies killed by the chain bolts burst.
 |---|---|
 | Sword | Normal Better Combat combo. Air crit: any swing in the air that rolls a crit becomes a two-handed, centred overhead strike. 3rd swing on the ground becomes a rising cut with Uppercut |
 | Spear | Four-stab combo; heavy thrust launches |
-| Mace | Swing on the ground launches with Uppercut; swing in the air is the mace smash |
+| Mace | Swing on the ground launches with Uppercut; swing in the air is the mace smash (Tempest splashes it) |
 
 ## Vanilla changes
 
@@ -67,13 +75,16 @@ At refinement 5: trim template + echo shard → trim's power at level 1. Same tr
 
 | Power | Trims | Why |
 |---|---|---|
-| Lightning | bolt, spire, eye | storm bolt, sky-high End city, ender eye |
-| Wind Charged | flow, dune, wayfinder | breeze vaults, desert winds, the traveller |
-| Shockwave | rib, snout | fortress and bastion brutes |
-| Cold Edge | tide, coast | the sea |
-| Echo | silence, ward | ancient city, home of echo shards |
-| Chains | wild, vex | binding vines, evoker fangs |
-| Uppercut | sentry, raiser, shaper, host | outposts and trail ruins |
+| Lightning | bolt | the lightning bolt itself, from the copper trial chambers |
+| Wind Charged | flow, dune | the breeze's wind; desert sandstorms |
+| Cold Edge | tide, coast | ocean monument and shipwreck: the cold sea |
+| Echo | silence | the ancient city, home of echo shards |
+| Shockwave | ward, rib | the warden's sonic boom; the wither's blast from the fortress |
+| Chains | wild, vex | binding jungle vines; evoker fangs |
+| Gravity | eye, spire | the eye of ender pulls toward the End; End city shulkers |
+| Momentum | wayfinder, host | trail-ruins travellers on the road |
+| Rampaging | snout, sentry | piglin brutes; pillager raids and their ravagers |
+| Uppercut | raiser, shaper | "raise" a foe; trail-ruins craft |
 
 ## Shield powers
 
@@ -102,11 +113,3 @@ No refinement needed: trim template + shield + echo shard → the power, one lev
 |---|---|---|
 | Better Combat On / Off | Mod Menu → settings | Off restores vanilla attacks and sweeping, for farms. Singleplayer / LAN host only |
 | Charge bars | Mod Menu → settings | Under or beside the crosshair, offset, size |
-
-## Ideas
-
-| Idea | What it does | Combinations |
-|---|---|---|
-| Gravity | Hits pull nearby enemies slightly toward the struck target | Singularity (+ Shockwave): enemies pulled into the wave's path · Black Hole (+ Chains): bound enemies pull others in · Cyclone (+ Wind Charged): kills pull enemies in before the burst |
-| Momentum | Moving shortly before attacking empowers knockback / the weapon's special | Launch (+ Uppercut): you and the target are launched · Blast Step (+ Wind Charged): empowered kills give a forward burst |
-| Rampaging | Kills grant attack speed for a short time, refreshed by further kills | Another route into fast builds; pairs with Frenzy |

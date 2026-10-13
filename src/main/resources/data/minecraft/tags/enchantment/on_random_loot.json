@@ -6,6 +6,9 @@
 		"bcenchantments:uppercut",
 		"bcenchantments:chains",
 		"bcenchantments:echo",
-		"bcenchantments:wind_charged"
+		"bcenchantments:wind_charged",
+		"bcenchantments:gravity",
+		"bcenchantments:momentum",
+		"bcenchantments:rampaging"
 	]
 }

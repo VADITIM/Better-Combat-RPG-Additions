@@ -20,7 +20,7 @@ It does this when the item has a tuned `critical_hit` clip, because Punchy reads
 ## Debt
 
 **The trim → power remap changes existing items.**
-Weapons already trimmed with vex, flow, silence or ward now grant their new power.
+Trims store their name, not their power, so weapons trimmed before a remap grant the new power (2026-10-13: spire, eye, wayfinder, ward, rib, snout, sentry, host moved).
 
 **A mace with Uppercut launches on every grounded hit.**
 

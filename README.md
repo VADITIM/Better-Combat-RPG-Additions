@@ -5,7 +5,8 @@ A Fabric mod for Minecraft 26.2 that layers a combat RPG onto vanilla, built on
 
 - **Weapon playstyles**: each weapon kind plays its own way, with its own attacks and animations
   (the spear's four-stab combo, the sword's air crit and uppercut).
-- **Trim Powers**, Dungeons-style: Lightning, Shockwave, Chains, Echo, Cold Edge, Uppercut and Wind Charged,
+- **Trim Powers**, Dungeons-style: Lightning, Shockwave, Chains, Echo, Cold Edge, Uppercut, Wind Charged,
+  Gravity, Momentum and Rampaging,
   reworked from Minecraft Dungeons enchantments.
 - **Vanilla-friendly progression**: refine weapons at the smithing table with emeralds, then turn a
   finished weapon's trim and an echo shard into a power. Shields take a few powers too.
@@ -30,13 +31,16 @@ shard, raises it to 2 and then 3.
 
 | Power | Trims |
 |---|---|
-| Lightning | bolt, spire, eye |
-| Wind Charged | flow, dune, wayfinder |
-| Shockwave | rib, snout |
+| Lightning | bolt |
+| Wind Charged | flow, dune |
 | Cold Edge | tide, coast |
-| Echo | silence, ward |
+| Echo | silence |
+| Shockwave | ward, rib |
 | Chains | wild, vex |
-| Uppercut | sentry, raiser, shaper, host |
+| Gravity | eye, spire |
+| Momentum | wayfinder, host |
+| Rampaging | snout, sentry |
+| Uppercut | raiser, shaper |
 
 **Shield powers.** A shield needs no refinement: a trim template, the shield and an echo shard. Only
 a few powers work on a shield, at one level:
@@ -57,9 +61,14 @@ combinations show in gold in the tooltip.
 | Frozen Chains | Chains + Cold Edge | Bound enemies are chilled |
 | Frost Burst | Cold Edge + Wind Charged | Death bursts chill what they catch |
 | Resonance | Echo + Lightning | Echoes spark a quarter-power bolt |
-| Tempest | Shockwave + Wind Charged | The shockwave throws enemies much harder; hitting a wall deals knockback damage |
+| Tempest | Shockwave + Wind Charged | The shockwave throws enemies much harder; hitting a wall deals knockback damage. A mace smash also hurts enemies within 2.5 blocks of the impact for 30% of its damage |
 | Frenzy | Echo + Refinement 5 | Echo every third swing instead of every fourth |
 | Shatter | Cold Edge + Lightning | Lightning deals 15% more damage to slowed enemies, and double to enemies frozen solid, which also chills those around them; kills spread chill to up to 6 enemies nearby |
+| Singularity | Gravity + Shockwave | The shockwave drags the enemies beside its path into it |
+| Black Hole | Gravity + Chains | Every bound enemy pulls the free enemies around it in |
+| Cyclone | Gravity + Wind Charged | Kills draw the enemies around them in before the burst |
+| Launch | Momentum + Uppercut | A launch after a run-up goes higher, and you go up after the target |
+| Blast Step | Momentum + Wind Charged | A kill by a swing after a run-up bursts you onward |
 
 ## Building
 

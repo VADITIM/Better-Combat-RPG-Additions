@@ -2,6 +2,12 @@
 
 Shipped work and why it was built this way, newest first. Dates are when it was decided.
 
+## 2026-10-13 (powers)
+
+- **Ten powers over the 18 trims,** each trim matched by name, look or structure (`Refinement.TRIM_PERKS`, table in `POWERS.md`). Lightning (bolt) and Echo (silence) have one trim each.
+- **Gravity, Momentum and Rampaging shipped** with Singularity, Black Hole, Cyclone, Launch and Blast Step. Momentum needs a sprint run-up (≥ 0.4 s) and is spent by one swing, so it rewards charging in rather than walking. Rampaging counts monster kills only, so animal farms do not feed it.
+- **Shockwave particles cut to 40%** at the user's request.
+
 ## 2026-10-13
 
 **Combat**

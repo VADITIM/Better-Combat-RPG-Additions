@@ -4,6 +4,8 @@ import dev.vadim.bcenchantments.RpgAdditions;
 import dev.vadim.bcenchantments.combat.CombatHooks;
 import dev.vadim.bcenchantments.progression.Refinement;
 import java.util.List;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -25,9 +27,13 @@ public final class Perks {
 	public static final ResourceKey<Enchantment> CHAINS = key("chains");
 	public static final ResourceKey<Enchantment> ECHO = key("echo");
 	public static final ResourceKey<Enchantment> WIND_CHARGED = key("wind_charged");
+	public static final ResourceKey<Enchantment> GRAVITY = key("gravity");
+	public static final ResourceKey<Enchantment> MOMENTUM = key("momentum");
+	public static final ResourceKey<Enchantment> RAMPAGING = key("rampaging");
 
 	/** Every perk, for anything that weighs how strong a weapon is. */
-	public static final List<ResourceKey<Enchantment>> ALL = List.of(LIGHTNING, SHOCKWAVE, COLD_EDGE, UPPERCUT, CHAINS, ECHO, WIND_CHARGED);
+	public static final List<ResourceKey<Enchantment>> ALL = List.of(LIGHTNING, SHOCKWAVE, COLD_EDGE, UPPERCUT, CHAINS, ECHO, WIND_CHARGED,
+		GRAVITY, MOMENTUM, RAMPAGING);
 
 	/** Perks that charge up over a combo, in the order the HUD shows their rows. Both sides index into this list. */
 	public static final List<ChargedPerk> CHARGED = List.of(Lightning.INSTANCE, Shockwave.INSTANCE, Chains.INSTANCE, Echo.INSTANCE);
@@ -45,6 +51,14 @@ public final class Perks {
 		CombatHooks.onServerTick(Impact::tick);
 		CombatHooks.onKill(WindCharged::onKill);
 		CombatHooks.onKill(Lightning::onKill);
+		CombatHooks.onSwing(Gravity::onSwing);
+		// After Uppercut, which reads the run-up this spends.
+		CombatHooks.onSwing(Momentum::onSwing);
+		CombatHooks.onKill(Momentum::onKill);
+		ServerTickEvents.END_SERVER_TICK.register(Momentum::tick);
+		CombatHooks.onKill(Rampaging::onKill);
+		CombatHooks.onServerTick(Rampaging::tick);
+		ServerLivingEntityEvents.AFTER_DAMAGE.register(MaceTempest::afterDamage);
 	}
 
 	private static ResourceKey<Enchantment> key(String name) {

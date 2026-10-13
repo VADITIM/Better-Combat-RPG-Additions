@@ -28,7 +28,7 @@ import net.minecraft.world.phys.Vec3;
  * a row that each hit three or more enemies. It cuts through everything in its path once, kicks up
  * the ground it passes over like the Dungeons shockwave, and breaks on walls. With
  * {@link Synergy#TEMPEST} it throws what it hits much harder, and an enemy slammed into a wall takes
- * knockback damage.
+ * knockback damage. With {@link Synergy#SINGULARITY} it drags the enemies beside its path into it.
  */
 public final class Shockwave implements ChargedPerk {
 	static final Shockwave INSTANCE = new Shockwave();
@@ -50,6 +50,10 @@ public final class Shockwave implements ChargedPerk {
 	private static final double TEMPEST_LIFT = 0.3;
 	private static final float[] TEMPEST_DAMAGE = {4.0F, 6.0F, 8.0F};
 	private static final int TEMPEST_TRACK_TICKS = 25;
+	/** Singularity: reach of the pull around a point this far ahead of the blade, and its share of Gravity's pull. */
+	private static final double SINGULARITY_RADIUS = 4.0;
+	private static final double SINGULARITY_LEAD = 1.5;
+	private static final double SINGULARITY_PULL = 0.8;
 
 	private static final class Wave {
 		final ServerPlayer owner;
@@ -60,11 +64,13 @@ public final class Shockwave implements ChargedPerk {
 		final float damage;
 		/** Tempest's wall damage, 0 without it. */
 		final float slam;
+		/** Singularity's pull speed, 0 without it. */
+		final double gravity;
 		final Set<Entity> hit = new HashSet<>();
 		Vec3 pos;
 		double travelled;
 
-		Wave(ServerPlayer owner, ServerLevel level, Vec3 pos, Vec3 dir, int enchantLevel, boolean tempest) {
+		Wave(ServerPlayer owner, ServerLevel level, Vec3 pos, Vec3 dir, int enchantLevel, boolean tempest, int gravity) {
 			this.owner = owner;
 			this.level = level;
 			this.pos = pos;
@@ -73,6 +79,7 @@ public final class Shockwave implements ChargedPerk {
 			this.range = RANGE[enchantLevel - 1];
 			this.damage = DAMAGE[enchantLevel - 1];
 			this.slam = tempest ? TEMPEST_DAMAGE[enchantLevel - 1] : 0.0F;
+			this.gravity = gravity > 0 ? Gravity.strength(gravity) * SINGULARITY_PULL : 0.0;
 		}
 	}
 
@@ -109,10 +116,11 @@ public final class Shockwave implements ChargedPerk {
 
 	@Override
 	public void fire(SwingResult swing, int level) {
-		launch(swing.player(), level, Synergy.TEMPEST.on(swing.weapon()));
+		int gravity = Synergy.SINGULARITY.on(swing.weapon()) ? Perks.level(swing.weapon(), Perks.GRAVITY) : 0;
+		launch(swing.player(), level, Synergy.TEMPEST.on(swing.weapon()), gravity);
 	}
 
-	private static void launch(ServerPlayer player, int level, boolean tempest) {
+	private static void launch(ServerPlayer player, int level, boolean tempest, int gravity) {
 		level = Math.min(level, DAMAGE.length);
 		ServerLevel world = player.level();
 		Vec3 look = player.getLookAngle();
@@ -124,19 +132,19 @@ public final class Shockwave implements ChargedPerk {
 		}
 		dir = dir.normalize();
 		Vec3 start = player.position().add(0.0, HEIGHT, 0.0).add(dir.scale(0.6));
-		WAVES.add(new Wave(player, world, start, dir, level, tempest));
+		WAVES.add(new Wave(player, world, start, dir, level, tempest, gravity));
 
 		world.playSound((Entity) null, start.x, start.y, start.z, SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 0.6F);
 		world.playSound((Entity) null, start.x, start.y, start.z, SoundEvents.TRIDENT_RIPTIDE_1, SoundSource.PLAYERS, 0.7F, 1.4F);
 		world.playSound((Entity) null, start.x, start.y, start.z, SoundEvents.BREEZE_SHOOT, SoundSource.PLAYERS, 0.8F, 1.2F);
 		// The ring of dust a Dungeons shockwave throws up around the player.
-		for (int i = 0; i < 16; i++) {
-			double angle = Math.PI * 2.0 * i / 16.0;
+		for (int i = 0; i < 6; i++) {
+			double angle = Math.PI * 2.0 * i / 6.0;
 			double x = player.getX() + Math.cos(angle) * 1.2;
 			double z = player.getZ() + Math.sin(angle) * 1.2;
 			world.sendParticles(ParticleTypes.POOF, x, player.getY() + 0.1, z, 0, Math.cos(angle), 0.05, Math.sin(angle), 0.15);
 		}
-		ground(world, player.position().add(0.0, HEIGHT, 0.0), 14, 1.2);
+		ground(world, player.position().add(0.0, HEIGHT, 0.0), 6, 1.2);
 	}
 
 	static void tick() {
@@ -169,9 +177,14 @@ public final class Shockwave implements ChargedPerk {
 					target.push(wave.dir.x * PUSH, 0.25, wave.dir.z * PUSH);
 				}
 				target.hurtMarked = true;
-				wave.level.sendParticles(ParticleTypes.CRIT, target.getX(), target.getY(0.5), target.getZ(), 10, 0.3, 0.3, 0.3, 0.3);
+				wave.level.sendParticles(ParticleTypes.CRIT, target.getX(), target.getY(0.5), target.getZ(), 4, 0.3, 0.3, 0.3, 0.3);
 			}
 
+			if (wave.gravity > 0.0) {
+				// Singularity: drags the enemies beside the path in, ahead of the blade.
+				Vec3 ahead = wave.pos.add(wave.dir.scale(SINGULARITY_LEAD));
+				Gravity.pull(wave.owner, ahead, SINGULARITY_RADIUS, wave.gravity, wave.hit::contains, false);
+			}
 			draw(wave);
 			if (wave.travelled >= wave.range) {
 				shatter(wave);
@@ -192,23 +205,22 @@ public final class Shockwave implements ChargedPerk {
 	private static void draw(Wave wave) {
 		ServerLevel world = wave.level;
 		// The blade: a crescent bowed back at the tips, bright like a sword beam.
-		for (int k = -5; k <= 5; k++) {
-			double t = k / 5.0;
+		for (int k = -2; k <= 2; k++) {
+			double t = k / 2.0;
 			Vec3 p = wave.pos.add(wave.side.scale(t * HALF_WIDTH)).subtract(wave.dir.scale(t * t * 0.8));
 			double lift = (1.0 - t * t) * 0.2;
 			world.sendParticles(ParticleTypes.END_ROD, p.x, p.y + lift, p.z, 1, 0.02, 0.02, 0.02, 0.0);
-			if ((k & 1) == 0) {
+			if ((k & 1) != 0) {
 				world.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.x, p.y + lift, p.z, 1, 0.05, 0.08, 0.05, 0.05);
 			}
 		}
-		for (int k = -1; k <= 1; k++) {
-			Vec3 p = wave.pos.add(wave.side.scale(k * HALF_WIDTH * 0.55)).subtract(wave.dir.scale(Math.abs(k) * 0.35));
-			world.sendParticles(ParticleTypes.SWEEP_ATTACK, p.x, p.y, p.z, 0, 0.0, 0.0, 0.0, 0.0);
+		world.sendParticles(ParticleTypes.SWEEP_ATTACK, wave.pos.x, wave.pos.y, wave.pos.z, 0, 0.0, 0.0, 0.0, 0.0);
+		// A trail of wind behind the blade, two steps in five.
+		if (Math.round(wave.travelled / SPEED) % 5 < 2) {
+			Vec3 tail = wave.pos.subtract(wave.dir.scale(0.8));
+			world.sendParticles(ParticleTypes.SMALL_GUST, tail.x, tail.y, tail.z, 1, 0.4, 0.1, 0.4, 0.0);
 		}
-		// A trail of wind behind the blade.
-		Vec3 tail = wave.pos.subtract(wave.dir.scale(0.8));
-		world.sendParticles(ParticleTypes.SMALL_GUST, tail.x, tail.y, tail.z, 1, 0.4, 0.1, 0.4, 0.0);
-		ground(world, wave.pos, 8, HALF_WIDTH * 0.5);
+		ground(world, wave.pos, 3, HALF_WIDTH * 0.5);
 	}
 
 	/** Kicks up the block under {@code pos}, the cracking-earth look of the Dungeons shockwave. */
@@ -219,13 +231,13 @@ public final class Shockwave implements ChargedPerk {
 			return;
 		}
 		world.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), pos.x, floor.getY() + 1.05, pos.z, count, spread, 0.05, spread, 0.15);
-		world.sendParticles(new BlockParticleOption(ParticleTypes.DUST_PILLAR, state), pos.x, floor.getY() + 1.0, pos.z, count / 4, spread, 0.0, spread, 0.0);
+		world.sendParticles(new BlockParticleOption(ParticleTypes.DUST_PILLAR, state), pos.x, floor.getY() + 1.0, pos.z, Math.max(1, count / 3), spread, 0.0, spread, 0.0);
 	}
 
 	private static void shatter(Wave wave) {
 		Vec3 p = wave.pos;
 		wave.level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, p.x, p.y, p.z, 1, 0.0, 0.0, 0.0, 0.0);
-		wave.level.sendParticles(ParticleTypes.END_ROD, p.x, p.y, p.z, 12, 0.3, 0.3, 0.3, 0.12);
+		wave.level.sendParticles(ParticleTypes.END_ROD, p.x, p.y, p.z, 5, 0.3, 0.3, 0.3, 0.12);
 		wave.level.playSound((Entity) null, p.x, p.y, p.z, SoundEvents.WIND_CHARGE_BURST, SoundSource.PLAYERS, 0.6F, 1.3F);
 	}
 }

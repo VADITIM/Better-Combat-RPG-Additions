@@ -18,7 +18,7 @@ Better Combat attack request
       └ ComboTracker.endSwing → SwingResult → CombatHooks.onSwing listeners
                                             → charge ChargedPerks → fire → ComboHudPayload to client
 Damage events → CombatHooks.onDirectHit / onKill (Fabric AFTER_DAMAGE / AFTER_DEATH)
-Server tick   → CombatHooks.onServerTick (ColdEdge, Shockwave, Control, Impact)
+Server tick   → CombatHooks.onServerTick (ColdEdge, Shockwave, Control, Impact, Rampaging); Momentum tracks sprinting on its own server tick
 ```
 
 **Adding a power:**

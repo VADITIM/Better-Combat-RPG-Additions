@@ -57,8 +57,9 @@ public final class Uppercut {
 			return;
 		}
 		ServerLevel world = player.level();
-		double speed = LAUNCH[level - 1];
 		boolean updraft = Synergy.UPDRAFT.on(swing.weapon());
+		// Updraft sends the player up on its own; Launch only follows the targets without it.
+		double speed = Momentum.launch(player, swing.weapon(), LAUNCH[level - 1], !updraft);
 		for (LivingEntity target : swing.hits()) {
 			if (updraft) {
 				target.setDeltaMovement(0.0, speed, 0.0);

@@ -22,6 +22,7 @@ import net.minecraft.world.phys.Vec3;
  * <li>{@link Synergy#CHAINED_LIGHTNING}: instead of being chained, each of those enemies is struck by
  * lightning at half the weapon's Lightning power and rooted for a moment.</li>
  * <li>{@link Synergy#FROZEN_CHAINS}: everything bound is chilled as by Cold Edge.</li>
+ * <li>{@link Synergy#BLACK_HOLE}: every bound enemy pulls the free enemies around it in.</li>
  * </ul>
  */
 public final class Chains implements ChargedPerk {
@@ -42,6 +43,8 @@ public final class Chains implements ChargedPerk {
 	/** Chained Lightning: share of Lightning's damage each bolt deals, and the root that follows. */
 	private static final float CHAINED_BOLT = 0.5F;
 	private static final int CHAINED_ROOT_TICKS = 10;
+	/** Black Hole: how far around each bound enemy the free ones are pulled from. */
+	private static final double BLACK_HOLE_RADIUS = 3.5;
 	private static final DustParticleOptions LINK = new DustParticleOptions(0x8F9AA3, 1.0F);
 
 	private Chains() {
@@ -93,7 +96,13 @@ public final class Chains implements ChargedPerk {
 		int lightning = Perks.level(swing.weapon(), Perks.LIGHTNING);
 		boolean chainedLightning = Synergy.CHAINED_LIGHTNING.on(swing.weapon());
 		int cold = Synergy.FROZEN_CHAINS.on(swing.weapon()) ? Perks.level(swing.weapon(), Perks.COLD_EDGE) : 0;
+		int gravity = Synergy.BLACK_HOLE.on(swing.weapon()) ? Perks.level(swing.weapon(), Perks.GRAVITY) : 0;
+		List<LivingEntity> held = bound;
 		for (LivingEntity target : bound) {
+			if (gravity > 0) {
+				// Each bound enemy pulls in the free ones around it; the bound ones stay put.
+				Gravity.pull(player, target.position(), BLACK_HOLE_RADIUS, Gravity.strength(gravity), e -> e == anchor || held.contains(e), true);
+			}
 			link(player.level(), anchor, target);
 			if (chainedLightning) {
 				Lightning.strike(player, swing.weapon(), target, Lightning.damage(lightning) * CHAINED_BOLT);
