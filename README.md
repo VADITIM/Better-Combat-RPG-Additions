@@ -103,3 +103,7 @@ python tools/animations.py src/main/resources
 ```
 python tools/power_effects.py src/main/resources
 ```
+
+## License
+
+All Rights Reserved. See [LICENSE](LICENSE). Better Combat and Punchy are separate mods under their own licenses.
