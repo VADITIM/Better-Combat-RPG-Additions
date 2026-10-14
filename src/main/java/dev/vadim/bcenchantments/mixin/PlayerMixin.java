@@ -2,10 +2,12 @@ package dev.vadim.bcenchantments.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.vadim.bcenchantments.combat.ComboTracker;
 import dev.vadim.bcenchantments.combat.CriticalHits;
 import dev.vadim.bcenchantments.mob.HitChain;
 import dev.vadim.bcenchantments.perk.Updraft;
+import dev.vadim.bcenchantments.weapon.MaceTiming;
 import dev.vadim.bcenchantments.weapon.WeaponStyles;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,6 +19,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,13 +27,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Tells a running swing whether each of its attacks actually took health off the target, and swaps
  * vanilla's falling crit for the rolled one from {@link CriticalHits}. Also lets weapon styles give
- * each attack its own cooldown, and runs monster hits through {@link HitChain}.
+ * each attack its own cooldown, runs monster hits through {@link HitChain}, and applies the mace's
+ * {@link MaceTiming}.
  */
 @Mixin(Player.class)
 public abstract class PlayerMixin {
 	@ModifyReturnValue(method = "createAttributes", at = @At("RETURN"))
 	private static AttributeSupplier.Builder bcenchantments$criticalAttributes(AttributeSupplier.Builder builder) {
 		return builder.add(CriticalHits.CRITICAL_CHANCE).add(CriticalHits.CRITICAL_DAMAGE);
+	}
+
+	/** A timed mace swing hits with full strength whenever it lands; its timing sets the damage instead. */
+	@ModifyReturnValue(method = "getAttackStrengthScale", at = @At("RETURN"))
+	private float bcenchantments$maceStrength(float scale) {
+		return MaceTiming.timed((Player) (Object) this) ? 1.0F : scale;
+	}
+
+	@ModifyArg(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtOrSimulate(Lnet/minecraft/world/damagesource/DamageSource;F)Z"), index = 1)
+	private float bcenchantments$maceTiming(float amount, @Local(argsOnly = true) Entity target) {
+		return MaceTiming.damage((Player) (Object) this, target, amount);
 	}
 
 	@ModifyReturnValue(method = "getCurrentItemAttackStrengthDelay", at = @At("RETURN"))

@@ -197,6 +197,7 @@ public final class GuideScreen extends Screen {
 			new Recipe(ItemStack.EMPTY, sword, new ItemStack(Items.EMERALD, 32), refined, text("refining.emeralds")),
 			new Recipe(ItemStack.EMPTY, sword, new ItemStack(Items.EMERALD_BLOCK, 8), refined, text("refining.blocks")),
 			new Paragraph(text("refining.levels")),
+			new Paragraph(text("refining.points")),
 			new Paragraph(text("refining.tooltip"))
 		);
 	}

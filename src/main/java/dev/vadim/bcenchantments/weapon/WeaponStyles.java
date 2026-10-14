@@ -21,6 +21,7 @@ public final class WeaponStyles {
 		register(SpearStyle.INSTANCE);
 		register(SwordStyle.INSTANCE);
 		register(MaceStyle.INSTANCE);
+		register(AxeStyle.INSTANCE);
 	}
 
 	public static void register(WeaponStyle style) {
@@ -65,6 +66,11 @@ public final class WeaponStyles {
 	public static double knockbackFactor(AttackHand swing) {
 		WeaponStyle style = of(swing.itemStack());
 		return style == null ? 1.0 : style.knockbackFactor(swing.attack().animation());
+	}
+
+	public static int restAfter(AttackHand swing) {
+		WeaponStyle style = of(swing.itemStack());
+		return style == null ? 0 : style.restAfter(swing.attack().animation());
 	}
 
 	public static boolean launches(Player player, AttackHand swing) {

@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.client;
 
+import dev.vadim.bcenchantments.weapon.AxeStyle;
 import dev.vadim.bcenchantments.weapon.SwordStyle;
 import java.lang.reflect.Method;
 import net.bettercombat.api.AttackHand;
@@ -8,7 +9,7 @@ import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 
 /**
- * First-person clips for the special attacks when Punchy draws the arms. Punchy's Better Combat compat
+ * First-person clips for the special attacks and the axe combo when Punchy draws the arms. Punchy's Better Combat compat
  * stops Better Combat's own first-person animation and plays a clip of its own, chosen by combo index,
  * so the clip for an air crit or uppercut is handed to it here. The clips live in
  * {@code assets/minecraft/punchy/animations/bcenchantments.animation.json}. Punchy is optional, so it
@@ -31,6 +32,10 @@ public final class PunchyClips {
 			pending = "bcenchantments_uppercut";
 		} else if (SwordStyle.AIR_CRIT.equals(animation)) {
 			pending = "bcenchantments_air_crit";
+		} else if (AxeStyle.CLEAVE_RIGHT.equals(animation)) {
+			pending = "bcenchantments_axe_cleave_right";
+		} else if (AxeStyle.CLEAVE_LEFT.equals(animation)) {
+			pending = "bcenchantments_axe_cleave_left";
 		} else {
 			pending = null;
 		}

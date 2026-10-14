@@ -28,8 +28,14 @@ In game, the **?** button beside the smithing table opens the Field Guide, with 
 
 **Refining.** At a smithing table, put a weapon in the middle slot and emeralds or emerald blocks in the
 right slot, with the template slot empty. There are five levels, about 500 emeralds in all. Each
-adds attack speed (+0.05 per level, +0.25 at level 5) and one small random boost (damage, critical chance or
-critical damage).
+adds attack speed (+0.05 per level, +0.25 at level 5), one small random boost (damage, critical chance or
+critical damage) and a level point: with the weapon in the middle slot, click a stat in the side panel to
+raise it by 3%. Attack speed takes no points.
+
+**Axe and mace.** The axe swings a two-cleave combo, right to left and back, each far heavier than a
+sword swing, and rests 0.35 s after the backhand. The mace is a timing weapon: it readies 1.3× slower,
+and a press while it sparkles (0.15 s, at 0.8 of the wait) is a Perfect Hit for 1.5× damage; every
+other swing deals 0.9×.
 
 **Powers** come only from trims: every armor trim grants its own power on a weapon. Lightning,
 Shockwave, Chains and Echo charge over a combo and show as bars under the crosshair; the rest work on

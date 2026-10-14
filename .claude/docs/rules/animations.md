@@ -233,6 +233,9 @@ with `src/main/resources`.
    control, follow `PunchySpear`: queue the clip on `ATTACK_START` and play it from a Punchy
    state-machine tick through `AnimationIntentCoordinator.request`.
 
+The axe (`AxeStyle`, `axe.json`) is the one-handed example: two cleaves, first-person clips handed to
+Punchy through `PunchyClips` like the specials, with `anim_speed_1`.
+
 ### Only changing numbers
 
 Damage per attack, reach and hit shape live in the JSON. Cooldown per attack and knockback live
@@ -287,6 +290,13 @@ in the style. The data needs no rebuild of the animations, but the jar still has
   first-person state has to do the same.
 
 **Fragile hooks:**
+
+- **The mace swings early through Better Combat's strength checks.** `AttackInteractorMixin` modifies
+  the `getAttackStrengthScale` reads in `startUpswing` and `performAttack`, so a fresh press (`onDoAttack`)
+  can start a mace swing from the Perfect Hit window at 0.8, where Better Combat would wait until
+  `1 − upswingRate`. A BC update that moves those checks silently brings back the late-only swing.
+- **The axe combo's rest is client side only** (`ComboRest`, from `ATTACK_HIT`): swings only start on the
+  client, so the server has nothing to check.
 
 - **`ServerNetworkMixin` targets the synthetic `lambda$handleAttackRequest$2`.** Any BC update that
   reorders lambdas breaks it. It is `require = 1`, so it fails loudly at launch.

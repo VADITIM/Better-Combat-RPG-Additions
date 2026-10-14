@@ -240,6 +240,34 @@ def rampaging(frames):
     return out
 
 
+def perfect_hit(frames):
+    """The mace's Perfect Hit window: the head flares white and four-point stars burst over it.
+    Its frames follow the 0.15 s window rather than the clock, so it plays once per window."""
+    color = rgb(0xFFFFFF)
+    stars = [(11, 3, 0), (13, 6, 1), (8, 2, 1), (12, 1, 2), (9, 6, 2), (14, 3, 3)]
+    out = []
+    for f in range(frames):
+        img = blank()
+        t = f / (frames - 1)
+        flare = 1 - abs(t - 0.35) / 0.65
+        for y in range(SIZE):
+            for x in range(SIZE):
+                a = along(x, y)
+                if a > 0.55:
+                    add(img, x, y, color, 0.45 * flare * (a - 0.55) / 0.45)
+        for sx, sy, start in stars:
+            age = f - start
+            if 0 <= age < 3:
+                strength = (1.0, 0.8, 0.4)[age]
+                arm = 1 if age == 0 else 2
+                add(img, sx, sy, color, strength)
+                for d in range(1, arm + 1):
+                    for dx, dy in ((d, 0), (-d, 0), (0, d), (0, -d)):
+                        add(img, sx + dx, sy + dy, color, strength * (0.6 if d == 1 else 0.3))
+        out.append(img)
+    return out
+
+
 # Power id -> (generator, frame count). Must match PowerEffects.Effect.
 EFFECTS = {
     "lightning": (lightning, 32),
@@ -252,6 +280,7 @@ EFFECTS = {
     "gravity": (gravity, 24),
     "momentum": (momentum, 16),
     "rampaging": (rampaging, 24),
+    "perfect_hit": (perfect_hit, 6),
 }
 
 

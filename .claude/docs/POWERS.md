@@ -292,7 +292,8 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 |---|---|
 | Sword | Normal Better Combat combo. Air crit: any swing in the air that rolls a crit becomes a two-handed, centred overhead strike. 3rd swing on the ground becomes a rising cut with Uppercut |
 | Spear | Four-stab combo, every stab +75% faster; the first two stabs knock back 0.3× a normal hit, the third none, the heavy thrust 2.2× and launches |
-| Mace | Swing on the ground launches with Uppercut; swing in the air is the mace smash (Tempest splashes it) |
+| Mace | One attack. A timing weapon: it readies 1.3× slower than vanilla. At 0.8 of that wait it sparkles for 0.15 s (3 ticks); a fresh press then is a **Perfect Hit** for 1.5× damage, every other swing deals 0.9×. A press before the window fumbles it until the next swing, and a held attack key never lands one. Timed swings always hit at full attack strength. Swing on the ground launches with Uppercut; swing in the air is the mace smash (Tempest splashes it) |
+| Axe | Two-cleave combo: right to left (1.3× damage), then a backhand left to right (1.5×), each a 110° sweep. After the backhand the next swing waits 0.35 s past the cooldown |
 
 ## Vanilla changes
 
@@ -312,6 +313,8 @@ Smithing table, empty template slot, weapon in the middle, emeralds or emerald b
 | 3 | 100 | +0.15 | " |
 | 4 | 120 | +0.2 | " |
 | 5 | 140 | +0.25 | " |
+
+Every level also earns a **level point**. With the weapon in the smithing table's middle slot, the side panel spends it on a stat of the player's choice, 3% per point: damage +3% of the weapon's own, crit chance +3 points, crit damage +3 points. Attack speed takes none; spent points are not refunded.
 
 ## Trim Powers
 

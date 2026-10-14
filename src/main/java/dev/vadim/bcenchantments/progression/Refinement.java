@@ -42,7 +42,8 @@ import org.jspecify.annotations.Nullable;
 /**
  * Weapon refinement at the smithing table. Gems (emeralds, or blocks of emerald worth nine) are paid
  * into a weapon until it reaches the next refinement level; each level adds attack speed and one
- * small, random stat boost, and rolls what the next level will cost. At level {@link #MAX_LEVEL} the
+ * small, random stat boost and a level point the player spends on a stat of their choice
+ * ({@link Points}), and rolls what the next level will cost. At level {@link #MAX_LEVEL} the
  * weapon is locked and takes trims: each trim template with an echo shard grants that trim's power.
  * The first is free; every further one costs experience levels. Another template of a trim the
  * weapon already has raises that power, up to {@link #MAX_PERK}.
@@ -56,9 +57,10 @@ import org.jspecify.annotations.Nullable;
  * @param gems gems paid toward the next level
  * @param cost gems the next level costs, rolled when the previous one was reached
  * @param powers the trim powers, in the order they were applied
+ * @param points the level points spent; every level earns one (see {@link Points})
  */
 public record Refinement(int level, int gems, int cost, float damage, float attackSpeed, float critChance, float critDamage,
-	List<Power> powers) {
+	List<Power> powers, Points points) {
 
 	public static final int MAX_LEVEL = 5;
 	public static final int MAX_PERK = 3;
@@ -70,6 +72,61 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 	/** Experience levels for a weapon's second power, and how much each further one adds. */
 	private static final int POWER_LEVELS = 20;
 	private static final int POWER_LEVELS_STEP = 10;
+
+	/** What one level point adds to the stat it is spent on: 3%. Attack speed takes none. */
+	public static final float POINT_BOOST = 0.03F;
+
+	/** The stats a level point can go to. */
+	public enum Stat {
+		DAMAGE, CRIT_CHANCE, CRIT_DAMAGE;
+
+		public String id() {
+			return this.name().toLowerCase(Locale.ROOT);
+		}
+
+		public static @Nullable Stat of(String id) {
+			for (Stat stat : values()) {
+				if (stat.id().equals(id)) {
+					return stat;
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * Level points spent on each stat. Every refinement level earns the weapon one, on top of that level's
+	 * random boost; the player spends it at the smithing table on the stat they want, {@link #POINT_BOOST}
+	 * each: damage by 3% of the weapon's own, critical chance and critical damage by 3 points.
+	 */
+	public record Points(int damage, int critChance, int critDamage) {
+		public static final Points NONE = new Points(0, 0, 0);
+		public static final Codec<Points> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			Codec.INT.optionalFieldOf("damage", 0).forGetter(Points::damage),
+			Codec.INT.optionalFieldOf("critical_chance", 0).forGetter(Points::critChance),
+			Codec.INT.optionalFieldOf("critical_damage", 0).forGetter(Points::critDamage)
+		).apply(instance, Points::new));
+
+		public int total() {
+			return this.damage + this.critChance + this.critDamage;
+		}
+
+		public int of(Stat stat) {
+			return switch (stat) {
+				case DAMAGE -> this.damage;
+				case CRIT_CHANCE -> this.critChance;
+				case CRIT_DAMAGE -> this.critDamage;
+			};
+		}
+
+		Points plus(Stat stat) {
+			return switch (stat) {
+				case DAMAGE -> new Points(this.damage + 1, this.critChance, this.critDamage);
+				case CRIT_CHANCE -> new Points(this.damage, this.critChance + 1, this.critDamage);
+				case CRIT_DAMAGE -> new Points(this.damage, this.critChance, this.critDamage + 1);
+			};
+		}
+	}
 
 	/** One trim power on a weapon: the trim's name, such as {@code bolt}, and the power's level. */
 	public record Power(String trim, int level) {
@@ -92,12 +149,13 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		Codec.FLOAT.optionalFieldOf("critical_chance", 0.0F).forGetter(Refinement::critChance),
 		Codec.FLOAT.optionalFieldOf("critical_damage", 0.0F).forGetter(Refinement::critDamage),
 		Power.CODEC.listOf().optionalFieldOf("powers", List.of()).forGetter(Refinement::powers),
+		Points.CODEC.optionalFieldOf("points", Points.NONE).forGetter(Refinement::points),
 		// Before several powers, a weapon held one trim and its level; read so old items keep their power.
 		Codec.STRING.optionalFieldOf("trim").forGetter(refinement -> Optional.empty()),
 		Codec.INT.optionalFieldOf("perk_level", 0).forGetter(refinement -> 0)
-	).apply(instance, (level, gems, cost, damage, attackSpeed, critChance, critDamage, powers, trim, perkLevel) ->
+	).apply(instance, (level, gems, cost, damage, attackSpeed, critChance, critDamage, powers, points, trim, perkLevel) ->
 		new Refinement(level, gems, cost, damage, attackSpeed, critChance, critDamage,
-			powers.isEmpty() && trim.isPresent() ? List.of(new Power(trim.get(), Math.max(1, perkLevel))) : powers)));
+			powers.isEmpty() && trim.isPresent() ? List.of(new Power(trim.get(), Math.max(1, perkLevel))) : powers, points)));
 
 	public static final DataComponentType<Refinement> COMPONENT = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE,
 		TrimEnchantments.id("refinement"),
@@ -110,6 +168,28 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 
 	public Refinement {
 		powers = List.copyOf(powers);
+	}
+
+	Refinement(int level, int gems, int cost, float damage, float attackSpeed, float critChance, float critDamage, List<Power> powers) {
+		this(level, gems, cost, damage, attackSpeed, critChance, critDamage, powers, Points.NONE);
+	}
+
+	/** Level points earned and not spent yet: one per level. */
+	public int unspentPoints() {
+		return Math.max(0, this.level - this.points.total());
+	}
+
+	/**
+	 * {@code stack} with one more level point spent on {@code stat}, or null if it has none to spend.
+	 * Spent points stay: they are never refunded.
+	 */
+	public static @Nullable ItemStack spendPoint(ItemStack stack, Stat stat) {
+		Refinement refinement = stack.get(COMPONENT);
+		if (!isWeapon(stack) || refinement == null || refinement.unspentPoints() <= 0) {
+			return null;
+		}
+		return new Refinement(refinement.level, refinement.gems, refinement.cost, refinement.damage, refinement.attackSpeed,
+			refinement.critChance, refinement.critDamage, refinement.powers, refinement.points.plus(stat)).applyTo(stack);
 	}
 
 	/**
@@ -482,7 +562,7 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		int items = Math.min(addition.getCount(), Mth.positiveCeilDiv(needed, value));
 		int paid = this.gems + items * value;
 		if (paid < this.cost) {
-			Refinement partial = new Refinement(this.level, paid, this.cost, this.damage, this.attackSpeed, this.critChance, this.critDamage, this.powers);
+			Refinement partial = new Refinement(this.level, paid, this.cost, this.damage, this.attackSpeed, this.critChance, this.critDamage, this.powers, this.points);
 			return new Plan(partial.applyTo(base), items, false, false);
 		}
 
@@ -501,12 +581,12 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		// Gems paid past the cost carry over; the last level has nothing to carry them into.
 		int carried = next < MAX_LEVEL ? paid - this.cost : 0;
 		int cost = next < MAX_LEVEL ? rollCost(next, random) : 0;
-		Refinement raised = new Refinement(next, carried, cost, damage, attackSpeed, critChance, critDamage, this.powers);
+		Refinement raised = new Refinement(next, carried, cost, damage, attackSpeed, critChance, critDamage, this.powers, this.points);
 		return new Plan(raised.applyTo(base), items, false, true);
 	}
 
 	private Refinement withPowers(List<Power> powers) {
-		return new Refinement(this.level, this.gems, this.cost, this.damage, this.attackSpeed, this.critChance, this.critDamage, powers);
+		return new Refinement(this.level, this.gems, this.cost, this.damage, this.attackSpeed, this.critChance, this.critDamage, powers, this.points);
 	}
 
 	private static RandomSource random(int seed, Item item, int level) {
@@ -526,31 +606,41 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		float attackSpeed = ATTACK_SPEED_PER_LEVEL * this.level;
 
 		ItemAttributeModifiers defaults = base.getItem().components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+		// Level points add to the random boosts: damage by a share of the weapon's own (the player's 1 included), the critical stats by points.
+		double ownDamage = 1.0;
+		for (ItemAttributeModifiers.Entry entry : defaults.modifiers()) {
+			if (entry.matches(Attributes.ATTACK_DAMAGE, Item.BASE_ATTACK_DAMAGE_ID)) {
+				ownDamage += entry.modifier().amount();
+			}
+		}
+		float damage = this.damage + (float) (ownDamage * POINT_BOOST * this.points.damage);
+		float critChance = this.critChance + POINT_BOOST * this.points.critChance;
+		float critDamage = this.critDamage + POINT_BOOST * this.points.critDamage;
 		ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
 		boolean[] folded = new boolean[3];
 		for (ItemAttributeModifiers.Entry entry : defaults.modifiers()) {
 			// Boosts join the weapon's base lines, so the tooltip shows one total per stat instead of a pile of small additions.
-			if (entry.matches(Attributes.ATTACK_DAMAGE, Item.BASE_ATTACK_DAMAGE_ID) && this.damage != 0.0F) {
-				builder.add(entry.attribute(), plus(entry.modifier(), this.damage), entry.slot(), entry.display());
+			if (entry.matches(Attributes.ATTACK_DAMAGE, Item.BASE_ATTACK_DAMAGE_ID) && damage != 0.0F) {
+				builder.add(entry.attribute(), plus(entry.modifier(), damage), entry.slot(), entry.display());
 				folded[0] = true;
 			} else if (entry.matches(Attributes.ATTACK_SPEED, Item.BASE_ATTACK_SPEED_ID) && attackSpeed != 0.0F) {
 				builder.add(entry.attribute(), plus(entry.modifier(), attackSpeed), entry.slot(), entry.display());
 				folded[1] = true;
-			} else if (entry.matches(CriticalHits.CRITICAL_CHANCE, CriticalHits.WEAPON_CHANCE) && this.critChance != 0.0F) {
-				AttributeModifier modifier = plus(entry.modifier(), this.critChance);
+			} else if (entry.matches(CriticalHits.CRITICAL_CHANCE, CriticalHits.WEAPON_CHANCE) && critChance != 0.0F) {
+				AttributeModifier modifier = plus(entry.modifier(), critChance);
 				builder.add(entry.attribute(), modifier, entry.slot(), ItemAttributeModifiers.Display.override(CriticalHits.chanceLine(modifier.amount())));
 				folded[2] = true;
 			} else {
 				builder.add(entry.attribute(), entry.modifier(), entry.slot(), entry.display());
 			}
 		}
-		addUnfolded(builder, !folded[0], Attributes.ATTACK_DAMAGE, BOOST_DAMAGE, this.damage);
+		addUnfolded(builder, !folded[0], Attributes.ATTACK_DAMAGE, BOOST_DAMAGE, damage);
 		addUnfolded(builder, !folded[1], Attributes.ATTACK_SPEED, BOOST_ATTACK_SPEED, attackSpeed);
-		addUnfolded(builder, !folded[2], CriticalHits.CRITICAL_CHANCE, BOOST_CRITICAL_CHANCE, this.critChance);
-		if (this.critDamage != 0.0F) {
+		addUnfolded(builder, !folded[2], CriticalHits.CRITICAL_CHANCE, BOOST_CRITICAL_CHANCE, critChance);
+		if (critDamage != 0.0F) {
 			Component line = Component.translatable("attribute.modifier.bcenchantments.critical_damage",
-				CriticalHits.PERCENT.format(this.critDamage * 100.0) + "%").withStyle(ChatFormatting.BLUE);
-			builder.add(CriticalHits.CRITICAL_DAMAGE, new AttributeModifier(BOOST_CRITICAL_DAMAGE, this.critDamage, AttributeModifier.Operation.ADD_VALUE),
+				CriticalHits.PERCENT.format(critDamage * 100.0) + "%").withStyle(ChatFormatting.BLUE);
+			builder.add(CriticalHits.CRITICAL_DAMAGE, new AttributeModifier(BOOST_CRITICAL_DAMAGE, critDamage, AttributeModifier.Operation.ADD_VALUE),
 				EquipmentSlotGroup.MAINHAND, ItemAttributeModifiers.Display.override(line));
 		}
 		result.set(DataComponents.ATTRIBUTE_MODIFIERS, builder.build());
@@ -608,6 +698,9 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		} else {
 			added.add(level(refinement.level));
 			added.add(hint(Component.translatable("refinement.bcenchantments.progress", refinement.gems, refinement.cost)));
+		}
+		if (refinement.unspentPoints() > 0) {
+			added.add(hint(Component.translatable("refinement.bcenchantments.points", refinement.unspentPoints())));
 		}
 		lines.addAll(1, added);
 	}

@@ -1,0 +1,31 @@
+{
+	"attributes": {
+		"range_bonus": -0.25,
+		"two_handed": false,
+		"category": "axe",
+		"attacks": [
+			{
+				"hitbox": "HORIZONTAL_PLANE",
+				"damage_multiplier": 1.3,
+				"angle": 110,
+				"upswing": 0.45,
+				"animation": "bcenchantments:axe_cleave_right",
+				"swing_sound": {"id": "bettercombat:axe_slash", "pitch": 0.9},
+				"trail_particles": [
+					{"particle_type": "slash180", "x_addition": 0.0, "y_addition": -0.1, "z_addition": 0.0, "local_yaw": 0.0, "pitch_addition": 0.0, "roll_set": -5.0}
+				]
+			},
+			{
+				"hitbox": "HORIZONTAL_PLANE",
+				"damage_multiplier": 1.5,
+				"angle": 110,
+				"upswing": 0.45,
+				"animation": "bcenchantments:axe_cleave_left",
+				"swing_sound": {"id": "bettercombat:axe_slash", "pitch": 0.8},
+				"trail_particles": [
+					{"particle_type": "slash180", "x_addition": 0.0, "y_addition": -0.1, "z_addition": 0.0, "local_yaw": 0.0, "pitch_addition": 0.0, "roll_set": 180.0}
+				]
+			}
+		]
+	}
+}

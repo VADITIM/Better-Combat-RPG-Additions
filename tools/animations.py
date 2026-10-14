@@ -80,6 +80,60 @@ cr_grip = [
     (1.0,  [0, 0, 0], C),
 ]
 
+# Axe combo. Punchy starts a clip on the hit, so each cleave has only a short wind-up before the blade
+# sweeps through, then hangs at the end of the swing before it comes back. 1 cuts from the right across
+# to the left; 2 is the backhand from the left back to the right.
+ax1_rot = [
+    (0.0,  [0, 0, 0], C),
+    (0.08, [-48, 2, 62], C),
+    (0.14, [-40, 0, 60], L),
+    (0.22, [58, -28, 56], L),
+    (0.3,  [64, -30, 54], C),
+    (0.45, [58, -26, 50], C),
+    (0.75, [0, 0, 0], C),
+]
+ax1_pos = [
+    (0.0,  [0, 0, 0], C),
+    (0.08, [6, -1, -1], C),
+    (0.14, [5, -1, -2], L),
+    (0.22, [-13, -5, -10], L),
+    (0.3,  [-14.5, -5.5, -11], C),
+    (0.45, [-13, -5, -10], C),
+    (0.75, [0, 0, 0], C),
+]
+ax1_grip = [
+    (0.0,  [0, 0, 0], C),
+    (0.08, [40, 0, 0], C),
+    (0.22, [88, 0, 0], L),
+    (0.45, [70, 0, 0], C),
+    (0.75, [0, 0, 0], C),
+]
+ax2_rot = [
+    (0.0,  [0, 0, 0], C),
+    (0.08, [-20, -35, -30], C),
+    (0.14, [-15, -32, -28], L),
+    (0.22, [45, 30, -45], L),
+    (0.3,  [50, 34, -48], C),
+    (0.45, [46, 30, -44], C),
+    (0.75, [0, 0, 0], C),
+]
+ax2_pos = [
+    (0.0,  [0, 0, 0], C),
+    (0.08, [-9, 1, -3], C),
+    (0.14, [-8, 0, -4], L),
+    (0.22, [9, -5, -10], L),
+    (0.3,  [10.5, -5.5, -11], C),
+    (0.45, [9, -5, -10], C),
+    (0.75, [0, 0, 0], C),
+]
+ax2_grip = [
+    (0.0,  [0, 0, 0], C),
+    (0.08, [30, 0, 0], C),
+    (0.22, [80, 0, 0], L),
+    (0.45, [65, 0, 0], C),
+    (0.75, [0, 0, 0], C),
+]
+
 def clip(rot, pos, grip, length, timeline="anim_speed_1;"):
     return {
         "animation_length": length,
@@ -168,6 +222,8 @@ punchy = {"format_version": "1.8.0", "animations": {
     "bcenchantments_uppercut": clip(up_rot, up_pos, up_grip, 1.0),
     # dual_handed makes Punchy animate the off arm with its own track instead of leaving it idle.
     "bcenchantments_air_crit": clip(cr_rot, cr_pos, cr_grip, 1.15, "dual_handed;anim_speed_1;"),
+    "bcenchantments_axe_cleave_right": clip(ax1_rot, ax1_pos, ax1_grip, 0.75),
+    "bcenchantments_axe_cleave_left": clip(ax2_rot, ax2_pos, ax2_grip, 0.75),
     # "attack" in the names lets Punchy treat them as attacks (sprint and fall blending).
     "bcenchantments_spear_attack_1": spear_clip(*s1),
     "bcenchantments_spear_attack_2": spear_clip(*s2),
@@ -371,10 +427,79 @@ spear_4 = emote("spear_heavy", "Heavy downward spear thrust", [
     }),
 ], begin=8, stop=30)
 
+# Axe combo, one-handed: heavier than Better Combat's horizontal slashes, with a deeper wind-up, a full
+# turn of the torso and a step into each cleave. 1 ends with the axe across to the left, where 2 winds up
+# its backhand, so the pair chains. Impact at tick 10.
+axe_1 = emote("axe_cleave_right", "Heavy axe cleave from the right across to the left", [
+    (7, "EASEOUTQUAD", {
+        "rightArm": {"pitch": 0.3, "yaw": 1.1, "roll": 1.7, "x": -5.8, "y": 3.8, "z": 0.8},
+        "rightItem": {"x": 1.64, "y": -1.98, "z": -1.05, "pitch": -0.1, "yaw": 0.29, "roll": -1.73},
+        "leftArm": {"pitch": -0.5, "yaw": 0.2, "roll": -0.25},
+        "torso": {"yaw": -0.65, "pitch": 0.15},
+        "head": {"yaw": -0.4},
+        "rightLeg": {"pitch": 0.3},
+        "leftLeg": {"pitch": -0.25},
+    }),
+    (10, "EASEINQUAD", {
+        "rightArm": {"pitch": -1.5, "yaw": 0.35, "roll": 0.3, "x": -4.9, "y": 2.2, "z": -2.6},
+        "rightItem": {"x": -1.05, "y": -2.04, "z": -0.63, "pitch": -1.29, "yaw": 0.05, "roll": -1.56},
+        "leftArm": {"pitch": 0.2, "yaw": -0.1, "roll": -0.2},
+        "torso": {"yaw": 0.35, "pitch": -0.2},
+        "head": {"yaw": 0.2},
+        "rightLeg": {"pitch": -0.1},
+        "leftLeg": {"pitch": 0.2},
+    }),
+    (13, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -1.4, "yaw": -0.7, "roll": 0.2, "z": -2.2},
+        "leftArm": {"pitch": 0.5, "yaw": -0.4},
+        "torso": {"yaw": 1.05, "pitch": -0.25, "roll": -0.25},
+        "head": {"yaw": 0.8},
+        "rightLeg": {"pitch": -0.15},
+        "leftLeg": {"pitch": 0.3},
+    }),
+    (18, "EASEINOUTQUAD", {
+        "rightArm": {"pitch": -1.3, "yaw": -0.65},
+        "torso": {"yaw": 1.0, "pitch": -0.2},
+    }),
+], begin=7, stop=28)
+
+axe_2 = emote("axe_cleave_left", "Heavy backhand axe cleave from the left back to the right", [
+    (7, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -1.45, "yaw": -1.0, "roll": 0.25, "x": -4.6, "y": 2.2, "z": -1.6},
+        "rightItem": {"x": 0.51, "y": -2.19, "z": -0.09, "pitch": -0.71, "yaw": -0.01, "roll": 1.43},
+        "leftArm": {"pitch": 0.4, "yaw": -0.3},
+        "torso": {"yaw": 1.1, "pitch": 0.15},
+        "head": {"yaw": 0.7},
+        "rightLeg": {"pitch": -0.2},
+        "leftLeg": {"pitch": 0.3},
+    }),
+    (10, "EASEINQUAD", {
+        "rightArm": {"pitch": -1.75, "yaw": -0.05, "roll": 0.06, "x": -3.8, "y": 1.9, "z": -3.7},
+        "rightItem": {"x": 1.05, "y": -1.99, "z": -0.04, "pitch": -1.22, "yaw": 0.0, "roll": 1.58},
+        "leftArm": {"pitch": 0.1, "yaw": 0.1},
+        "torso": {"yaw": 0.05, "pitch": -0.25},
+        "head": {"yaw": 0.0},
+        "rightLeg": {"pitch": 0.1},
+        "leftLeg": {"pitch": -0.05},
+    }),
+    (13, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -2.3, "yaw": 1.2, "roll": -0.8, "x": -5.0, "z": -1.95},
+        "leftArm": {"pitch": -0.4, "yaw": 0.3},
+        "torso": {"yaw": -0.6, "pitch": -0.2},
+        "head": {"yaw": -0.4},
+        "rightLeg": {"pitch": 0.25},
+        "leftLeg": {"pitch": -0.2},
+    }),
+    (18, "EASEINOUTQUAD", {
+        "rightArm": {"pitch": -2.5, "yaw": 1.35, "roll": -1.1},
+        "torso": {"yaw": -0.55, "pitch": -0.18},
+    }),
+], begin=7, stop=28)
+
 p = os.path.join(res, "assets/bcenchantments/player_animations")
 os.makedirs(p, exist_ok=True)
 json.dump(uppercut, open(os.path.join(p, "uppercut.json"), "w"), indent=1)
 json.dump(air_crit, open(os.path.join(p, "air_crit.json"), "w"), indent=1)
-for anim in (spear_1, spear_2, spear_3, spear_4):
+for anim in (spear_1, spear_2, spear_3, spear_4, axe_1, axe_2):
     json.dump(anim, open(os.path.join(p, anim["name"] + ".json"), "w"), indent=1)
 print("ok")

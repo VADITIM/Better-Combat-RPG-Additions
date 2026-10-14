@@ -30,6 +30,8 @@ public class TrimEnchantmentsClient implements ClientModInitializer {
 		BetterCombatClientEvents.ATTACK_START.register((player, hand) -> {
 			PunchyClips.onAttackStart(hand);
 			PunchySpear.onAttackStart(player, hand);
+			MaceTimingClient.onAttackStart(player, hand);
 		});
+		BetterCombatClientEvents.ATTACK_HIT.register((player, hand, targets, cursorTarget) -> ComboRest.onAttackHit(player, hand));
 	}
 }

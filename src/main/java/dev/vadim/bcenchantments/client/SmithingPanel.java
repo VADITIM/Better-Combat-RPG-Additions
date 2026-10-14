@@ -1,11 +1,13 @@
 package dev.vadim.bcenchantments.client;
 
 import dev.vadim.bcenchantments.combat.CriticalHits;
+import dev.vadim.bcenchantments.network.SpendPointPayload;
 import dev.vadim.bcenchantments.perk.Synergy;
 import dev.vadim.bcenchantments.progression.Refinement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.Minecraft;
@@ -73,7 +75,7 @@ public final class SmithingPanel {
 	private static ItemStack shown = ItemStack.EMPTY;
 	/** The trim whose combinations are listed in full, if one was clicked. */
 	private static Refinement.@Nullable Perk expanded;
-	/** Where the clickable trims were drawn this frame, inside the visible part of the panel. */
+	/** Where the clickable trims and level points were drawn this frame, inside the visible part of the panel. */
 	private static final List<Hit> hits = new ArrayList<>();
 	private static int @Nullable [] view;
 
@@ -216,11 +218,44 @@ public final class SmithingPanel {
 			icon.draw(x, y, width);
 			String mark = expanded == perk ? "-" : "+";
 			g.text(font, mark, x + width - font.width(mark), y + 1, Theme.argb(alpha, over ? Theme.TEXT_BRIGHT : Theme.TEXT_FAINT), false);
-			hits.add(new Hit(x - 2, y - 1, x + width + 2, y + h, perk));
+			hits.add(new Hit(x - 2, y - 1, x + width + 2, y + h, () -> expanded = expanded == perk ? null : perk));
 		}
 	}
 
-	private record Hit(int x0, int y0, int x1, int y1, Refinement.Perk perk) {
+	/**
+	 * A stat a level point can go to: its name, the points already on it, and a "+" while the weapon has
+	 * one to spend. A click spends it; the server changes the weapon on the table.
+	 */
+	private record PointRow(Refinement.Stat stat, int spent, boolean open) implements Row {
+		@Override
+		public int height(int width) {
+			return LINE + 2;
+		}
+
+		@Override
+		public void draw(int x, int y, int width) {
+			int h = height(width);
+			boolean over = open && mouseX >= x && mouseX < x + width && mouseY >= y - 1 && mouseY < y + h - 1;
+			if (over) {
+				g.fill(x - 2, y - 1, x + width + 2, y + h - 1, Theme.argb(alpha * 0.12F, 0xFFFFFF));
+			}
+			g.text(font, text("stat." + stat.id()), x, y + 1, Theme.argb(alpha, open ? Theme.TEXT_BODY : Theme.TEXT_LABEL), false);
+			String value = spent > 0 ? "+" + NUMBER.format(spent * Refinement.POINT_BOOST * 100.0) + "%" : "";
+			String mark = open ? "+" : "";
+			int right = x + width;
+			if (!mark.isEmpty()) {
+				right -= font.width(mark);
+				g.text(font, mark, right, y + 1, Theme.argb(alpha, over ? Theme.TEXT_BRIGHT : Theme.TEXT_MUTED), false);
+				right -= 6;
+			}
+			g.text(font, value, right - font.width(value), y + 1, Theme.argb(alpha, Theme.TEXT_MUTED), false);
+			if (open) {
+				hits.add(new Hit(x - 2, y - 1, x + width + 2, y + h - 1, () -> ClientPlayNetworking.send(new SpendPointPayload(stat.id()))));
+			}
+		}
+	}
+
+	private record Hit(int x0, int y0, int x1, int y1, Runnable action) {
 	}
 
 	private record Space(int size) implements Row {
@@ -261,7 +296,7 @@ public final class SmithingPanel {
 				}
 				for (Hit hit : hits) {
 					if (event.x() >= hit.x0() && event.x() < hit.x1() && event.y() >= hit.y0() && event.y() < hit.y1()) {
-						expanded = expanded == hit.perk() ? null : hit.perk();
+						hit.action().run();
 						Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 						return false;
 					}
@@ -418,6 +453,7 @@ public final class SmithingPanel {
 		stat(rows, "speed", base, result, stack -> BASE_SPEED + sum(stack, Attributes.ATTACK_SPEED), "");
 		stat(rows, "crit_chance", base, result, stack -> sum(stack, CriticalHits.CRITICAL_CHANCE) * 100.0, "%");
 		stat(rows, "crit_damage", base, result, stack -> BASE_CRIT_DAMAGE + sum(stack, CriticalHits.CRITICAL_DAMAGE), "×");
+		points(rows, base);
 
 		if (refinement.level() < Refinement.MAX_LEVEL) {
 			refining(rows, player, refinement, plan);
@@ -544,6 +580,22 @@ public final class SmithingPanel {
 			}
 		}
 		rows.add(new Stat(text("stat." + name), format(now, unit), next));
+	}
+
+	/** The weapon's level points: one per refinement level, each spent on the stat the player clicks. */
+	private static void points(List<Row> rows, ItemStack base) {
+		Refinement refinement = base.get(Refinement.COMPONENT);
+		if (refinement == null || refinement.level() == 0) {
+			return;
+		}
+		int left = refinement.unspentPoints();
+		rows.add(new Heading(text("section.points")));
+		rows.add(new Text(left > 0 ? text("points.left", left) : text("points.none"), left > 0 ? Theme.TEXT_BRIGHT : Theme.TEXT_MUTED));
+		rows.add(new Space(2));
+		for (Refinement.Stat stat : Refinement.Stat.values()) {
+			rows.add(new PointRow(stat, refinement.points().of(stat), left > 0));
+		}
+		rows.add(new Text(text(left > 0 ? "points.how" : "points.earn"), Theme.TEXT_FAINT));
 	}
 
 	private static String format(double value, String unit) {

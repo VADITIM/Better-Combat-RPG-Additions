@@ -3,6 +3,7 @@ package dev.vadim.bcenchantments.combat;
 import dev.vadim.bcenchantments.network.ComboHudPayload;
 import dev.vadim.bcenchantments.perk.ChargedPerk;
 import dev.vadim.bcenchantments.perk.Perks;
+import dev.vadim.bcenchantments.weapon.MaceTiming;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,7 @@ public final class ComboTracker {
 		swingCursorTarget = cursorTarget;
 		swingHits.clear();
 		CriticalHits.beginSwing(player, hand.isOffHand());
+		MaceTiming.beginSwing(player, hand);
 	}
 
 	public static void beforeAttack(ServerPlayer player, Entity target) {
@@ -115,6 +117,7 @@ public final class ComboTracker {
 		swingPlayer = null;
 		swingHand = null;
 		swingHits.clear();
+		MaceTiming.endSwing();
 		if (player == null || hand == null) {
 			return;
 		}

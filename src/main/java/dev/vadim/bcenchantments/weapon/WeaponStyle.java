@@ -36,6 +36,11 @@ public interface WeaponStyle {
 		return 1.0;
 	}
 
+	/** Extra ticks the player has to wait after this attack before the next swing can start; it ends a combo. */
+	default int restAfter(String animation) {
+		return 0;
+	}
+
 	/** Whether the attack throws what it hits into the air when the weapon has Uppercut. */
 	default boolean launches(Player player, String animation) {
 		return false;

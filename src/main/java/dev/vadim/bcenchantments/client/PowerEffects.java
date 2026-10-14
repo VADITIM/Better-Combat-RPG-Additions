@@ -22,7 +22,8 @@ import org.jspecify.annotations.Nullable;
  * dropped or in a frame. A frame from {@code textures/item/power/<power>.png} (made by
  * {@code tools/power_effects.py}) is laid 1:1 over the item's 16x16 sprite and drawn with the
  * enchantment-glint pipeline, whose equal-depth test keeps it on the item's own pixels. A weapon with
- * several powers cycles through their effects.
+ * several powers plays their effects one after another, each through once. The mace's Perfect Hit
+ * window ({@link MaceTimingClient}) shows over all of them while it is open.
  *
  * <p>The mixins on the item render state carry the weapon's effect from model resolving to submission:
  * {@code ItemModelResolverMixin} picks it and marks the state animated so slots redraw every frame,
@@ -31,42 +32,55 @@ import org.jspecify.annotations.Nullable;
 public final class PowerEffects {
 	/** Frame counts must match {@code tools/power_effects.py}. */
 	private enum Effect {
-		LIGHTNING(Refinement.Perk.LIGHTNING, 32, 70),
-		SHOCKWAVE(Refinement.Perk.SHOCKWAVE, 20, 60),
-		COLD_EDGE(Refinement.Perk.COLD_EDGE, 24, 90),
-		UPPERCUT(Refinement.Perk.UPPERCUT, 16, 60),
-		CHAINS(Refinement.Perk.CHAINS, 12, 90),
-		ECHO(Refinement.Perk.ECHO, 24, 70),
-		WIND_CHARGED(Refinement.Perk.WIND_CHARGED, 16, 70),
-		GRAVITY(Refinement.Perk.GRAVITY, 24, 70),
-		MOMENTUM(Refinement.Perk.MOMENTUM, 16, 50),
-		RAMPAGING(Refinement.Perk.RAMPAGING, 24, 60);
+		LIGHTNING("lightning", 32, 70),
+		SHOCKWAVE("shockwave", 20, 60),
+		COLD_EDGE("cold_edge", 24, 90),
+		UPPERCUT("uppercut", 16, 60),
+		CHAINS("chains", 12, 90),
+		ECHO("echo", 24, 70),
+		WIND_CHARGED("wind_charged", 16, 70),
+		GRAVITY("gravity", 24, 70),
+		MOMENTUM("momentum", 16, 50),
+		RAMPAGING("rampaging", 24, 60),
+		/** The mace's Perfect Hit window; its frames follow the window, not the clock. */
+		PERFECT_HIT("perfect_hit", 6, 25);
 
-		final Refinement.Perk perk;
+		final String id;
 		final int frames;
 		final long frameMs;
 		final RenderType renderType;
 
-		Effect(Refinement.Perk perk, int frames, long frameMs) {
-			this.perk = perk;
+		Effect(String id, int frames, long frameMs) {
+			this.id = id;
 			this.frames = frames;
 			this.frameMs = frameMs;
-			this.renderType = RenderType.create(TrimEnchantments.MOD_ID + "_power_" + perk.id(),
+			this.renderType = RenderType.create(TrimEnchantments.MOD_ID + "_power_" + id,
 				RenderSetup.builder(RenderPipelines.GLINT)
-					.withTexture("Sampler0", TrimEnchantments.id("textures/item/power/" + perk.id() + ".png"))
+					.withTexture("Sampler0", TrimEnchantments.id("textures/item/power/" + id + ".png"))
 					.createRenderSetup());
+		}
+
+		/** How long one run of the animation lasts. */
+		long length() {
+			return this.frames * this.frameMs;
 		}
 	}
 
-	/** How long each power's effect shows before a weapon with several moves on to the next. */
-	private static final long CYCLE_MS = 3000;
+	/** One frame of one effect: what an item state carries from resolving to submission. */
+	private record Shown(Effect effect, int frame) {
+	}
+
 	/** The effect of the item state submitting right now; submission runs on the render thread only. */
 	public static @Nullable Object submitting;
 	private static final Map<Refinement.Perk, Effect> BY_PERK = new EnumMap<>(Refinement.Perk.class);
 
 	static {
 		for (Effect effect : Effect.values()) {
-			BY_PERK.put(effect.perk, effect);
+			for (Refinement.Perk perk : Refinement.Perk.values()) {
+				if (perk.id().equals(effect.id)) {
+					BY_PERK.put(perk, effect);
+				}
+			}
 		}
 	}
 
@@ -82,21 +96,37 @@ public final class PowerEffects {
 
 	/** The effect {@code stack} shows right now, or null for an item without a power that has one. */
 	public static @Nullable Object effectFor(ItemStack stack) {
+		float window = MaceTimingClient.sparkle(stack);
+		if (window >= 0.0F) {
+			Effect perfect = Effect.PERFECT_HIT;
+			int frame = Math.min(perfect.frames - 1, (int) (window * 50.0F / perfect.frameMs));
+			return new Shown(perfect, frame);
+		}
 		if (!Refinement.isWeapon(stack)) {
 			return null;
 		}
 		List<Effect> effects = new ArrayList<>();
+		long total = 0;
 		for (Refinement.Power power : Refinement.powersOf(stack)) {
 			Refinement.Perk perk = Refinement.perk(power.trim());
 			Effect effect = perk == null ? null : BY_PERK.get(perk);
 			if (effect != null) {
 				effects.add(effect);
+				total += effect.length();
 			}
 		}
 		if (effects.isEmpty()) {
 			return null;
 		}
-		return effects.get((int) (Util.getMillis() / CYCLE_MS % effects.size()));
+		// Each effect plays its animation through once, then hands over to the next; none overlap or cut in.
+		long time = Util.getMillis() % total;
+		for (Effect effect : effects) {
+			if (time < effect.length()) {
+				return new Shown(effect, (int) (time / effect.frameMs));
+			}
+			time -= effect.length();
+		}
+		return null;
 	}
 
 	/**
@@ -104,8 +134,9 @@ public final class PowerEffects {
 	 * position in the item model, so a texture pixel lands on exactly one item pixel.
 	 */
 	public static List<BakedQuad> quads(Object effect, List<BakedQuad> quads) {
-		Effect current = (Effect) effect;
-		int frame = (int) (Util.getMillis() / current.frameMs % current.frames);
+		Shown shown = (Shown) effect;
+		Effect current = shown.effect();
+		int frame = shown.frame();
 		List<BakedQuad> out = new ArrayList<>(quads.size());
 		for (BakedQuad quad : quads) {
 			BakedQuad.MaterialInfo material = quad.materialInfo();
