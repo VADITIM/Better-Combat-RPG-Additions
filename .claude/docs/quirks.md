@@ -51,3 +51,7 @@ Live test sessions happen only when the user asks for one:
 - NVIDIA TDR crashes (`VK_ERROR_DEVICE_LOST`) predate the mod; relaunch.
 - A NoAI mob ignores knockback. To measure knockback, use Slowness 255 on a normal mob instead.
 - Check `key_key.chat` in `options.txt` before scripting chat commands; it has been rebound to Enter before.
+
+## Trident combo
+- Better Combat ships `data/minecraft/weapon_attributes/trident.json` itself, and which mod's copy wins depends on pack order. So this mod ships no `minecraft:trident` file; `WeaponRegistryMixin` swaps the `bettercombat:trident` parent for `bcenchantments:trident` in `WeaponRegistry.resolveAttributes`. A datapack that points the trident elsewhere is left alone.
+- Each trident thrust has its own emote only so `WeaponStyle` hooks (keyed by animation) can tell them apart; first person stays Punchy's own trident swing.

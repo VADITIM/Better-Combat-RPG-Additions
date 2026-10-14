@@ -8,6 +8,7 @@ import dev.vadim.bcenchantments.combat.CriticalHits;
 import dev.vadim.bcenchantments.mob.HitChain;
 import dev.vadim.bcenchantments.perk.Updraft;
 import dev.vadim.bcenchantments.weapon.MaceTiming;
+import dev.vadim.bcenchantments.weapon.TridentStyle;
 import dev.vadim.bcenchantments.weapon.WeaponStyles;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Tells a running swing whether each of its attacks actually took health off the target, and swaps
  * vanilla's falling crit for the rolled one from {@link CriticalHits}. Also lets weapon styles give
  * each attack its own cooldown, runs monster hits through {@link HitChain}, and applies the mace's
- * {@link MaceTiming}.
+ * {@link MaceTiming} and the trident's Perfect Spacing ({@link TridentStyle}).
  */
 @Mixin(Player.class)
 public abstract class PlayerMixin {
@@ -45,7 +46,8 @@ public abstract class PlayerMixin {
 
 	@ModifyArg(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtOrSimulate(Lnet/minecraft/world/damagesource/DamageSource;F)Z"), index = 1)
 	private float bcenchantments$maceTiming(float amount, @Local(argsOnly = true) Entity target) {
-		return MaceTiming.damage((Player) (Object) this, target, amount);
+		Player player = (Player) (Object) this;
+		return TridentStyle.damage(player, target, MaceTiming.damage(player, target, amount));
 	}
 
 	@ModifyReturnValue(method = "getCurrentItemAttackStrengthDelay", at = @At("RETURN"))

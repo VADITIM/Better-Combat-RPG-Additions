@@ -55,7 +55,8 @@ public final class ForgeScreen extends Screen {
 		super(Component.translatable("screen.bcenchantments.forge.title"));
 		this.parent = parent;
 		for (Item item : BuiltInRegistries.ITEM) {
-			if (Refinement.isBase(new ItemStack(item))) {
+			ItemStack stack = new ItemStack(item);
+			if (Refinement.isRefinable(stack) || Refinement.isShield(stack)) {
 				weapons.add(item);
 			}
 		}

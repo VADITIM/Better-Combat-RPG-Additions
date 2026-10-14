@@ -31,7 +31,9 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MaceItem;
@@ -46,7 +48,8 @@ import org.jspecify.annotations.Nullable;
  * ({@link Points}), and rolls what the next level will cost. At level {@link #MAX_LEVEL} the
  * weapon is locked and takes trims: each trim template with an echo shard grants that trim's power.
  * The first is free; every further one costs experience levels. Another template of a trim the
- * weapon already has raises that power, up to {@link #MAX_PERK}.
+ * weapon already has does nothing; a power goes up to {@link #MAX_PERK} for {@link #UPGRADE_COST}
+ * emeralds from the smithing panel, and back down for a refund of the same.
  * <p>
  * Powers combine in the order they were applied: the first with the second, the third with the
  * fourth, and so on. A power already in a combination is locked out of every other, so a third
@@ -64,6 +67,8 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 
 	public static final int MAX_LEVEL = 5;
 	public static final int MAX_PERK = 3;
+	/** Emeralds one power level costs, and returns when the level is given up again. */
+	public static final int UPGRADE_COST = 64;
 	/** Cost of each level before its ±10% roll; all five come to about 500 gems. */
 	private static final int[] BASE_COST = {60, 80, 100, 120, 140};
 	private static final float COST_SPREAD = 0.1F;
@@ -180,6 +185,30 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 	}
 
 	/**
+	 * {@code stack} with the power of {@code trim} one level higher ({@code up}) or lower, or null if the
+	 * weapon does not have it or it is already at the limit (level {@link #MAX_PERK}, or level 1 going down).
+	 */
+	public static @Nullable ItemStack shiftPower(ItemStack stack, String trim, boolean up) {
+		Refinement refinement = stack.get(COMPONENT);
+		if (!isRefinable(stack) || isShield(stack) || refinement == null) {
+			return null;
+		}
+		List<Power> powers = new ArrayList<>(refinement.powers);
+		for (int i = 0; i < powers.size(); i++) {
+			Power power = powers.get(i);
+			int level = power.level + (up ? 1 : -1);
+			if (power.trim.equals(trim)) {
+				if (level < 1 || level > MAX_PERK) {
+					return null;
+				}
+				powers.set(i, new Power(power.trim, level));
+				return refinement.withPowers(powers).applyTo(stack);
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * {@code stack} with one more level point spent on {@code stat}, or null if it has none to spend.
 	 * Spent points stay: they are never refunded.
 	 */
@@ -288,12 +317,22 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		}
 	}
 
+	public static final TagKey<Item> REFINABLE = TagKey.create(Registries.ITEM, TrimEnchantments.id("refinable"));
+
 	public static void init() {
 		// Loading the class registers the component.
 	}
 
 	public static boolean isWeapon(ItemStack stack) {
 		return CriticalHits.baseChance(stack.getItem()) > 0.0;
+	}
+
+	/**
+	 * Weapons the smithing table refines and gives trim powers: diamond and netherite ones, the mace
+	 * and the trident ({@code bcenchantments:refinable}). Lesser weapons keep whatever they already have.
+	 */
+	public static boolean isRefinable(ItemStack stack) {
+		return isWeapon(stack) && stack.is(REFINABLE);
 	}
 
 	public static boolean isShield(ItemStack stack) {
@@ -492,7 +531,7 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		if (isShield(base)) {
 			return shieldPlan(template, base, addition);
 		}
-		if (!isWeapon(base)) {
+		if (!isRefinable(base)) {
 			return null;
 		}
 		Refinement current = base.get(COMPONENT);
@@ -508,15 +547,9 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		if (perk == null || !perk.built) {
 			return null;
 		}
-		Power owned = current.power(perk);
-		if (owned != null) {
-			// A trim the weapon already has raises its power instead; it never adds the power twice.
-			if (!addition.isEmpty() || owned.level >= MAX_PERK) {
-				return null;
-			}
-			List<Power> raised = new ArrayList<>(current.powers);
-			raised.set(raised.indexOf(owned), new Power(owned.trim, owned.level + 1));
-			return new Plan(current.withPowers(raised).applyTo(base), 0, true, true);
+		if (current.power(perk) != null) {
+			// A power the weapon has is raised with emeralds from the panel ({@link #shiftPower}), never by a second trim.
+			return null;
 		}
 		if (!addition.is(Items.ECHO_SHARD)) {
 			return null;
@@ -688,7 +721,7 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 				if (details) {
 					Synergy.describe("tooltip.bcenchantments.power." + perk.id(), added);
 					if (power.level < MAX_PERK) {
-						added.add(hint(Component.translatable("refinement.bcenchantments.upgrade", trimName(power.trim))));
+						added.add(hint(Component.translatable("refinement.bcenchantments.upgrade", UPGRADE_COST)));
 					}
 				}
 			}

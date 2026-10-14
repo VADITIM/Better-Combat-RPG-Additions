@@ -19,6 +19,9 @@ on it at the smithing table and it gains that trim's **Trim Power**; put on two 
 - **Elites and captains**: some monsters spawn as elites whose hits slow, weaken or strip armor.
   Captains wear an ominous banner and hurry and shield the monsters around them.
 - **Harder by place**: mild near world spawn, harder underground, in the Deep Dark, the Nether and the End.
+  Each place has a difficulty, from Regular through Hard, Very Hard and Extreme to Possible Death, shown
+  in the bottom right corner with the biome. The harder it is, the better the armor monsters spawn in:
+  copper near home, up to enchanted netherite.
 - **Ominous difficulty**: drink an ominous bottle to make monsters tougher on purpose. While Bad
   Omen lasts, kills can drop emeralds (5% at I, up to 9% at V), and at level V an echo shard (0.2%).
 
@@ -26,16 +29,20 @@ on it at the smithing table and it gains that trim's **Trim Power**; put on two 
 
 In game, the **?** button beside the smithing table opens the Field Guide, with the recipes laid out in item icons.
 
-**Refining.** At a smithing table, put a weapon in the middle slot and emeralds or emerald blocks in the
+**Refining.** Only diamond and netherite weapons, the mace and the trident can be refined. At a smithing table, put one in the middle slot and emeralds or emerald blocks in the
 right slot, with the template slot empty. There are five levels, about 500 emeralds in all. Each
 adds attack speed (+0.05 per level, +0.25 at level 5), one small random boost (damage, critical chance or
 critical damage) and a level point: with the weapon in the middle slot, click a stat in the side panel to
 raise it by 3%. Attack speed takes no points.
 
-**Axe and mace.** The axe swings a two-cleave combo, right to left and back, each far heavier than a
+**Axe, mace and trident.** The axe swings a two-cleave combo, right to left and back, each far heavier than a
 sword swing, and rests 0.35 s after the backhand. The mace is a timing weapon: it readies 1.3× slower,
 and a press while it sparkles (0.15 s, at 0.8 of the wait) is a Perfect Hit for 1.5× damage; every
 other swing deals 0.9×.
+
+**Trident.** The reach weapon: two quick jabs and a lunge. A thrust that lands near the end of its
+reach is **Perfect Spacing**, for 1.3× damage. Loyalty widens the sweet spot, a Riptide spin makes every
+thrust perfect for a moment, and Channeling calls lightning on a perfect lunge in a thunderstorm.
 
 **Powers** come only from trims: every armor trim grants its own power on a weapon. Lightning,
 Shockwave, Chains and Echo charge over a combo and show as bars under the crosshair; the rest work on
@@ -43,8 +50,8 @@ every hit.
 
 **Trim Powers.** A weapon at refinement level 5 takes an armor trim template and an echo shard at the
 smithing table and gains that trim's power at level 1. A different trim and an echo shard add another
-power for experience levels (20 for the second, 10 more for each after). The same trim again, without a
-shard, raises its power to 2 and then 3. A weapon holds any number of powers.
+power for experience levels (20 for the second, 10 more for each after). With the weapon in the middle slot, the panel raises a power to 2 and then 3
+for 64 emeralds a level, and lowering it a level gives the 64 back. A weapon holds any number of powers.
 
 | Power | Trim | | Power | Trim |
 |---|---|---|---|---|

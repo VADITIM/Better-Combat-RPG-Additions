@@ -43,7 +43,9 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 - **Spawn cap ×1.8.** Health +0–30% per monster (mean of three rolls, so middle values are common). Damage +0–15%, rolled evenly. Health no longer scales with difficulty or player power; armor and knockback resistance still do.
 - **Difficulty plan (from an outside proposal), what was taken:** elites and captains, status attacks, place multipliers, and a power measure that counts power pairs. *Rejected:* a threat level from recent power damage and adaptive resistance (both punish using the powers you earned), Echo Strain weapon upkeep (a chore, and experience cost already balances powers), and flanking AI (a rewrite of vanilla AI for little gain).
 - **Elites hurt with statuses, not damage.** Frost, Weakening and Shredding add pressure without turning monsters into sponges. Captains are the kill-first target that breaks up click-and-slash fights; the ominous banner reuses vanilla's raid-captain look. Ranks are entity tags, saved with the monster, and their health goes into the same health modifier so mob farms keep their drop height.
-- **Place multiplies every bonus.** Near spawn ×0.5 keeps the home base calm; caves ×1.25, Deep Dark and Nether ×1.5, End ×1.75.
+- **Place multiplies every bonus.** Near spawn ×0.5 keeps the home base calm; caves ×1.25, Deep Dark and Nether ×1.5, Soul Sand Valley and Basalt Deltas ×1.65, End ×1.75.
+- **Each place also has a named tier** (Regular to Possible Death) that picks monster armor and is shown on the HUD. Bad Omen raises it, so Possible Death is only reached by choice. Armor drops at 4% (vanilla 8.5%) so farms don't flood with it.
+- **The trident is the spacing weapon.** Sword is close combat, spear versatile reach, trident specialised reach plus mobility: Perfect Spacing at the end of its reach, with Loyalty, Riptide and Channeling feeding it. It has less reach than the spear and no bonus up close, so it is not a better spear.
 - **Player power counts pairs.** Weapons hold unlimited powers now, so the measure is power levels + 2 per pair, capped at 30 instead of 12, with smaller per-point armor and knockback resistance.
 - **Ominous bottles are the difficulty dial.** Bad Omen I–V adds health +6%, damage +3%, armor +0.5 and knockback resistance +0.02 per level to monsters spawning near the player, and the player's monster kills drop an emerald at 4% + 1% per level, plus an echo shard at 0.2% at level V. It reuses a vanilla item, it is opt-in, and it pays in the refinement currencies. The buff is applied at spawn like the rest of the scaling, so drinking a bottle affects new monsters, not ones already loaded.
 
@@ -60,4 +62,4 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 ## 2026-10-12
 
 - **V/AS base register, cut down for a game:** monochrome accent and the Minecraft font only (`rules/frontend.md`).
-- **Refinement with emeralds at the smithing table,** five levels, then trim + echo shard into a power, raised to III by repeat trims.
+- **Refinement with emeralds at the smithing table,** five levels, then trim + echo shard into a power, raised to III in the smithing panel for 64 emeralds a level, and lowered again for a full refund so a level can be tried out.

@@ -1,6 +1,7 @@
 package dev.vadim.bcenchantments.client;
 
 import dev.vadim.bcenchantments.combat.CriticalHits;
+import dev.vadim.bcenchantments.network.PowerLevelPayload;
 import dev.vadim.bcenchantments.network.SpendPointPayload;
 import dev.vadim.bcenchantments.perk.Synergy;
 import dev.vadim.bcenchantments.progression.Refinement;
@@ -255,6 +256,29 @@ public final class SmithingPanel {
 		}
 	}
 
+	/** A click line under a power: raise it for emeralds, or lower it and get them back. Faint when it cannot be done. */
+	private record PowerAction(Component label, String trim, boolean up, boolean usable) implements Row {
+		@Override
+		public int height(int width) {
+			return LINE + 2;
+		}
+
+		@Override
+		public void draw(int x, int y, int width) {
+			int h = height(width);
+			x += SLOT + 4;
+			width -= SLOT + 4;
+			boolean over = usable && mouseX >= x && mouseX < x + width && mouseY >= y - 1 && mouseY < y + h - 1;
+			if (over) {
+				g.fill(x - 2, y - 1, x + width + 2, y + h - 1, Theme.argb(alpha * 0.12F, 0xFFFFFF));
+			}
+			g.text(font, label, x, y + 1, Theme.argb(alpha, over ? Theme.TEXT_BRIGHT : usable ? Theme.TEXT_BODY : Theme.TEXT_FAINT), false);
+			if (usable) {
+				hits.add(new Hit(x - 2, y - 1, x + width + 2, y + h - 1, () -> ClientPlayNetworking.send(new PowerLevelPayload(trim, up))));
+			}
+		}
+	}
+
 	private record Hit(int x0, int y0, int x1, int y1, Runnable action) {
 	}
 
@@ -430,8 +454,11 @@ public final class SmithingPanel {
 		}
 		if (Refinement.isShield(base)) {
 			shield(rows, player, template, base, addition);
-		} else if (Refinement.isWeapon(base)) {
+		} else if (Refinement.isRefinable(base)) {
 			weapon(rows, player, template, base, addition);
+		} else if (Refinement.isWeapon(base)) {
+			rows.add(new Header(base, base.getHoverName(), Component.empty()));
+			rows.add(new Text(text("why.tier"), Theme.TEXT_MUTED));
 		} else {
 			rows.add(new Header(base, base.getHoverName(), Component.empty()));
 			rows.add(new Text(text("other"), Theme.TEXT_MUTED));
@@ -482,9 +509,7 @@ public final class SmithingPanel {
 			} else if (trim != null) {
 				Refinement.Perk perk = Refinement.perk(trim);
 				int owned = Refinement.perkLevel(base, perk.enchantment());
-				if (owned > 0) {
-					lines.add(text("preview.raise", perk.displayName(), numeral(owned + 1)));
-				} else {
+				{
 					lines.add(text("preview.add", perk.displayName()));
 					Refinement.Perk waiting = Refinement.unpaired(base);
 					if (Refinement.isShield(base)) {
@@ -561,7 +586,7 @@ public final class SmithingPanel {
 			return text("why.max", perk.displayName());
 		}
 		if (owned > 0) {
-			return addition.isEmpty() ? null : text("why.no_shard");
+			return text("why.upgrade");
 		}
 		return addition.is(Items.ECHO_SHARD) ? null : text("why.shard");
 	}
@@ -665,11 +690,14 @@ public final class SmithingPanel {
 			Component name = Component.empty().append(perk.displayName()).append(" ").append(numeral(power.level()));
 			rows.add(new Icon(template(power.trim()), name, Theme.perkColor(perk.id()), description("tooltip.bcenchantments.power." + perk.id()),
 				Theme.TEXT_MUTED));
+			boolean rich = player.hasInfiniteMaterials() || emeralds(player) >= Refinement.UPGRADE_COST;
 			if (power.level() < Refinement.MAX_PERK) {
-				boolean has = carries(player, power.trim());
-				rows.add(new Text(text("raise", Refinement.trimName(power.trim())), has ? Theme.TEXT_BODY : Theme.TEXT_FAINT, SLOT + 4));
+				rows.add(new PowerAction(text("upgrade", Refinement.UPGRADE_COST, numeral(power.level() + 1)), power.trim(), true, rich));
 			} else {
 				rows.add(new Text(text("max"), Theme.TEXT_FAINT, SLOT + 4));
+			}
+			if (power.level() > 1) {
+				rows.add(new PowerAction(text("downgrade", numeral(power.level() - 1), Refinement.UPGRADE_COST), power.trim(), false, true));
 			}
 			rows.add(new Space(3));
 		}

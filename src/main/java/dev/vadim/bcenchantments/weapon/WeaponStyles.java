@@ -22,6 +22,7 @@ public final class WeaponStyles {
 		register(SwordStyle.INSTANCE);
 		register(MaceStyle.INSTANCE);
 		register(AxeStyle.INSTANCE);
+		register(TridentStyle.INSTANCE);
 	}
 
 	public static void register(WeaponStyle style) {

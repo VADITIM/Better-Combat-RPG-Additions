@@ -71,9 +71,26 @@ final class MobBalance {
 	static final double PLACE_UNDERGROUND = 1.25;
 	static final double PLACE_DEEP_DARK = 1.5;
 	static final double PLACE_NETHER = 1.5;
+	/** Soul Sand Valley and Basalt Deltas. */
+	static final double PLACE_NETHER_HARSH = 1.65;
 	static final double PLACE_END = 1.75;
 	/** Overworld surface within this many blocks of world spawn counts as near spawn. */
 	static final double SPAWN_RADIUS = 256.0;
+
+	// Armor, by the spot's tier (Place.Tier: Regular, Hard, Very Hard, Extreme, Possible Death; Bad
+	// Omen raises it). Only the bcenchantments:armored_monsters tag wears it.
+	/** Chance a monster spawns in armor at all. */
+	static final double[] ARMOR_WEAR_CHANCE = {0.10, 0.22, 0.35, 0.50, 0.65};
+	/** The range of materials: 0 copper, 1 chainmail, 2 iron, 3 diamond, 4 netherite; the better ones rarer. */
+	static final int[] ARMOR_MATERIAL_MIN = {0, 0, 1, 2, 3};
+	static final int[] ARMOR_MATERIAL_MAX = {1, 2, 3, 4, 4};
+	/** The helmet always comes; each other piece comes with this chance. */
+	static final double[] ARMOR_PIECE_CHANCE = {0.35, 0.45, 0.55, 0.65, 0.8};
+	/** Chance each piece is enchanted, and at which enchanting level. */
+	static final double[] ARMOR_ENCHANT_CHANCE = {0.0, 0.15, 0.35, 0.6, 0.85};
+	static final int[] ARMOR_ENCHANT_LEVEL = {0, 8, 15, 22, 30};
+	/** Chance each worn piece drops on death; vanilla's is 8.5%. */
+	static final float ARMOR_DROP_CHANCE = 0.04F;
 
 	// Elites and captains. An elite carries one affix; a captain is an elite that rallies others.
 	/** Chance a monster spawns elite, before place. */

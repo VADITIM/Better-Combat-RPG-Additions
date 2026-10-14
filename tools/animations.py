@@ -496,10 +496,84 @@ axe_2 = emote("axe_cleave_left", "Heavy backhand axe cleave from the left back t
     }),
 ], begin=7, stop=28)
 
+# Trident combo, one-handed: two quick straight jabs and a long lunge. The item keeps the trident's own
+# hold (no rightItem keys), so the prongs lead along the arm. Arm and step reach further than the
+# spear's stabs: it is fought at the edge of its reach. Impact at tick 10.
+trident_1 = emote("trident_thrust_1", "Quick straight trident jab", [
+    (7, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -1.35, "yaw": -0.2, "roll": 0.0, "x": -5.6, "z": 1.4},
+        "leftArm": {"pitch": -0.35, "yaw": 0.2, "roll": -0.5},
+        "torso": {"yaw": -0.3, "pitch": 0.1},
+        "rightLeg": {"pitch": 0.2},
+        "leftLeg": {"pitch": -0.15},
+    }),
+    (10, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -1.6, "yaw": 0.15, "roll": 0.05, "x": -5.0, "z": -3.0},
+        "leftArm": {"pitch": 0.35, "yaw": 0.1, "roll": -0.6},
+        "torso": {"yaw": 0.3, "pitch": -0.2},
+        "rightLeg": {"pitch": -0.2},
+        "leftLeg": {"pitch": 0.25},
+    }),
+    (15, "EASEINOUTQUAD", {
+        "rightArm": {"pitch": -1.55, "yaw": 0.1, "z": -2.0},
+        "torso": {"yaw": 0.22, "pitch": -0.15},
+    }),
+], begin=7, stop=24)
+
+trident_2 = emote("trident_thrust_2", "Second trident jab, a little higher and from the left", [
+    (7, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -1.5, "yaw": 0.35, "roll": -0.05, "x": -4.4, "z": 1.0},
+        "leftArm": {"pitch": -0.3, "yaw": 0.2, "roll": -0.6},
+        "torso": {"yaw": 0.3, "pitch": 0.05},
+        "rightLeg": {"pitch": 0.1},
+        "leftLeg": {"pitch": -0.2},
+    }),
+    (10, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -1.75, "yaw": -0.1, "roll": 0.1, "x": -5.2, "z": -3.0},
+        "leftArm": {"pitch": 0.4, "yaw": 0.0, "roll": -0.7},
+        "torso": {"yaw": -0.15, "pitch": -0.2, "roll": 0.08},
+        "rightLeg": {"pitch": -0.2},
+        "leftLeg": {"pitch": 0.25},
+    }),
+    (15, "EASEINOUTQUAD", {
+        "rightArm": {"pitch": -1.65, "yaw": -0.05, "z": -2.0},
+        "torso": {"yaw": -0.1, "pitch": -0.15},
+    }),
+], begin=7, stop=24)
+
+trident_3 = emote("trident_lunge", "Long trident lunge with a deep step", [
+    (5, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -1.2, "yaw": -0.35, "roll": 0.0, "x": -6.4, "z": 2.4},
+        "leftArm": {"pitch": -0.7, "yaw": 0.3, "roll": -0.4},
+        "torso": {"yaw": -0.5, "pitch": 0.2},
+        "rightLeg": {"pitch": 0.35},
+        "leftLeg": {"pitch": -0.25},
+    }),
+    (8, "EASEINOUTQUAD", {
+        "rightArm": {"pitch": -1.25, "yaw": -0.4, "x": -6.6, "z": 2.8},
+        "torso": {"yaw": -0.55, "pitch": 0.25},
+    }),
+    (10, "EASEINQUAD", {
+        "rightArm": {"pitch": -1.58, "yaw": 0.3, "roll": 0.1, "x": -5.0, "z": -4.0},
+        "leftArm": {"pitch": 0.7, "yaw": -0.1, "roll": -0.5},
+        "torso": {"yaw": 0.45, "pitch": -0.45},
+        "rightLeg": {"pitch": -0.6},
+        "leftLeg": {"pitch": 0.5},
+    }),
+    (12, "EASEOUTQUAD", {
+        "rightArm": {"pitch": -1.55, "z": -3.8},
+        "torso": {"pitch": -0.5},
+    }),
+    (17, "EASEINOUTQUAD", {
+        "rightArm": {"pitch": -1.5, "yaw": 0.2, "z": -2.4},
+        "torso": {"yaw": 0.3, "pitch": -0.25},
+    }),
+], begin=8, stop=30)
+
 p = os.path.join(res, "assets/bcenchantments/player_animations")
 os.makedirs(p, exist_ok=True)
 json.dump(uppercut, open(os.path.join(p, "uppercut.json"), "w"), indent=1)
 json.dump(air_crit, open(os.path.join(p, "air_crit.json"), "w"), indent=1)
-for anim in (spear_1, spear_2, spear_3, spear_4, axe_1, axe_2):
+for anim in (spear_1, spear_2, spear_3, spear_4, axe_1, axe_2, trident_1, trident_2, trident_3):
     json.dump(anim, open(os.path.join(p, anim["name"] + ".json"), "w"), indent=1)
 print("ok")

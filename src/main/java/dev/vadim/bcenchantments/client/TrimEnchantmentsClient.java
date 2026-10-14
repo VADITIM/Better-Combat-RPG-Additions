@@ -27,6 +27,7 @@ public class TrimEnchantmentsClient implements ClientModInitializer {
 		});
 		HudElementRegistry.addLast(TrimEnchantments.id("enemy_health"), new EnemyHealthBars());
 		HudElementRegistry.addLast(TrimEnchantments.id("combo_meter"), new ComboHud());
+		HudElementRegistry.addLast(TrimEnchantments.id("difficulty"), new DifficultyHud());
 		BetterCombatClientEvents.ATTACK_START.register((player, hand) -> {
 			PunchyClips.onAttackStart(hand);
 			PunchySpear.onAttackStart(player, hand);

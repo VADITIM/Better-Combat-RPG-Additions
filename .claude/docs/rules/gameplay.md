@@ -15,6 +15,7 @@ The user stated these rules for this project. They override V/AS, defaults and o
 - **Armor stands are unbreakable.** No attack, power or burn may break or ignite one (`ArmorStandMixin`, `vanilla/FireAspect`).
 - **Mob farms must keep working.** A scaled monster still dies from the fall height it would have died from before scaling (`MobScaling.fallDamage`). The Better Combat switch exists so the user's sweeping-edge silverfish farm works.
 - **Powers come only from trims,** one power per trim, never from books. Every two powers have a combination; powers pair in the order applied and a combined power is locked out of other combinations. Trim powers per weapon are unlimited: experience levels and refinement cost balance them.
+- **Refinement and trim powers are for diamond and netherite weapons only,** plus the mace and the trident (`bcenchantments:refinable`, checked in `Refinement.plan`). Lesser weapons keep what they already have. Shields keep their own few powers.
 - **Attack Speed is not a power.** Refinement grants it: +0.05 per level, +0.25 at level 5. Level points (one per level, +3% to the chosen stat) never go to attack speed.
 - **The mace is a timing weapon** (`weapon/MaceTiming`): 1.3× ready time, a 0.15 s Perfect Hit window at 0.8 of it for 1.5× damage, 0.9× otherwise. It keeps one attack.
 - **Elites hurt with statuses, not damage.** Captains rally nearby monsters and are the one to kill first. Every monster bonus scales with where it spawns: mild near world spawn, harder underground, Nether and End.

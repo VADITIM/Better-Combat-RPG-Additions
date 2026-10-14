@@ -294,6 +294,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Spear | Four-stab combo, every stab +75% faster; the first two stabs knock back 0.3× a normal hit, the third none, the heavy thrust 2.2× and launches |
 | Mace | One attack. A timing weapon: it readies 1.3× slower than vanilla. At 0.8 of that wait it sparkles for 0.15 s (3 ticks); a fresh press then is a **Perfect Hit** for 1.5× damage, every other swing deals 0.9×. A press before the window fumbles it until the next swing, and a held attack key never lands one. Timed swings always hit at full attack strength. Swing on the ground launches with Uppercut; swing in the air is the mace smash (Tempest splashes it) |
 | Axe | Two-cleave combo: right to left (1.3× damage), then a backhand left to right (1.5×), each a 110° sweep. After the backhand the next swing waits 0.35 s past the cooldown |
+| Trident | The reach and mobility weapon, one-handed, reach +0.75 (the spear's is +1). Three-thrust combo: two quick jabs (0.8×, 0.85× damage, 0.75× cooldown each) and a lunge (1.3×, 1.35× cooldown, 1.6× knockback). **Perfect Spacing:** a thrust whose target is at 75% of its reach or further deals 1.3× damage, with a splash. Loyalty starts that sweet spot 5% nearer per level; during a Riptide spin and 1.5 s after it every thrust is Perfect Spacing; with Channeling, a Perfect Spacing lunge in a thunderstorm calls lightning onto a target under open sky |
 
 ## Vanilla changes
 
@@ -303,6 +304,8 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Attack Speed | No longer an enchantment; comes from refinement instead |
 
 ## Refinement
+
+Only **diamond and netherite** weapons, the mace and the trident can be refined and take trim powers (`bcenchantments:refinable`); lesser weapons keep what they already have. Shields are not affected.
 
 Smithing table, empty template slot, weapon in the middle, emeralds or emerald blocks on the right. The **?** button beside the smithing table opens the Field Guide.
 
@@ -324,7 +327,8 @@ All at the smithing table, on a weapon at refinement 5:
 |---|---|---|
 | First power | trim template + weapon + echo shard | free |
 | Another power | a different trim template + weapon + echo shard | 20 levels for the 2nd power, +10 for each after (3rd 30, 4th 40, …) |
-| Raise a power | the same trim template + weapon, no shard | free; up to level III |
+| Raise a power | click it in the smithing panel, weapon in the middle slot | 64 emeralds per level (blocks count nine); up to level III |
+| Lower a power | click it in the smithing panel | refunds the 64 emeralds; down to level I |
 
 The anvil refuses an item with trim powers in its right slot, so powers can't be lost merging weapons. One power per trim:
 
@@ -389,14 +393,29 @@ Vanilla still turns Bad Omen into a raid in a village and a trial omen at a tria
 
 Every bonus above (health, damage, armor, knockback resistance, omen stats and elite odds) is multiplied by where the monster spawns.
 
-| Where | Multiplier |
-|---|---|
-| Overworld surface within 256 blocks of world spawn | ×0.5 |
-| Overworld surface elsewhere | ×1 |
-| Underground (below sea level, no sky) | ×1.25 |
-| Deep Dark | ×1.5 |
-| Nether | ×1.5 |
-| End | ×1.75 |
+| Where | Multiplier | Tier |
+|---|---|---|
+| Overworld surface within 256 blocks of world spawn | ×0.5 | Regular |
+| Overworld surface elsewhere | ×1 | Regular |
+| Underground (below sea level, no sky) | ×1.25 | Hard |
+| Deep Dark | ×1.5 | Very Hard |
+| Nether: Nether Wastes, Crimson and Warped Forest | ×1.5 | Hard |
+| Nether: Soul Sand Valley, Basalt Deltas | ×1.65 | Very Hard |
+| End | ×1.75 | Extreme |
+
+The **tier** is raised by Bad Omen on a nearby player: one step at I–II, two at III–IV, three at V, up to **Possible Death**. It picks the armor below, and the HUD shows it in the bottom right corner with the biome: "Nether Wastes - Hard".
+
+### Armor
+
+Zombies, husks, drowned, zombie villagers, skeletons, strays, bogged, wither skeletons, piglins, piglin brutes and zombified piglins (`bcenchantments:armored_monsters`) can spawn in armor. One material per outfit, the better ones rarer within the range; the helmet always comes, each other piece is its own roll. Slots already filled stay. Each piece drops 4% of the time.
+
+| Tier | Wears armor | Materials | Other pieces | Enchanted | Enchanting level |
+|---|---|---|---|---|---|
+| Regular | 10% | copper, chainmail | 35% | — | — |
+| Hard | 22% | copper to iron | 45% | 15% | 8 |
+| Very Hard | 35% | chainmail to diamond | 55% | 35% | 15 |
+| Extreme | 50% | iron to netherite | 65% | 60% | 22 |
+| Possible Death | 65% | diamond, netherite | 80% | 85% | 30 |
 
 ### Elites and captains
 

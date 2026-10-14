@@ -1,7 +1,9 @@
 package dev.vadim.bcenchantments.mixin;
 
+import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.combat.BetterCombatSwitch;
 import java.util.Map;
+import net.bettercombat.api.AttributesContainer;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.api.component.BetterCombatDataComponents;
 import net.bettercombat.logic.WeaponRegistry;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -27,8 +30,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class WeaponRegistryMixin {
 	private static final TagKey<Item> SPEARS = TagKey.create(Registries.ITEM, Identifier.withDefaultNamespace("spears"));
 
+	private static final Identifier TRIDENT = Identifier.withDefaultNamespace("trident");
+	private static final String BETTERCOMBAT_TRIDENT = "bettercombat:trident";
+
 	@Shadow
 	static Map<Identifier, WeaponAttributes> registrations;
+
+	/**
+	 * Better Combat ships {@code minecraft:trident} as its own one-stab trident. Which mod's file wins
+	 * depends on pack order, so the trident is pointed at this mod's combo here instead.
+	 */
+	@ModifyVariable(method = "resolveAttributes", at = @At("HEAD"), argsOnly = true)
+	private static AttributesContainer bcenchantments$tridentCombo(AttributesContainer container, Identifier itemId) {
+		return TRIDENT.equals(itemId) && container != null && BETTERCOMBAT_TRIDENT.equals(container.parent())
+			? new AttributesContainer(TrimEnchantments.MOD_ID + ":trident", container.attributes())
+			: container;
+	}
 
 	@Inject(method = "getAttributes(Lnet/minecraft/world/item/ItemStack;)Lnet/bettercombat/api/WeaponAttributes;", at = @At("HEAD"), cancellable = true)
 	private static void bcenchantments$spearAttributes(ItemStack stack, CallbackInfoReturnable<WeaponAttributes> cir) {

@@ -29,7 +29,8 @@ import net.minecraft.world.item.ItemStack;
  * it and mark it as done. Fall damage grows with the added health, so mob farms still kill at the
  * same drop height. Bad Omen on a nearby player adds more on top ({@link Omen}), every bonus is
  * multiplied by where the monster spawns ({@link Place}), and a few monsters spawn as elites or
- * captains ({@link Elites}).
+ * captains ({@link Elites}). Monsters that can wear armor may spawn in it, by the spot's tier
+ * ({@link MobArmor}).
  */
 public final class MobScaling {
 	private static final Identifier HEALTH = TrimEnchantments.id("mob_health");
@@ -73,6 +74,7 @@ public final class MobScaling {
 		add(mob, Attributes.KNOCKBACK_RESISTANCE, KNOCKBACK_RESISTANCE, AttributeModifier.Operation.ADD_VALUE,
 			(MobBalance.KNOCKBACK_RESISTANCE_BASE + MobBalance.KNOCKBACK_RESISTANCE_PER_DIFFICULTY * difficulty
 				+ MobBalance.KNOCKBACK_RESISTANCE_PER_POWER * power + MobBalance.OMEN_KNOCKBACK_RESISTANCE * omen) * place);
+		MobArmor.equip(world, mob, Place.tier(world, mob.blockPosition(), omen));
 		// Keeps the share of health it had, so a fresh spawn starts full and a hurt one stays as hurt.
 		mob.setHealth(healthShare * mob.getMaxHealth());
 	}
