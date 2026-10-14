@@ -56,6 +56,10 @@ Holding Shift shows a short description under a weapon's trim power and each com
 
 The smithing table's **?** button, on the table's right under the panel toggle, opens `client/GuideScreen`. Update it whenever a power, trim, recipe or combination changes, along with `lang/en_us.json`, `README.md` and `docs/POWERS.md`.
 
+## Shared UI code and the UI lab
+
+The smithing panel and the Field Guide are drawn by the Minecraft-free `ui` package (`Rows`, `SmithingView`, `GuideView`); spacing, sizes, colours and offsets are keys in `ui/style.json`, edited in the UI lab (`docs/ui-lab.md`). `SmithingPanel` and `GuideScreen` decide what is said and use the rows; they do not position or colour anything themselves. A new row or part goes through `Ctx` so the lab can select, move, remove and style it; a new view applies `Layout` to its rows so they can be reordered, removed and added to.
+
 ## Smithing panel
 
 The window on the smithing table's left (`client/SmithingPanel`), half again the table's height and centred on it, works like the recipe book: a toggle on the table's right ("<" / ">") opens and closes it, and when open it pushes the table right so the two are centred together (`SmithingScreenMixin` moves `leftPos`). It stays as the player left it for the session. It reads the middle slot: stats (with the value the current inputs would give after an arrow), level points (a click on a stat spends one, through `SpendPointPayload`), refinement progress, trim powers, their pairs, what the inputs do now or why they do nothing, the next step and its cost, and the trims the player carries, each with what its power does on its own. Clicking one lists every combination it is part of, with the partner, its trim and what it does (faint where this weapon can no longer take the partner). It takes its numbers from `Refinement` and `Synergy`, so it follows them on its own; a new rule for what the table accepts needs a `panel.bcenchantments.why.*` line.

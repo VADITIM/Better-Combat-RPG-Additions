@@ -2,11 +2,30 @@
 
 Shipped work and why it was built this way, newest first. Dates are when it was decided.
 
+## 2026-10-14 (smithing panel pass)
+
+- **Every power costs levels, the first 10** (then 20, 30, …); the first is no longer free.
+- **Raising a power spends its trim** with the 64 emeralds. *Rejected:* the earlier rule where the template stayed on the table, which read as a bug.
+- **Degrade gives nothing back** and needs a second click on a red Confirm; it works on the weapon at once, without a recipe. *Rejected:* the full refund, which let a level be tried for free.
+- **An upgraded weapon goes back in the table's middle slot** (click or shift-click), so the next step follows without moving it by hand.
+- **The panel's preview has no "This upgrade" heading** and no lines for refining (the bar shows it), new pairs or a free cost; the level cost sits centred under it. Power names are in their trim's colour everywhere (panel, guide, tooltips).
+
+## 2026-10-14 (UI lab)
+
+- **The smithing panel and the Field Guide are drawn by a shared, Minecraft-free `ui` package** (`Rows`, `SmithingView`, `GuideView`, `Ctx`) through a small `Canvas`. The mod draws it over `GuiGraphicsExtractor` (`client/GuiCanvas`); the UI lab draws the same code with Java2D, Minecraft's font and the textures in the client jar. *Rejected:* faking `GuiGraphicsExtractor` and `Minecraft` (breaks on every Minecraft update, and can only change constants), and a separate mock (drifts from the mod).
+- **Look lives in `ui/style.json`,** a flat table of `part.property` keys (`stat.label.color`, `header.slot.size`, ...) with `$NAME` palette references. Code asks for a key with its default, so a missing key still works and the lab can list exactly what a part has. `SmithingPanel` and `GuideScreen` only decide what is said; rows, spacing and colours are not in them any more.
+- **Palette is `ui/Palette`; `Theme` re-exports it** for the HUD. Editing a colour in the lab moves the panel and guide, not the HUD (not migrated yet).
+- **Text edits go to the lang file line by line** (`Lang.save`), so the file keeps its layout. Which item an icon shows comes from the game; the lab's item box is a preview only.
+- **The lab is edited on the screen, not in a side panel** (`lab/Designer`): click, drag, drag rows by a grip, double-click to reword, right-click for looks; the properties window is optional. The user found the side panel hard to follow. Every edit is one `History` step (`lab/Edits`), and a drag previews on the sheet outside the history, then commits once.
+- **Remove means gone, not hidden:** a removed row closes up and a removed part is not drawn or outlined; *Removed* in the toolbar brings things back. Keys are `remove.`; `hide.` is still read.
+- **Rows move by anchor** (`move.<ref>: "after:<anchor>"`), like added rows, so a move survives rows that come and go with the weapon; with its anchor missing a row stays where the code puts it. A move re-anchors the rows that hung on the moved ones, so nothing else shifts. *Rejected:* a stored full order per view (breaks as soon as the game shows a different set of rows).
+- **A part moves everywhere or in one row** (`part.dx` or `part@view/anchor.dx`, added together): rows are generated, so moving every stat label at once is usually what is meant; the toolbar switch and Alt pick one.
+
 ## 2026-10-13 (combinations rework)
 
 - **One power per trim, 18 in all, and a combination for every pair (153).** 8 powers and 140 combinations are drafted in `POWERS.md` for review before they are built.
 - **Powers pair in the order applied** (1st+2nd, 3rd+4th, …); a power in a combination is locked out of every other. Simple to read off a weapon, no player choice needed.
-- **Combining happens at the smithing table, not the anvil.** A new power costs 20 levels for the 2nd, +10 per further one; the anvil refuses a right-hand item with powers so they are never lost.
+- **Combining happens at the smithing table, not the anvil.** A new power costs 20 levels for the 2nd, +10 per further one (the first became 10 levels on 2026-10-14); the anvil refuses a right-hand item with powers so they are never lost.
 - **No books.** The enchantment JSONs stay registered (world safety for items that carry them) but apply to nothing and are hidden.
 
 ## 2026-10-13 (powers)
@@ -62,4 +81,4 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 ## 2026-10-12
 
 - **V/AS base register, cut down for a game:** monochrome accent and the Minecraft font only (`rules/frontend.md`).
-- **Refinement with emeralds at the smithing table,** five levels, then trim + echo shard into a power, raised to III in the smithing panel for 64 emeralds a level, and lowered again for a full refund so a level can be tried out.
+- **Refinement with emeralds at the smithing table,** five levels, then trim + echo shard into a power, raised to III in the smithing panel for 64 emeralds a level, and lowered again for a full refund so a level can be tried out (the refund was dropped on 2026-10-14).

@@ -39,3 +39,28 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25
 }
+
+// The UI lab: the smithing panel and Field Guide drawn by the mod's own `ui` package with Minecraft's
+// font and textures from the client jar, no game needed. `./gradlew uiLab` opens it; see docs/ui-lab.md.
+sourceSets {
+	uilab {
+		java {
+			srcDir 'src/uilab/java'
+			srcDir 'src/main/java'
+			include 'dev/vadim/bcenchantments/ui/**'
+			include 'dev/vadim/bcenchantments/lab/**'
+		}
+	}
+}
+
+tasks.register('uiLab', JavaExec) {
+	group = 'application'
+	description = 'Opens the UI lab: edit the smithing panel and Field Guide without starting Minecraft.'
+	classpath = sourceSets.uilab.runtimeClasspath
+	mainClass = 'dev.vadim.bcenchantments.lab.Lab'
+	workingDir = projectDir
+	jvmArgs '-Dsun.java2d.uiScale=1', '-Dfile.encoding=UTF-8'
+	if (project.hasProperty('labArgs')) {
+		args project.property('labArgs').toString().split(' ')
+	}
+}

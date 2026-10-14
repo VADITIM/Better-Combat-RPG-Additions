@@ -4,30 +4,33 @@ import dev.vadim.bcenchantments.network.PowerLevelPayload;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.SmithingMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /**
- * Raises and lowers the level of a trim power on the weapon in the open smithing table's middle slot.
- * A level up costs {@link Refinement#UPGRADE_COST} emeralds from the inventory (blocks count nine); a
- * level down hands the same back, so a level that disappoints can be undone for free.
+ * The smithing panel's Upgrade and Degrade buttons. Upgrade changes nothing on the weapon: it puts the
+ * power's trim template in the template slot and {@link Refinement#UPGRADE_COST} emeralds from the
+ * inventory in the addition slot (blocks are changed into loose emeralds). The table then offers the
+ * result like any refinement step ({@link Refinement#plan}); taking it spends both. Degrade, confirmed
+ * in the panel, lowers the power a level on the weapon at once and gives nothing back.
  */
 public final class PowerLevels {
+	private static final int TEMPLATE_SLOT = 0;
 	private static final int BASE_SLOT = 1;
+	private static final int ADDITION_SLOT = 2;
 
 	private PowerLevels() {
 	}
 
 	public static void init() {
 		PayloadTypeRegistry.serverboundPlay().register(PowerLevelPayload.TYPE, PowerLevelPayload.CODEC);
-		ServerPlayNetworking.registerGlobalReceiver(PowerLevelPayload.TYPE, (payload, context) -> shift(context.player(), payload));
+		ServerPlayNetworking.registerGlobalReceiver(PowerLevelPayload.TYPE, (payload, context) -> prepare(context.player(), payload));
 	}
 
-	private static void shift(ServerPlayer player, PowerLevelPayload payload) {
+	private static void prepare(ServerPlayer player, PowerLevelPayload payload) {
 		if (!(player.containerMenu instanceof SmithingMenu menu)) {
 			return;
 		}
@@ -35,20 +38,56 @@ public final class PowerLevels {
 		if (shifted == null) {
 			return;
 		}
-		boolean free = player.hasInfiniteMaterials();
-		if (payload.up()) {
-			if (!free && !take(player.getInventory(), Refinement.UPGRADE_COST)) {
-				return;
-			}
-		} else if (!free) {
-			give(player, Refinement.UPGRADE_COST);
+		if (!payload.up()) {
+			menu.getSlot(BASE_SLOT).set(shifted);
+			menu.broadcastChanges();
+			return;
 		}
-		menu.getSlot(BASE_SLOT).set(shifted);
+		Item template = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Refinement.template(payload.trim()));
+		boolean free = player.hasInfiniteMaterials();
+		Inventory inventory = player.getInventory();
+
+		// Whatever sits in the template and addition slots goes back to the inventory first.
+		for (int slot : new int[] {TEMPLATE_SLOT, ADDITION_SLOT}) {
+			ItemStack held = menu.getSlot(slot).getItem();
+			if (!held.isEmpty()) {
+				menu.getSlot(slot).set(ItemStack.EMPTY);
+				if (!inventory.add(held)) {
+					player.drop(held, false);
+				}
+			}
+		}
+		ItemStack found = free ? new ItemStack(template) : takeOne(inventory, template);
+		if (found.isEmpty()) {
+			menu.broadcastChanges();
+			return;
+		}
+		if (free) {
+			menu.getSlot(ADDITION_SLOT).set(new ItemStack(Items.EMERALD, Refinement.UPGRADE_COST));
+		} else if (!take(inventory, Refinement.UPGRADE_COST)) {
+			inventory.add(found);
+			menu.broadcastChanges();
+			return;
+		}
+		menu.getSlot(TEMPLATE_SLOT).set(found);
 		menu.broadcastChanges();
-		player.level().playSound(null, player.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.BLOCKS, 0.6F, payload.up() ? 1.3F : 0.9F);
 	}
 
-	/** Removes {@code amount} emeralds from {@code inventory}, loose ones first, changing a block into loose ones if need be; false if short. */
+	/** One {@code item} out of the inventory, or empty if it has none. */
+	private static ItemStack takeOne(Inventory inventory, Item item) {
+		for (int i = 0; i < inventory.getContainerSize(); i++) {
+			ItemStack stack = inventory.getItem(i);
+			if (stack.is(item)) {
+				return stack.split(1);
+			}
+		}
+		return ItemStack.EMPTY;
+	}
+
+	/**
+	 * Moves {@code amount} emeralds from the inventory to the table's addition slot, loose ones first and a
+	 * block changed into loose ones if need be; false, with nothing moved, if the inventory is short.
+	 */
 	private static boolean take(Inventory inventory, int amount) {
 		int total = 0;
 		for (int i = 0; i < inventory.getContainerSize(); i++) {
@@ -71,23 +110,23 @@ public final class PowerLevels {
 			}
 		}
 		if (left < 0) {
-			giveEmeralds(inventory, -left);
+			giveEmeralds(inventory.player instanceof ServerPlayer p ? p : null, inventory, -left);
+		}
+		if (inventory.player.containerMenu instanceof SmithingMenu menu) {
+			menu.getSlot(ADDITION_SLOT).set(new ItemStack(Items.EMERALD, amount));
 		}
 		return true;
 	}
 
-	private static void give(ServerPlayer player, int amount) {
-		giveEmeralds(player.getInventory(), amount);
-	}
-
-	private static void giveEmeralds(Inventory inventory, int amount) {
+	/** Hands {@code amount} emeralds (change from a block) back, dropping what does not fit. */
+	private static void giveEmeralds(ServerPlayer player, Inventory inventory, int amount) {
 		int left = amount;
 		while (left > 0) {
 			int batch = Math.min(left, 64);
 			ItemStack stack = new ItemStack(Items.EMERALD, batch);
 			inventory.add(stack);
-			if (!stack.isEmpty()) {
-				inventory.player.drop(stack, false);
+			if (!stack.isEmpty() && player != null) {
+				player.drop(stack, false);
 			}
 			left -= batch;
 		}

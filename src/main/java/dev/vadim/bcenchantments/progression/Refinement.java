@@ -47,9 +47,9 @@ import org.jspecify.annotations.Nullable;
  * small, random stat boost and a level point the player spends on a stat of their choice
  * ({@link Points}), and rolls what the next level will cost. At level {@link #MAX_LEVEL} the
  * weapon is locked and takes trims: each trim template with an echo shard grants that trim's power.
- * The first is free; every further one costs experience levels. Another template of a trim the
- * weapon already has does nothing; a power goes up to {@link #MAX_PERK} for {@link #UPGRADE_COST}
- * emeralds from the smithing panel, and back down for a refund of the same.
+ * Each costs experience levels, 10 for the first and 10 more for each after. A template of a trim the
+ * weapon already has, with {@link #UPGRADE_COST} emeralds, raises that power a level, up to
+ * {@link #MAX_PERK}; both are spent. The smithing panel lowers a power again, with nothing given back.
  * <p>
  * Powers combine in the order they were applied: the first with the second, the third with the
  * fourth, and so on. A power already in a combination is locked out of every other, so a third
@@ -67,19 +67,22 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 
 	public static final int MAX_LEVEL = 5;
 	public static final int MAX_PERK = 3;
-	/** Emeralds one power level costs, and returns when the level is given up again. */
+	/** Emeralds one power level costs, with the power's trim template. */
 	public static final int UPGRADE_COST = 64;
 	/** Cost of each level before its ±10% roll; all five come to about 500 gems. */
 	private static final int[] BASE_COST = {60, 80, 100, 120, 140};
 	private static final float COST_SPREAD = 0.1F;
 	/** Attack speed every refinement level adds, +0.25 at level 5. */
 	public static final float ATTACK_SPEED_PER_LEVEL = 0.05F;
-	/** Experience levels for a weapon's second power, and how much each further one adds. */
-	private static final int POWER_LEVELS = 20;
+	/** Experience levels for a weapon's first power, and how much each further one adds. */
+	private static final int POWER_LEVELS = 10;
 	private static final int POWER_LEVELS_STEP = 10;
 
 	/** What one level point adds to the stat it is spent on: 3%. Attack speed takes none. */
 	public static final float POINT_BOOST = 0.03F;
+	/** The random growth each stat gets per level: 0.25 to 2%. */
+	private static final float BOOST_MIN = 0.0025F;
+	private static final float BOOST_MAX = 0.02F;
 
 	/** The stats a level point can go to. */
 	public enum Stat {
@@ -386,6 +389,38 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		return trim.substring(0, 1).toUpperCase(Locale.ROOT) + trim.substring(1);
 	}
 
+	/** Name colour of an armor trim, so a power reads as the trim it comes from; -1 for an unknown trim. */
+	public static int trimColor(String trim) {
+		return switch (trim) {
+			case "bolt" -> 0xF2C94C;
+			case "flow" -> 0x9ADCF0;
+			case "tide" -> 0x4A8FD6;
+			case "silence" -> 0x4FA6A0;
+			case "ward" -> 0x7A6FD0;
+			case "vex" -> 0x9FB0BE;
+			case "eye" -> 0x6FD36B;
+			case "wayfinder" -> 0xC8A07A;
+			case "snout" -> 0xE0623C;
+			case "raiser" -> 0xE8884A;
+			case "wild" -> 0x5FA84A;
+			case "dune" -> 0xE3D08A;
+			case "coast" -> 0x7FB6E6;
+			case "rib" -> 0xC8423C;
+			case "spire" -> 0xC06FD6;
+			case "host" -> 0xD4A06A;
+			case "sentry" -> 0xC9C0B0;
+			case "shaper" -> 0xE58FB0;
+			default -> -1;
+		};
+	}
+
+	/** {@code perk}'s name in the colour of {@code trim}. */
+	public static Component tintedName(Perk perk, String trim) {
+		int rgb = trimColor(trim);
+		MutableComponent name = Component.empty().append(perk.displayName());
+		return rgb < 0 ? name : name.withColor(rgb);
+	}
+
 	/** Refinement level of {@code stack}, 0 if it was never refined. */
 	public static int levelOf(ItemStack stack) {
 		Refinement refinement = stack.get(COMPONENT);
@@ -518,9 +553,9 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		return new Refinement(MAX_LEVEL, 0, 0, 0.0F, 0.0F, 0.0F, 0.0F, taken).applyTo(base);
 	}
 
-	/** Experience levels the next new power on a weapon holding {@code powers} costs: the first is free. */
+	/** Experience levels the next new power on a weapon holding {@code powers} costs: 10, 20, 30, ... */
 	public static int powerCost(int powers) {
-		return powers == 0 ? 0 : POWER_LEVELS + POWER_LEVELS_STEP * (powers - 1);
+		return POWER_LEVELS + POWER_LEVELS_STEP * powers;
 	}
 
 	/**
@@ -548,7 +583,12 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 			return null;
 		}
 		if (current.power(perk) != null) {
-			// A power the weapon has is raised with emeralds from the panel ({@link #shiftPower}), never by a second trim.
+			// A power the weapon has goes up a level with its trim template and 64 emeralds, both spent. Lowering it is
+			// the panel's Degrade, not a recipe.
+			if (addition.is(Items.EMERALD) && addition.getCount() >= UPGRADE_COST) {
+				ItemStack raised = shiftPower(base, trim, true);
+				return raised == null ? null : new Plan(raised, UPGRADE_COST, true, false);
+			}
 			return null;
 		}
 		if (!addition.is(Items.ECHO_SHARD)) {
@@ -605,12 +645,11 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		float attackSpeed = this.attackSpeed;
 		float critChance = this.critChance;
 		float critDamage = this.critDamage;
-		// One small boost per level, so a finished weapon is a little better, never a different weapon.
-		switch (random.nextInt(3)) {
-			case 0 -> damage += Mth.randomBetween(random, 0.25F, 0.5F);
-			case 1 -> critChance += Mth.randomBetween(random, 0.01F, 0.025F);
-			default -> critDamage += Mth.randomBetween(random, 0.05F, 0.1F);
-		}
+		// Every stat grows a little each level, so a finished weapon is a little better, never a different weapon.
+		// Damage by 0.25 to 2% of the weapon's own; the critical stats by 0.25 to 2 points.
+		damage += (float) (ownDamage(base.getItem()) * Mth.randomBetween(random, BOOST_MIN, BOOST_MAX));
+		critChance += Mth.randomBetween(random, BOOST_MIN, BOOST_MAX);
+		critDamage += Mth.randomBetween(random, BOOST_MIN, BOOST_MAX);
 		// Gems paid past the cost carry over; the last level has nothing to carry them into.
 		int carried = next < MAX_LEVEL ? paid - this.cost : 0;
 		int cost = next < MAX_LEVEL ? rollCost(next, random) : 0;
@@ -640,13 +679,7 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 
 		ItemAttributeModifiers defaults = base.getItem().components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 		// Level points add to the random boosts: damage by a share of the weapon's own (the player's 1 included), the critical stats by points.
-		double ownDamage = 1.0;
-		for (ItemAttributeModifiers.Entry entry : defaults.modifiers()) {
-			if (entry.matches(Attributes.ATTACK_DAMAGE, Item.BASE_ATTACK_DAMAGE_ID)) {
-				ownDamage += entry.modifier().amount();
-			}
-		}
-		float damage = this.damage + (float) (ownDamage * POINT_BOOST * this.points.damage);
+		float damage = this.damage + (float) (ownDamage(base.getItem()) * POINT_BOOST * this.points.damage);
 		float critChance = this.critChance + POINT_BOOST * this.points.critChance;
 		float critDamage = this.critDamage + POINT_BOOST * this.points.critDamage;
 		ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
@@ -680,6 +713,17 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		return result;
 	}
 
+	/** The weapon's own attack damage, the player's 1 included. */
+	private static double ownDamage(Item item) {
+		double damage = 1.0;
+		for (ItemAttributeModifiers.Entry entry : item.components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY).modifiers()) {
+			if (entry.matches(Attributes.ATTACK_DAMAGE, Item.BASE_ATTACK_DAMAGE_ID)) {
+				damage += entry.modifier().amount();
+			}
+		}
+		return damage;
+	}
+
 	private static AttributeModifier plus(AttributeModifier modifier, float amount) {
 		return new AttributeModifier(modifier.id(), modifier.amount() + amount, modifier.operation());
 	}
@@ -706,7 +750,7 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 			Perk perk = power.perk();
 			if (perk != null) {
 				added.add(Component.translatable("refinement.bcenchantments.trimmed", trimName(power.trim)).withStyle(ChatFormatting.GRAY));
-				added.add(Component.literal(" ").append(perk.displayName()).withStyle(ChatFormatting.GRAY));
+				added.add(Component.literal(" ").append(tintedName(perk, power.trim)).withStyle(ChatFormatting.GRAY));
 				added.add(hint(Component.translatable("refinement.bcenchantments.shield." + perk.id())));
 			}
 		} else if (!refinement.powers.isEmpty()) {
@@ -716,7 +760,7 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 				if (perk == null) {
 					continue;
 				}
-				added.add(Component.literal(" ").append(perk.displayName()).append(" ")
+				added.add(Component.literal(" ").append(tintedName(perk, power.trim)).append(" ")
 					.append(Component.translatable("enchantment.level." + power.level)).withStyle(ChatFormatting.GRAY));
 				if (details) {
 					Synergy.describe("tooltip.bcenchantments.power." + perk.id(), added);

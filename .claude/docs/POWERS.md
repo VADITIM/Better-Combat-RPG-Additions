@@ -311,11 +311,13 @@ Smithing table, empty template slot, weapon in the middle, emeralds or emerald b
 
 | Level | Cost (±10%) | Attack speed | Random boost |
 |---|---|---|---|
-| 1 | 60 | +0.05 | damage, crit chance or crit damage |
+| 1 | 60 | +0.05 | damage, crit chance and crit damage, each by 0.25 to 2% |
 | 2 | 80 | +0.1 | " |
 | 3 | 100 | +0.15 | " |
 | 4 | 120 | +0.2 | " |
 | 5 | 140 | +0.25 | " |
+
+Damage grows by that share of the weapon's own; crit chance and crit damage by that many points.
 
 Every level also earns a **level point**. With the weapon in the smithing table's middle slot, the side panel spends it on a stat of the player's choice, 3% per point: damage +3% of the weapon's own, crit chance +3 points, crit damage +3 points. Attack speed takes none; spent points are not refunded.
 
@@ -325,10 +327,12 @@ All at the smithing table, on a weapon at refinement 5:
 
 | Step | Inputs | Cost |
 |---|---|---|
-| First power | trim template + weapon + echo shard | free |
-| Another power | a different trim template + weapon + echo shard | 20 levels for the 2nd power, +10 for each after (3rd 30, 4th 40, …) |
-| Raise a power | click it in the smithing panel, weapon in the middle slot | 64 emeralds per level (blocks count nine); up to level III |
-| Lower a power | click it in the smithing panel | refunds the 64 emeralds; down to level I |
+| First power | trim template + weapon + echo shard | 10 levels |
+| Another power | a different trim template + weapon + echo shard | 10 more levels for each (2nd 20, 3rd 30, …) |
+| Raise a power | the power's trim template + weapon + 64 emeralds; Upgrade in the smithing panel puts them on the table | the trim and 64 emeralds per level (blocks count nine); up to level III |
+| Lower a power | Degrade in the smithing panel, then Confirm | nothing is refunded; down to level I |
+
+A weapon or shield taken out of the table upgraded goes straight back in the middle slot.
 
 The anvil refuses an item with trim powers in its right slot, so powers can't be lost merging weapons. One power per trim:
 

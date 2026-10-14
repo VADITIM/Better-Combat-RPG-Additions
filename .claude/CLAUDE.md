@@ -39,11 +39,15 @@ python tools/animations.py src/main/resources
 ```bash
 python tools/power_effects.py src/main/resources
 ```
+```bash
+./gradlew uiLab
+```
 
 1. Build.
 2. Deploy: copy the jar after every build.
 3. Regenerate the animations: every PAL emote and Punchy clip is generated, never hand-edited.
 4. Regenerate the power effect textures the same way.
+5. UI lab: the smithing panel and Field Guide without starting the game; see `docs/ui-lab.md`. Their look lives in `ui/style.json`, edited there, never by hand.
 
 ## Working rules
 
@@ -61,6 +65,7 @@ python tools/power_effects.py src/main/resources
 - `docs/known-issues.md`: current bugs and debt.
 - `docs/roadmap.md`: planned work.
 - `docs/POWERS.md`: every power, combination and number.
+- `docs/ui-lab.md`: the UI lab (look at and edit the smithing panel and Field Guide without the game).
 
 @docs/rules/gameplay.md
 @docs/rules/frontend.md

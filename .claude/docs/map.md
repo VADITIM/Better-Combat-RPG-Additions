@@ -8,9 +8,11 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 |---|---|---|
 | `/` | Mod entry: wires every system's `init`; every mod particle goes through `Particles.send` | `TrimEnchantments`, `Particles` |
 | `client/` | Client entry; the HUD, settings, Field Guide and Punchy clips | `TrimEnchantmentsClient`, `ComboHud`, `EnemyHealthBars` (health bars pinned beside hurt enemies), `HudSettingsScreen`, `ForgeScreen` (weapon forge for testing), `GuideScreen`, `SmithingPanel` (the info window left of the smithing table, toggled like the recipe book), `Theme`, `PunchyClips`, `PunchySpear`, `UpdraftInput` (right click for Updraft's air move), `ParticleFilter` (minimal particles), `MaceTimingClient` (judges mace timing, sparkle), `ComboRest` (rest after a full combo), `DifficultyHud` (biome and difficulty tier, bottom right) |
+| `ui/` | Minecraft-free UI code shared by the mod and the UI lab: `Rows` (every row of the smithing panel and Field Guide), `SmithingView`/`GuideView` (frames, scrolling, tabs), `Ctx` (drawing by part id, styled from the sheet), `Sheet` (`style.json`), `Layout` (rows the sheet removes, moves or adds), `Palette`, `Canvas`, `Rich`, `ItemRef`, `Json` | `Rows`, `Sheet` |
+| `client/` adapters | `GuiCanvas` (`Canvas` over `GuiGraphicsExtractor`), `UiSheet` (loads `style.json`), `UiText` (`Component`/`ItemStack` to `Rich`/`ItemRef`) | `GuiCanvas` |
 | `combat/` | Server swing tracking, hooks, rolled crits, the Better Combat switch | `ComboTracker`, `CombatHooks`, `CriticalHits`, `BetterCombatSwitch` |
 | `perk/` | Every power, the combinations and the shield powers | `Perks` (registration), `Synergy`, `ShieldPowers`, one class per power; `Updraft` (the right-click air moves) and `MaceTempest` for combinations that need their own |
-| `progression/` | Refinement, trim powers and their pairing at the smithing table | `Refinement` (also `Points`, the level points), `LevelPoints` (spends them from the side panel), `PowerLevels` (raises a power for 64 emeralds or lowers it for a refund, from the side panel), `Forge` (testing shortcut: server side of the weapon forge) |
+| `progression/` | Refinement, trim powers and their pairing at the smithing table | `Refinement` (also `Points`, the level points), `LevelPoints` (spends them from the side panel), `PowerLevels` (the side panel's Upgrade, which puts a power's trim and 64 emeralds on the table, and Degrade, which lowers it with no refund), `Forge` (testing shortcut: server side of the weapon forge) |
 | `weapon/` | How each weapon kind plays | `WeaponStyles` (registry), `SwordStyle`, `SpearStyle`, `MaceStyle`, `MaceTiming` (the mace's Perfect Hit, server side), `AxeStyle`, `TridentStyle` (Perfect Spacing) |
 | `mob/` | The monster overhaul | `MobBalance` (all numbers), `MobScaling`, `Omen` (ominous difficulty and loot), `Elites` (elites and captains), `Place` (spawn-spot multiplier and difficulty tier), `MobArmor` (armor by tier), `HitChain`, `SpawnDensity` |
 | `vanilla/` | Reworked vanilla enchantments | `FireAspect` |
@@ -32,6 +34,7 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 | `assets/bcenchantments/player_animations/` | Third-person PAL emotes (generated) |
 | `assets/minecraft/punchy/animations/bcenchantments.animation.json` | First-person Punchy clips (generated) |
 | `assets/bcenchantments/lang/en_us.json` | Every player-facing string |
+| `assets/bcenchantments/ui/style.json` | Look of the smithing panel and Field Guide: spacing, sizes, colours, per part, plus removed parts and rows, moved rows and parts, and added rows. Edited in the UI lab |
 
 ## Other
 
@@ -39,6 +42,7 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 |---|---|
 | `tools/animations.py` | Generates every emote and Punchy clip; see `rules/animations.md` |
 | `tools/power_effects.py` | Generates the trim power effect strips in `textures/item/power/`, drawn by `client/PowerEffects` |
+| `src/uilab/` | The UI lab app (Swing): not part of the mod jar; see `ui-lab.md` |
 | `libs/` | The local Punchy jar (not committed) |
 | `README.md` | Player-facing overview |
 | `.claude/docs/POWERS.md` | The design sheet: every power, combination, trim and number |
@@ -57,4 +61,5 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 | An attack, combo or animation | `weapon/`, `weapon_attributes`, `tools/animations.py`; follow `rules/animations.md` |
 | HUD look | `client/Theme`, `client/ComboHud`, `client/EnemyHealthBars` |
 | Field Guide pages | `client/GuideScreen`, `guide.*` lang keys |
+| How a panel or guide row looks (spacing, colours, sizes), or moving, removing or adding a row | `ui/style.json` through the UI lab; a new kind of row in `ui/Rows` |
 | Smithing side panel (stats, next step, possible combinations) | `client/SmithingPanel`, `panel.*` lang keys; drawn, laid out and toggled from `mixin/SmithingScreenMixin` |

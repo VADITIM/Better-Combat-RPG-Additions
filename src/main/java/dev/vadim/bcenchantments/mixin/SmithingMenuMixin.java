@@ -7,6 +7,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ItemCombinerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.SmithingMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -22,8 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * Weapon refinement on the smithing table: a weapon in the base slot takes gems, an echo shard with a
  * trim template, or a trim template alone, and a shield takes a trim template with an echo shard, as
- * described in {@link Refinement}. A weapon's second and later powers cost experience levels, shown
- * by {@code SmithingScreenMixin}.
+ * described in {@link Refinement}. A weapon's powers cost experience levels, shown by
+ * {@code SmithingScreenMixin}. A weapon or shield taken out upgraded goes straight back in the middle slot.
  */
 @Mixin(SmithingMenu.class)
 public abstract class SmithingMenuMixin extends ItemCombinerMenu {
@@ -104,6 +105,46 @@ public abstract class SmithingMenuMixin extends ItemCombinerMenu {
 				level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 0.6F, 1.3F);
 			}
 		});
+		this.bcenchantments$returnTool(carried);
+	}
+
+	@Inject(method = "onTake", at = @At("TAIL"))
+	private void bcenchantments$takeVanilla(Player player, ItemStack carried, CallbackInfo ci) {
+		// A vanilla upgrade (netherite) of a weapon goes back on the table too.
+		this.bcenchantments$returnTool(carried);
+	}
+
+	/** Shift-clicking an upgraded weapon out of the result puts it back in the middle slot, like a plain click. */
+	@Override
+	public ItemStack quickMoveStack(Player player, int index) {
+		if (index == this.getResultSlot()) {
+			Slot slot = this.slots.get(index);
+			if (slot.hasItem() && Refinement.isBase(slot.getItem()) && slot.mayPickup(player)) {
+				ItemStack taken = slot.remove(slot.getItem().getCount());
+				slot.onTake(player, taken);
+				if (!taken.isEmpty() && !player.getInventory().add(taken)) {
+					player.drop(taken, false);
+				}
+				return ItemStack.EMPTY;
+			}
+		}
+		return super.quickMoveStack(player, index);
+	}
+
+	/**
+	 * Puts an upgraded weapon or shield straight back in the emptied middle slot, so the next step can follow;
+	 * {@code taken} is then off the cursor, or emptied when it was shift-clicked.
+	 */
+	private void bcenchantments$returnTool(ItemStack taken) {
+		if (taken.isEmpty() || !Refinement.isBase(taken) || !this.inputSlots.getItem(1).isEmpty()) {
+			return;
+		}
+		ItemStack tool = taken.copy();
+		if (this.getCarried() == taken) {
+			this.setCarried(ItemStack.EMPTY);
+		}
+		taken.setCount(0);
+		this.inputSlots.setItem(1, tool);
 	}
 
 	private Refinement.Plan bcenchantments$plan() {

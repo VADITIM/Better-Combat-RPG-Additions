@@ -31,8 +31,8 @@ In game, the **?** button beside the smithing table opens the Field Guide, with 
 
 **Refining.** Only diamond and netherite weapons, the mace and the trident can be refined. At a smithing table, put one in the middle slot and emeralds or emerald blocks in the
 right slot, with the template slot empty. There are five levels, about 500 emeralds in all. Each
-adds attack speed (+0.05 per level, +0.25 at level 5), one small random boost (damage, critical chance or
-critical damage) and a level point: with the weapon in the middle slot, click a stat in the side panel to
+adds attack speed (+0.05 per level, +0.25 at level 5), a small random boost of 0.25 to 2% to damage, critical chance and
+critical damage, and a level point: with the weapon in the middle slot, click a stat in the side panel to
 raise it by 3%. Attack speed takes no points.
 
 **Axe, mace and trident.** The axe swings a two-cleave combo, right to left and back, each far heavier than a
@@ -49,9 +49,10 @@ Shockwave, Chains and Echo charge over a combo and show as bars under the crossh
 every hit.
 
 **Trim Powers.** A weapon at refinement level 5 takes an armor trim template and an echo shard at the
-smithing table and gains that trim's power at level 1. A different trim and an echo shard add another
-power for experience levels (20 for the second, 10 more for each after). With the weapon in the middle slot, the panel raises a power to 2 and then 3
-for 64 emeralds a level, and lowering it a level gives the 64 back. A weapon holds any number of powers.
+smithing table and gains that trim's power at level 1 for 10 experience levels. A different trim and an echo shard add another
+power for 10 levels more each (20 for the second, 30 for the third). The power's trim and 64 emeralds raise it to 2 and then 3;
+with the weapon in the middle slot, the panel's Upgrade button puts them on the table. Degrade lowers a power a level after a
+confirm and refunds nothing. An upgraded weapon goes straight back in the table. A weapon holds any number of powers.
 
 | Power | Trim | | Power | Trim |
 |---|---|---|---|---|

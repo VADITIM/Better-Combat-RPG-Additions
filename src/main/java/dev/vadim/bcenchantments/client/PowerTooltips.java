@@ -58,7 +58,7 @@ public final class PowerTooltips {
 		if (perk == null) {
 			return;
 		}
-		lines.add(Component.translatable("tooltip.bcenchantments.template.weapon", perk.displayName().withStyle(ChatFormatting.BLUE))
+		lines.add(Component.translatable("tooltip.bcenchantments.template.weapon", Refinement.tintedName(perk, trim))
 			.withStyle(ChatFormatting.GRAY));
 		if (!perk.built()) {
 			lines.add(Component.literal(" ").append(Component.translatable("tooltip.bcenchantments.template.coming")).withStyle(ChatFormatting.DARK_GRAY));
@@ -66,7 +66,7 @@ public final class PowerTooltips {
 			Synergy.describe("tooltip.bcenchantments.power." + perk.id(), lines);
 		}
 		if (Refinement.onShield(perk)) {
-			lines.add(Component.translatable("tooltip.bcenchantments.template.shield", perk.displayName().withStyle(ChatFormatting.BLUE))
+			lines.add(Component.translatable("tooltip.bcenchantments.template.shield", Refinement.tintedName(perk, trim))
 				.withStyle(ChatFormatting.GRAY));
 		}
 	}
@@ -106,10 +106,7 @@ public final class PowerTooltips {
 					.withStyle(carried ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY));
 			}
 		}
-		int cost = Refinement.powerCost(powers.size());
-		if (cost > 0) {
-			added.add(Component.translatable("tooltip.bcenchantments.combine.cost", cost).withStyle(ChatFormatting.DARK_GRAY));
-		}
+		added.add(Component.translatable("tooltip.bcenchantments.combine.cost", Refinement.powerCost(powers.size())).withStyle(ChatFormatting.DARK_GRAY));
 		lines.addAll(added);
 	}
 }

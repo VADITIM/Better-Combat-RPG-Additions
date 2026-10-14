@@ -1,5 +1,7 @@
 package dev.vadim.bcenchantments.client;
 
+import dev.vadim.bcenchantments.progression.Refinement;
+import dev.vadim.bcenchantments.ui.Palette;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.Mth;
@@ -12,31 +14,35 @@ import net.minecraft.util.Mth;
  * corner pixel of a box is left out. Motion arrives slowly and leaves fast.
  */
 public final class Theme {
-	public static final int GROUND = 0x181818;
-	public static final int PANEL = 0x121212;
-	public static final int SUNKEN = 0x0E0E0E;
-	public static final int SUNKEN_LIGHT = 0x1C1C1C;
-	public static final int BORDER = 0x262626;
-	public static final int BORDER_CONTROL = 0x3A3A3A;
-	public static final int BORDER_HOVER = 0x5A5A5A;
+	// The shared colours live in ui/Palette, which the Field Guide and smithing panel read through ui/style.json.
+	public static final int GROUND = Palette.GROUND;
+	public static final int PANEL = Palette.PANEL;
+	public static final int SUNKEN = Palette.SUNKEN;
+	public static final int SUNKEN_LIGHT = Palette.SUNKEN_LIGHT;
+	public static final int BORDER = Palette.BORDER;
+	public static final int BORDER_CONTROL = Palette.BORDER_CONTROL;
+	public static final int BORDER_HOVER = Palette.BORDER_HOVER;
 
-	public static final int TEXT_BRIGHT = 0xF0F0F0;
-	public static final int TEXT_BODY = 0xD8D8D8;
-	public static final int TEXT_MUTED = 0x9A9A9A;
-	public static final int TEXT_LABEL = 0x8A8A8A;
-	public static final int TEXT_FAINT = 0x4A4A4A;
+	public static final int TEXT_BRIGHT = Palette.TEXT_BRIGHT;
+	public static final int TEXT_BODY = Palette.TEXT_BODY;
+	public static final int TEXT_MUTED = Palette.TEXT_MUTED;
+	public static final int TEXT_LABEL = Palette.TEXT_LABEL;
+	public static final int TEXT_FAINT = Palette.TEXT_FAINT;
 
 	/** The accent: black slabs, set off from the dark panel by a light hairline and light text on top. */
-	public static final int ACCENT = 0x000000;
-	public static final int ON_ACCENT = TEXT_BRIGHT;
+	public static final int ACCENT = Palette.ACCENT;
+	public static final int ON_ACCENT = Palette.ON_ACCENT;
 	/** Enchantment colours, kept because the charge bars are told apart by them. */
 	public static final int LIGHTNING = 0xFFDD1B;
 	public static final int SHOCKWAVE = 0x2EE6FF;
 	public static final int CHAINS = 0x9FB0BE;
 	public static final int ECHO = 0xA98BFF;
-	public static final int DANGER = 0xFF6B6B;
+	public static final int DANGER = Palette.DANGER;
 	/** Enemy health bars, in the red of vanilla's hearts, with the lighter top row its bars carry. */
 	public static final int HEALTH = 0xD32020;
+	/** The refinement progress bar: emerald green for what is paid, a softer one for what the table would pay. */
+	public static final int EMERALD = Palette.EMERALD;
+	public static final int EMERALD_SOFT = Palette.EMERALD_SOFT;
 	public static final int HEALTH_LIGHT = 0xFF5050;
 
 	public static final float PANEL_ALPHA = 0.85F;
@@ -57,6 +63,17 @@ public final class Theme {
 			case "echo" -> ECHO;
 			default -> TEXT_BRIGHT;
 		};
+	}
+
+	/** Name colour of an armor trim, so a power reads as the trim it comes from. */
+	public static int trimColor(String trim) {
+		int rgb = Refinement.trimColor(trim);
+		return rgb < 0 ? TEXT_BRIGHT : rgb;
+	}
+
+	/** Name colour of the trim that grants {@code perk}. */
+	public static int trimColor(Refinement.Perk perk) {
+		return trimColor(Refinement.trim(perk));
 	}
 
 	public static int argb(float alpha, int rgb) {
