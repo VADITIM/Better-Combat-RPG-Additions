@@ -1,0 +1,191 @@
+<title>Trim Enchantments Review</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column, a sticky review bar on top, planned entries as review cards */
+:root {
+  --bg: #f2f4f5;
+  --surface: #ffffff;
+  --fg: #14191c;
+  --muted: #5b6a71;
+  --line: #d9e0e3;
+  --accent: #26565c;
+  --good: #1f7a4d;
+  --good-bg: #dff3e8;
+  --adjust: #9a5b00;
+  --adjust-bg: #fbecd0;
+  --code-bg: #e7ecee;
+  --font: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1315; --surface: #171d20; --fg: #e4eaec; --muted: #8fa1a8; --line: #2a3438;
+    --accent: #7fc1c8; --good: #6fd19c; --good-bg: #17382a; --adjust: #f0b95a; --adjust-bg: #3d2d10;
+    --code-bg: #212a2e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1315; --surface: #171d20; --fg: #e4eaec; --muted: #8fa1a8; --line: #2a3438;
+  --accent: #7fc1c8; --good: #6fd19c; --good-bg: #17382a; --adjust: #f0b95a; --adjust-bg: #3d2d10;
+  --code-bg: #212a2e; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.55; padding-inline: 16px; }
+.wrap { max-width: 920px; margin-inline: auto; padding-block: 24px 80px; }
+h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 4px; text-wrap: balance; }
+h2 { font-size: 1.45rem; margin: 2.6rem 0 .6rem; text-wrap: balance; }
+h3 { font-size: 1.1rem; margin: 2rem 0 .5rem; color: var(--accent); }
+h4 { font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 1.6rem 0 .5rem; }
+p { margin: 0 0 .9rem; max-width: 68ch; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: .85em; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+pre { background: var(--code-bg); padding: 10px 14px; border-radius: 4px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.sub { color: var(--muted); margin: 0 0 20px; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-block: 16px; }
+.counts { display: flex; gap: 14px; font-variant-numeric: tabular-nums; font-size: .92rem; flex-wrap: wrap; }
+.counts b { font-weight: 700; }
+.c-good b { color: var(--good); } .c-adjust b { color: var(--adjust); } .c-open b { color: var(--muted); }
+.filters { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+.bar button, .rv button { font: inherit; font-size: .85rem; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+.bar button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tw { overflow-x: auto; margin: .4rem 0 1rem; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .75rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 700; white-space: nowrap; }
+.items { display: grid; gap: 8px; margin: .4rem 0 1rem; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px 12px; min-width: 0; }
+.item[data-status="good"] { border-color: var(--good); }
+.item[data-status="adjust"] { border-color: var(--adjust); }
+.head { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
+.name { font-weight: 700; }
+.meta { color: var(--muted); font-size: .85rem; font-family: var(--mono); }
+.eff { margin: 4px 0 8px; max-width: none; }
+.num { margin: -4px 0 8px; color: var(--muted); font-size: .88rem; max-width: none; }
+.rv { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.rv button[aria-pressed="true"][data-s="good"] { background: var(--good-bg); border-color: var(--good); color: var(--good); font-weight: 700; }
+.rv button[aria-pressed="true"][data-s="adjust"] { background: var(--adjust-bg); border-color: var(--adjust); color: var(--adjust); font-weight: 700; }
+.note { flex: 1 1 220px; min-width: 0; font: inherit; font-size: .9rem; padding: 5px 8px; border: 1px solid var(--adjust); border-radius: 4px; background: var(--bg); color: var(--fg); }
+.item[hidden] { display: none; }
+.status { color: var(--muted); font-size: .8rem; }
+@media (prefers-reduced-motion: no-preference) { .item { transition: border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <h1>Trim Enchantments Review</h1>
+  <p class="sub">The README, with a check on every planned power and combination. Mark each one Good or Needs adjustment. Choices are saved to this page.</p>
+
+  <div class="bar" role="region" aria-label="Review progress">
+    <div class="counts">
+      <span class="c-good"><b id="n-good">0</b> good</span>
+      <span class="c-adjust"><b id="n-adjust">0</b> need adjustment</span>
+      <span class="c-open"><b id="n-open">%%TOTAL%%</b> open</span>
+    </div>
+    <div class="filters" role="group" aria-label="Filter entries">
+      <button type="button" data-f="all" aria-pressed="true">All</button>
+      <button type="button" data-f="open" aria-pressed="false">Open</button>
+      <button type="button" data-f="good" aria-pressed="false">Good</button>
+      <button type="button" data-f="adjust" aria-pressed="false">Adjust</button>
+      <button type="button" id="copy">Copy adjustments</button>
+    </div>
+    <span class="status" id="status" aria-live="polite"></span>
+  </div>
+
+%%CONTENT%%
+</div>
+
+<script>
+(function () {
+  var items = Array.prototype.slice.call(document.querySelectorAll(".item"));
+  var state = {}; // key -> {status, note}
+  var filter = "all";
+  var col = null;
+  var LS = "bcrev-v1";
+  var statusEl = document.getElementById("status");
+
+  function lsRead() { try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch (e) { return {}; } }
+  function lsWrite() { try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} }
+  function idOf(key) { return key.replace(":", "--"); }
+
+  function paint() {
+    var g = 0, a = 0;
+    items.forEach(function (el) {
+      var s = state[el.dataset.key] || {};
+      var st = s.status || "";
+      if (st === "good") g++; else if (st === "adjust") a++;
+      el.dataset.status = st;
+      el.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.s === st)); });
+      var inp = el.querySelector(".note");
+      inp.hidden = st !== "adjust";
+      if (document.activeElement !== inp) inp.value = s.note || "";
+      el.hidden = !(filter === "all" || (filter === "open" && !st) || filter === st);
+    });
+    document.getElementById("n-good").textContent = g;
+    document.getElementById("n-adjust").textContent = a;
+    document.getElementById("n-open").textContent = items.length - g - a;
+  }
+
+  function save(key) {
+    var s = state[key];
+    lsWrite();
+    if (col) {
+      col.doc(idOf(key)).set({ key: key, name: document.querySelector('[data-key="' + key + '"]').dataset.name, status: s.status || "", note: s.note || "" })
+        .then(function () { statusEl.textContent = "Saved"; })
+        .catch(function () { statusEl.textContent = "Not saved to the page, kept in this browser"; });
+    }
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".rv button");
+    if (b) {
+      var el = b.closest(".item"), key = el.dataset.key;
+      var cur = state[key] || {};
+      state[key] = { status: cur.status === b.dataset.s ? "" : b.dataset.s, note: cur.note || "" };
+      paint(); save(key);
+      if (state[key].status === "adjust") el.querySelector(".note").focus();
+      return;
+    }
+    var f = e.target.closest("[data-f]");
+    if (f) {
+      filter = f.dataset.f;
+      document.querySelectorAll("[data-f]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === f)); });
+      paint();
+    }
+  });
+
+  var timers = {};
+  document.addEventListener("input", function (e) {
+    if (!e.target.classList.contains("note")) return;
+    var el = e.target.closest(".item"), key = el.dataset.key;
+    state[key] = { status: (state[key] || {}).status || "adjust", note: e.target.value };
+    clearTimeout(timers[key]);
+    timers[key] = setTimeout(function () { save(key); }, 600);
+  });
+
+  document.getElementById("copy").addEventListener("click", function () {
+    var lines = items.filter(function (el) { return (state[el.dataset.key] || {}).status === "adjust"; })
+      .map(function (el) { var n = state[el.dataset.key].note; return "- " + el.dataset.name + (n ? ": " + n : ""); });
+    var text = lines.length ? "Needs adjustment:\n" + lines.join("\n") : "Nothing marked for adjustment.";
+    var done = function () { statusEl.textContent = "Copied"; };
+    var fail = function () { statusEl.textContent = "Copy was blocked here"; };
+    try { navigator.clipboard.writeText(text).then(done, fail); } catch (e) { fail(); }
+  });
+
+  state = lsRead();
+  paint();
+
+  if (window.claude && window.claude.use) {
+    window.claude.use("db").then(function (db) {
+      if (!db) return;
+      col = db.collection("reviews");
+      col.onSnapshot(function (snap) {
+        var next = {};
+        snap.docs.forEach(function (d) { var v = d.data(); if (v && v.key) next[v.key] = { status: v.status || "", note: v.note || "" }; });
+        state = next; lsWrite(); paint();
+      }, function () { col = null; });
+    });
+  }
+})();
+</script>
