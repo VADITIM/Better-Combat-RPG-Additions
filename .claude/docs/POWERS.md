@@ -8,7 +8,7 @@ Trim Powers (Powers for short) come only from trims: every armor trim grants its
 
 | Power | Type | What it does | Numbers (I / II / III) | Weapons | Based on |
 |---|---|---|---|---|---|
-| Lightning | Charged | Bolt on the target after a long combo (2 full combos − 2 hits) | 7 / 13 / 17 dmg | sharp weapons | Dungeons *Thundering* |
+| Lightning | Charged | Every 10 hits a bolt strikes the target | 7 / 13 / 17 dmg | sharp weapons | Dungeons *Thundering* |
 | Shockwave | Charged | Wave flies out after 3 swings in a row that each hit 3+ enemies | 4 / 6 / 8 dmg, 8 / 10 / 12 blocks | sharp weapons | Dungeons *Shockwave* |
 | Chains | Charged | +5% per hit, +2% per extra enemy; charge lasts 8 s, survives misses. When full, nearby enemies and the target are rooted 0.7 s | binds 2 / 3 / 4 within 6 blocks | sharp weapons | Dungeons *Chains* |
 | Echo | Charged | Every 4th swing its targets are struck again 0.3 s later; counts toward other bars, triggers no perks | 50 / 65 / 80% of the swing | sharp weapons | Dungeons *Echo* |
@@ -28,7 +28,7 @@ Their trims are refused at the smithing table until they are built.
 | Venomous | wild | On hit | Hits throw a splash potion of poison upwards from the target's location, once per 8 s per target. Enemies it lands on get Poison II; if it hits the player it purifies every poison effect on them | Poison II for 2 / 3 / 4 s | Dungeons *Jungle's Poison* / *Poison Cloud* |
 | Curse | dune | On hit | 5 / 10 / 15% chance on a hit to put one random negative effect on the target | 1.5 / 2 / 2.5 s | Original (desert pyramid) |
 | Plunder | coast | On kill | Monster drops are increased; after 3–6 s (the same at every level) part of the drops turn into emeralds. 5% chance to drop double boss loot | 30 / 45 / 60% of the drops | Dungeons *Prospector* |
-| Withering | rib | On hit | Hits wither; withered enemies deal 15% less damage | Wither I 2 / 3 / 4 s | Dungeons *Weakening* + wither skeleton |
+| Withering | rib | Charged | Every 12 hits release a burst of souls: 5 damage and Weakness to every enemy within 3 blocks | Weakness for 1 / 2 / 3 s | Dungeons *Weakening* + wither skeleton |
 | Shulker Burst | spire | Charged | Every 8 hits release shulker bullets, each homing in on a random enemy and levitating it for 2 s on hit | 1 / 2 / 3 bullets | Shulker bullets |
 | Shared Pain | host | On kill | A kill's overflowing damage goes to the nearest enemies within 3 blocks (every level). It reaches only those first recipients and never carries on from them | 1 / 2 / 3 enemies | Dungeons *Shared Pain* |
 | Guardian Strike | vex | On kill | Every 3 kills within 10 s summon a vex that fights for you and dies after a few hits | dies after 2 / 3 / 4 hits | Dungeons *Guarding Strike* + evoker vexes |
@@ -73,7 +73,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Toxic Storm | Lightning + Venomous | Bolts leave a poison splash where they strike |
 | Hexbolt | Lightning + Curse | Every Curse that lands also calls a quarter-power bolt on its target |
 | Gilded Storm | Lightning + Plunder | Bolt kills convert twice the usual share of their drops into emeralds |
-| Black Lightning | Lightning + Withering | Bolts wither everything within 2 blocks |
+| Black Lightning | Lightning + Withering | Bolts release a soul burst where they strike |
 | Shulker Storm | Lightning + Shulker Burst | Each Shulker Burst bullet that hits calls a quarter-power bolt on its target |
 | Arc | Lightning + Shared Pain | A bolt kill's overkill jumps to the nearest enemy as a bolt |
 | Static Guard | Lightning + Guardian Strike | Your vexes strike what they hit with a quarter-power bolt |
@@ -89,7 +89,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Toxic Gust | Wind Charged + Venomous | Death bursts poison what they catch |
 | Hexwind | Wind Charged + Curse | Death bursts curse what they catch |
 | Windfall | Wind Charged + Plunder | Death bursts blow dropped loot and experience to you |
-| Ashen Wind | Wind Charged + Withering | Death bursts wither what they catch |
+| Ashen Wind | Wind Charged + Withering | Death bursts release a soul burst |
 | Shulker Gust | Wind Charged + Shulker Burst | Bullets that hit throw their target back like a small gust |
 | Shrapnel | Wind Charged + Shared Pain | A kill's overkill is added to its death burst's damage |
 | Bulwark Gust | Wind Charged + Guardian Strike | Kill bursts throw enemies away from you, not from the victim |
@@ -108,7 +108,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Frostbite | Cold Edge + Venomous | Chilled enemies take poison damage twice as fast |
 | Cursed Frost | Cold Edge + Curse | Cursed enemies are chilled too |
 | Ice Treasure | Cold Edge + Plunder | Kills on frozen enemies convert twice the usual share of their drops |
-| Necrotic Frost | Cold Edge + Withering | Freezes last twice as long on withered enemies |
+| Necrotic Frost | Cold Edge + Withering | Freezes last twice as long on weakened enemies |
 | Cold Snap | Cold Edge + Shulker Burst | Bullets that hit freeze their target solid |
 | Shattering Pain | Cold Edge + Shared Pain | Overkill from a frozen kill spreads to two enemies |
 | Permafrost | Cold Edge + Guardian Strike | Enemies hit by a vex are chilled |
@@ -127,7 +127,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Toxic Echo | Echo + Venomous | Echo strikes poison |
 | Echoing Curse | Echo + Curse | Echo strikes can curse too, at the same chance |
 | Echoing Coin | Echo + Plunder | Echo kills convert twice the usual share of their drops |
-| Withering Echo | Echo + Withering | Echo strikes wither |
+| Soul Echo | Echo + Withering | Echo strikes count as hits toward the soul burst |
 | Ghost Volley | Echo + Shulker Burst | Echo strikes count as hits toward Shulker Burst |
 | Resounding Pain | Echo + Shared Pain | Echo kills spread their overkill too |
 | Ward Echo | Echo + Guardian Strike | Echo kills summon a vex too |
@@ -144,7 +144,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Plague Wave | Shockwave + Venomous | The shockwave leaves a poison splash trail |
 | Curse Wave | Shockwave + Curse | The shockwave can curse what it cuts, at the same chance |
 | Gold Rush | Shockwave + Plunder | Shockwave kills convert twice the usual share of their drops |
-| Death Wave | Shockwave + Withering | The shockwave withers what it cuts |
+| Death Wave | Shockwave + Withering | The shockwave weakens what it cuts |
 | Shulker Wave | Shockwave + Shulker Burst | Every shockwave also releases a Shulker Burst |
 | Crushing Wave | Shockwave + Shared Pain | Each kill adds its overkill to the wave's damage |
 | Shield Wall | Shockwave + Guardian Strike | Firing a shockwave summons a vex |
@@ -160,7 +160,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Venom Links | Chains + Venomous | Bound enemies are poisoned |
 | Cursed Bind | Chains + Curse | Bound enemies are cursed |
 | Chain Gang | Chains + Plunder | Enemies killed while rooted convert twice the usual share of their drops |
-| Death Grip | Chains + Withering | Bound enemies wither |
+| Death Grip | Chains + Withering | Bound enemies are weakened |
 | Tether | Chains + Shulker Burst | Shulker Burst bullets home in on bound enemies first |
 | Shared Bonds | Chains + Shared Pain | Damage to the target is shared 30% with every enemy bound to it |
 | Iron Ward | Chains + Guardian Strike | Firing Chains summons a vex |
@@ -176,7 +176,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Miasma | Gravity + Venomous | Pulled enemies are poisoned |
 | Hex Well | Gravity + Curse | Pulled enemies are cursed |
 | Magnet | Gravity + Plunder | Gravity also pulls dropped items and experience to you |
-| Event Horizon | Gravity + Withering | Pulled enemies wither |
+| Event Horizon | Gravity + Withering | Pulled enemies are weakened |
 | Lure | Gravity + Shulker Burst | Bullets that hit pull nearby enemies to their target |
 | Collapse | Gravity + Shared Pain | Overkill splits across every pulled enemy |
 | Gravity Well | Gravity + Guardian Strike | Vexes pull in the enemies around them |
@@ -190,7 +190,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Toxic Charge | Marked + Venomous | A hit on a marked mob poisons for twice as long |
 | Cursed Trail | Marked + Curse | A hit on a marked mob always curses it |
 | Smash and Grab | Marked + Plunder | Kills on a marked mob convert twice the usual share of their drops |
-| Death Charge | Marked + Withering | A hit on a marked mob withers it (Wither II) |
+| Death Charge | Marked + Withering | A hit on a marked mob releases a soul burst |
 | Blitz | Marked + Shulker Burst | A hit on a marked mob triggers Shulker Burst at once |
 | Bowling | Marked + Shared Pain | Kills on a marked mob throw their overkill at the enemy behind them |
 | Vanguard | Marked + Guardian Strike | A hit on a marked mob summons a vex |
@@ -204,7 +204,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Blood Toxin | Rampaging + Venomous | While rampaging, poison lasts twice as long |
 | Cursed Rage | Rampaging + Curse | Kills while rampaging curse the enemies around the victim |
 | Pillage | Rampaging + Plunder | While rampaging, Plunder converts twice the usual share of drops |
-| Reaper | Rampaging + Withering | Kills on withered enemies extend the rampage by 2 s |
+| Reaper | Rampaging + Withering | Kills on weakened enemies extend the rampage by 2 s |
 | Shadow Rush | Rampaging + Shulker Burst | While rampaging, Shulker Burst charges twice as fast |
 | Massacre | Rampaging + Shared Pain | Kills by overkill refresh the rampage and spread again |
 | Berserker | Rampaging + Guardian Strike | Vexes summoned while rampaging last one hit longer |
@@ -217,7 +217,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Spore Launch | Uppercut + Venomous | Launched targets leave a poison cloud where they land |
 | Hex Geyser | Uppercut + Curse | Launches curse the enemies around the target |
 | Shakedown | Uppercut + Plunder | A launched enemy has a 10% chance to drop an emerald, once each |
-| Gallows | Uppercut + Withering | Launched targets wither |
+| Gallows | Uppercut + Withering | Launched targets are weakened |
 | Skyshot | Uppercut + Shulker Burst | After a launch, a Shulker Burst bullet homes in on the launched target |
 | Skyfall | Uppercut + Shared Pain | A launched target that dies spreads its overkill to everything within 2 blocks of where it lands |
 | Rising Guard | Uppercut + Guardian Strike | Launching summons a vex |
@@ -229,7 +229,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 |---|---|---|
 | Toxic Curse | Venomous + Curse | Cursed enemies are poisoned too |
 | Antidote Trade | Venomous + Plunder | Kills on poisoned enemies convert twice the usual share of their drops |
-| Blight | Venomous + Withering | Poison and wither on the same enemy deal 50% more |
+| Blight | Venomous + Withering | Poison deals 50% more to weakened enemies |
 | Venom Bullets | Venomous + Shulker Burst | Shulker Burst bullets poison on hit (Poison II) |
 | Contagion | Venomous + Shared Pain | A poisoned enemy's death passes its poison to the nearest enemy |
 | Venom Fang | Venomous + Guardian Strike | Vexes poison what they hit |
@@ -240,7 +240,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 | Combination | Needs | Effect |
 |---|---|---|
 | Cursed Hoard | Curse + Plunder | Kills on cursed enemies convert twice the usual share of their drops |
-| Rotting Curse | Curse + Withering | Cursed enemies wither |
+| Rotting Curse | Curse + Withering | Cursed enemies are weakened |
 | Hex Bullets | Curse + Shulker Burst | Bullets that hit apply a Curse at once |
 | Curse Spread | Curse + Shared Pain | Overkill spreads to every cursed enemy within 3 blocks |
 | Hex Ward | Curse + Guardian Strike | Vexes curse what they hit |
@@ -250,7 +250,7 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 
 | Combination | Needs | Effect |
 |---|---|---|
-| Grave Robber | Plunder + Withering | Kills on withered enemies drop double experience |
+| Grave Robber | Plunder + Withering | Kills on weakened enemies drop double experience |
 | Pickpocket | Plunder + Shulker Burst | Kills by a bullet convert twice the usual share of their drops |
 | Jackpot | Plunder + Shared Pain | Kills by overkill convert twice the usual share of their drops |
 | Treasure Guard | Plunder + Guardian Strike | Kills by a vex convert twice the usual share of their drops |
@@ -260,10 +260,10 @@ The other 140 pairs, grouped by the first power. Once approved they get built; u
 
 | Combination | Needs | Effect |
 |---|---|---|
-| Wither Bullets | Withering + Shulker Burst | Bullets wither their target |
-| Decay | Withering + Shared Pain | A withered enemy's death passes its wither to the nearest enemy |
-| Wraith Vex | Withering + Guardian Strike | Vexes wither what they hit |
-| Withering Arc | Withering + Copper Shock | Copper Shock pulses wither the enemies they hit |
+| Soul Bullets | Withering + Shulker Burst | Bullets weaken their target |
+| Decay | Withering + Shared Pain | A weakened enemy's death passes its weakness to the nearest enemy |
+| Wraith Vex | Withering + Guardian Strike | Vexes weaken what they hit |
+| Soul Arc | Withering + Copper Shock | Copper Shock pulses weaken the enemies they hit |
 
 **Shulker Burst**
 
@@ -351,7 +351,7 @@ The anvil refuses an item with trim powers in its right slot, so powers can't be
 | Venomous | wild | jungle temple poison and vines |
 | Curse | dune | desert pyramid curses |
 | Plunder | coast | shipwreck treasure |
-| Withering | rib | the fortress's wither skeletons |
+| Withering | rib | the fortress's wither skeletons and their souls |
 | Shulker Burst | spire | End city shulkers fire homing bullets |
 | Shared Pain | host | trail ruins: a host shares the load |
 | Guardian Strike | vex | the evoker's vexes, summoned to fight for you |
