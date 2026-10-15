@@ -53,7 +53,7 @@ Each armor trim grants one power, raised from level I to III. Powers marked \* a
 | Rampaging | snout | Every 2nd kill grants attack speed for 2 s; the kill count resets after each trigger | +20 / 25 / 30% |
 | Uppercut | raiser | The sword's 3rd swing, the spear's heavy thrust or a grounded mace swing launches the target | launch 0.55 / 0.7 / 0.85 |
 | Venomous\* | wild | Hits throw a splash potion of poison upwards from the target; nearby enemies get Poison II, and it purifies you if it hits you | Poison II for 2 / 3 / 4 s |
-| Curse\* | dune | 5 / 10 / 15% chance on a hit to put a random negative effect on the target | 1.5 / 2 / 2.5 s |
+| Curse\* | dune | 5 / 10 / 15% chance on a hit to put a random negative effect on the target ("cursed") | 1.5 / 2 / 2.5 s |
 | Plunder\* | coast | Monster drops are increased; after 3–6 s part of them turn into emeralds. 5% chance of double boss loot | 30 / 45 / 60% of drops |
 | Withering\* | rib | Every 12 hits release a burst of souls that deals 5 damage and weakens enemies within 3 blocks | Weakness for 1 / 2 / 3 s |
 | Shulker Burst\* | spire | Every 8 hits release shulker bullets that home in on a random enemy and levitate it for 2 s | 1 / 2 / 3 bullets |
@@ -81,8 +81,8 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Chained Lightning | Chains + Lightning | Bound enemies get half-power bolts and a short root |
 | Charged Lightning | Lightning + Wind Charged | The bolt bursts like a wind charge |
 | Updraft | Uppercut + Wind Charged | You and the target go straight up. Right click in the air: the mace slams down for a 1.5× smash, the sword dives and cuts around where it lands, the spear lunges through enemies |
-| Frozen Chains | Chains + Cold Edge | Bound enemies are chilled |
-| Frost Burst | Cold Edge + Wind Charged | Death bursts chill what they catch |
+| Frozen Chains | Chains + Cold Edge | Bound enemies gain a chill stack |
+| Frost Burst | Cold Edge + Wind Charged | Death bursts add a chill stack to what they catch |
 | Resonance | Echo + Lightning | Echoes spark a quarter-power bolt |
 | Tempest | Shockwave + Wind Charged | The shockwave throws enemies much harder, and slamming them into a wall hurts. A mace smash also splashes nearby enemies |
 | Shatter | Cold Edge + Lightning | Bolts hit frozen enemies twice as hard; lightning kills spread chill |
@@ -109,7 +109,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Gilded Storm | Lightning + Plunder | Bolt kills convert twice the usual share of their drops into emeralds |
 | Black Lightning | Lightning + Withering | Bolts release a soul burst where they strike |
 | Shulker Storm | Lightning + Shulker Burst | Each Shulker Burst bullet that hits calls a quarter-power bolt on its target |
-| Arc | Lightning + Shared Pain | A bolt kill's overkill jumps to the nearest enemy as a bolt |
+| Arc | Lightning + Shared Pain | A bolt kill's overkill reaches Shared Pain's enemies as bolts |
 | Static Guard | Lightning + Guardian Strike | Your vexes strike what they hit with a quarter-power bolt |
 | Copper Storm | Lightning + Copper Shock | Every enemy a Copper Shock pulse hits is struck by a quarter-power bolt |
 
@@ -133,19 +133,19 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 
 | Combination | Powers | Effect |
 |---|---|---|
-| Hoarfrost Echo | Cold Edge + Echo | Echo strikes chill |
+| Hoarfrost Echo | Cold Edge + Echo | Echo strikes add a chill stack |
 | Glacier Wave | Cold Edge + Shockwave | The shockwave chills what it cuts and frosts the ground it passes (a chill stack to enemies crossing it, 2 s) |
-| Frost Vortex | Cold Edge + Gravity | Pulled enemies are chilled |
+| Frost Vortex | Cold Edge + Gravity | Pulled enemies gain a chill stack |
 | Frostbite Charge | Cold Edge + Marked | A hit on a marked mob freezes it solid at once |
 | Cold Blood | Cold Edge + Rampaging | While rampaging, each hit adds two chill stacks |
 | Frozen Ascent | Cold Edge + Uppercut | Launched targets freeze solid in the air |
 | Frostbite | Cold Edge + Venomous | Chilled enemies take poison damage twice as fast |
-| Cursed Frost | Cold Edge + Curse | Cursed enemies are chilled too |
+| Cursed Frost | Cold Edge + Curse | Cursed enemies gain a chill stack |
 | Ice Treasure | Cold Edge + Plunder | Kills on frozen enemies convert twice the usual share of their drops |
 | Necrotic Frost | Cold Edge + Withering | Freezes last twice as long on weakened enemies |
 | Cold Snap | Cold Edge + Shulker Burst | Bullets that hit freeze their target solid |
-| Shattering Pain | Cold Edge + Shared Pain | Overkill from a frozen kill spreads to two enemies |
-| Permafrost | Cold Edge + Guardian Strike | Enemies hit by a vex are chilled |
+| Shattering Pain | Cold Edge + Shared Pain | Overkill from a frozen kill reaches one more enemy |
+| Permafrost | Cold Edge + Guardian Strike | Enemies hit by a vex gain a chill stack |
 | Deep Freeze | Cold Edge + Copper Shock | A Copper Shock pulse freezes chilled enemies solid at once |
 
 **Echo**
@@ -212,7 +212,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Magnet | Gravity + Plunder | Gravity also pulls items and experience to you |
 | Event Horizon | Gravity + Withering | Pulled enemies are weakened |
 | Lure | Gravity + Shulker Burst | Bullets that hit pull nearby enemies to their target |
-| Collapse | Gravity + Shared Pain | Overkill splits across every pulled enemy |
+| Collapse | Gravity + Shared Pain | Overkill goes to the pulled enemies first |
 | Gravity Well | Gravity + Guardian Strike | Vexes pull in the enemies around them |
 | Crush | Gravity + Copper Shock | Pulled enemies that reach the target are struck by a Copper Shock pulse |
 
@@ -221,7 +221,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Combination | Powers | Effect |
 |---|---|---|
 | Stampede | Marked + Rampaging | While rampaging, a hit on a marked mob does not spend the mark |
-| Toxic Charge | Marked + Venomous | A hit on a marked mob poisons for twice as long |
+| Toxic Charge | Marked + Venomous | A hit on a marked mob throws a Venomous splash at once, ignoring its 8 s limit |
 | Cursed Trail | Marked + Curse | A hit on a marked mob always curses it |
 | Smash and Grab | Marked + Plunder | Kills on a marked mob convert twice the usual share of their drops |
 | Death Charge | Marked + Withering | A hit on a marked mob releases a soul burst |
@@ -240,7 +240,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Pillage | Rampaging + Plunder | While rampaging, Plunder converts twice the usual share of drops |
 | Reaper | Rampaging + Withering | Kills on weakened enemies extend the rampage by 2 s |
 | Shadow Rush | Rampaging + Shulker Burst | While rampaging, Shulker Burst charges twice as fast |
-| Massacre | Rampaging + Shared Pain | Kills by overkill refresh the rampage and spread again |
+| Massacre | Rampaging + Shared Pain | Kills by overkill count as two kills for Rampaging |
 | Berserker | Rampaging + Guardian Strike | Vexes summoned while rampaging last one hit longer |
 | Terror | Rampaging + Copper Shock | Kills while rampaging release a Copper Shock pulse from the victim |
 
@@ -248,12 +248,12 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 
 | Combination | Powers | Effect |
 |---|---|---|
-| Spore Launch | Uppercut + Venomous | Launched targets leave a poison cloud where they land |
+| Spore Launch | Uppercut + Venomous | Launched targets throw a Venomous splash where they land |
 | Hex Geyser | Uppercut + Curse | Launches curse the enemies around the target |
 | Shakedown | Uppercut + Plunder | A launched enemy may drop an emerald |
 | Gallows | Uppercut + Withering | Launched targets are weakened |
 | Skyshot | Uppercut + Shulker Burst | After a launch, a Shulker Burst bullet homes in on the launched target |
-| Skyfall | Uppercut + Shared Pain | A launched target that dies spreads its overkill where it lands |
+| Skyfall | Uppercut + Shared Pain | A launched target that dies spreads its overkill around where it lands |
 | Rising Guard | Uppercut + Guardian Strike | Launching summons a vex |
 | Ragdoll | Uppercut + Copper Shock | Launching releases a Copper Shock pulse from the target |
 
@@ -276,7 +276,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Cursed Hoard | Curse + Plunder | Kills on cursed enemies convert twice the usual share of their drops |
 | Rotting Curse | Curse + Withering | Cursed enemies are weakened |
 | Hex Bullets | Curse + Shulker Burst | Bullets that hit apply a Curse at once |
-| Curse Spread | Curse + Shared Pain | Overkill spreads to every cursed enemy within 3 blocks |
+| Curse Spread | Curse + Shared Pain | Overkill goes to cursed enemies first |
 | Hex Ward | Curse + Guardian Strike | Vexes curse what they hit |
 | Curse Shock | Curse + Copper Shock | Copper Shock pulses carry a Curse |
 
@@ -303,7 +303,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 
 | Combination | Powers | Effect |
 |---|---|---|
-| Rift | Shulker Burst + Shared Pain | Overkill from bullet kills spreads to two enemies |
+| Rift | Shulker Burst + Shared Pain | Bullet kills carry their overkill to Shared Pain's enemies too |
 | Shulker Guard | Shulker Burst + Guardian Strike | Releasing a Shulker Burst summons a vex |
 | Shock Bullets | Shulker Burst + Copper Shock | Bullets that hit release a Copper Shock pulse |
 
