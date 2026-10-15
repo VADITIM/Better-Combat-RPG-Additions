@@ -2,7 +2,8 @@
 
 Planned work, in order. Shipped items move to `decisions.md`.
 
-1. **Build the drafts once the user approves them** (`POWERS.md` § Draft powers, § Draft combinations): 8 powers, 140 combinations. Flip `Refinement.Perk.built`, add a `Synergy` per combination.
+0. **Code the rest of the 15-10 redesign** (`known-issues.md` § Debt): Cold Edge chill stacks (with Frozen Chains, Frost Burst, Shatter and the shield), Lightning every 10 hits and Rampaging every 2nd kill; then update `POWERS.md`.
+1. **Build the planned combinations in batches** (`POWERS.md` § Planned combinations): 116 left, one power's at a time, each with its review note. Add a `Synergy` per combination.
 2. **Refinement UI:**
    - smithing table icons and autofill;
    - a two-column tooltip with powers first, maxed powers in orange, and faded stats on the right.

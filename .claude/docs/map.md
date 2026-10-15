@@ -65,3 +65,4 @@ Code lives in `src/main/java/dev/vadim/bcenchantments/`. Data and assets live in
 | Field Guide pages | `client/GuideScreen`, `guide.*` lang keys |
 | How a panel or guide row looks (spacing, colours, sizes), or moving, removing or adding a row | `ui/style.json` through the UI lab; a new kind of row in `ui/Rows` |
 | Smithing side panel (stats, next step, possible combinations) | `client/SmithingPanel`, `panel.*` lang keys; drawn, laid out and toggled from `mixin/SmithingScreenMixin` |
+| The README review page (Good / Needs adjustment on planned entries) | `tools/review/gen.py README.md tools/review/template.html out.html`, then publish `out.html` with `capabilities: {db: {}}` to the artifact https://claude.ai/artifact/MbvntGZZYYhXxTSccUswfG; choices live in its `reviews` collection |

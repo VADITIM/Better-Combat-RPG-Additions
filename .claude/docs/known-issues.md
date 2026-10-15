@@ -21,6 +21,8 @@ It does this when the item has a tuned `critical_hit` clip, because Punchy reads
 
 ## Debt
 
+**Part of the 15-10 power redesign is not built** (`decisions.md` § power redesign). Batch 1 built the new powers, Marked and the vex ↔ sentry swap; the code and `POWERS.md` still have the old Cold Edge (slow, then freeze after 3 s; no chill stacks or ×1.6), Lightning's charge (2 full combos − 2 hits, not 10 hits), Rampaging (4 s refreshed by every kill, +20 / 30 / 40%), Shatter's +15% to slowed enemies and the shield Cold Edge chill. Plunder was built at 10% after 7 s on purpose, not the redesign's 30 / 45 / 60% after 3–6 s.
+
 **The trim → power remap changes existing items.**
 Trims store their name, not their power, so weapons trimmed before a remap grant the new power. Since the 18-power remap, a weapon trimmed with vex now holds Guardian Strike and one trimmed with sentry holds Chains, and wayfinder grants Marked instead of Momentum.
 

@@ -123,22 +123,6 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 
 ### Planned
 
-**Wind Charged**
-
-| Combination | Powers | Effect |
-|---|---|---|
-| Gale Echo | Wind Charged + Echo | Echo strikes push their targets back like a small gust |
-| Whiplash | Wind Charged + Chains | When Chains fires, bound enemies are yanked to the target |
-| Hurricane | Wind Charged + Rampaging | While rampaging, death bursts are 50% wider |
-| Toxic Gust | Wind Charged + Venomous | Death bursts poison what they catch |
-| Hexwind | Wind Charged + Curse | Death bursts curse what they catch |
-| Windfall | Wind Charged + Plunder | Death bursts blow loot and experience to you |
-| Ashen Wind | Wind Charged + Withering | Death bursts release a soul burst |
-| Shulker Gust | Wind Charged + Shulker Burst | Bullets that hit throw their target back like a small gust |
-| Shrapnel | Wind Charged + Shared Pain | A kill's overkill is added to its death burst |
-| Bulwark Gust | Wind Charged + Guardian Strike | Kill bursts throw enemies away from you |
-| Spark Burst | Wind Charged + Copper Shock | Death bursts release a Copper Shock pulse from the victim |
-
 **Cold Edge**
 
 | Combination | Powers | Effect |

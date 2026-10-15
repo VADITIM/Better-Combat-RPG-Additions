@@ -19,6 +19,26 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 - **Gravity's own pull halved** (a plain swing pulls with half; Singularity, Black Hole and Cyclone keep the full pull) and **Lightning Rod pulls at 150%**. A Lightning Rod bolt whose target dies during the pull goes to the nearest enemy where it stood.
 - **Withering and Shulker Burst count enemies hit, not swings,** and survive misses for 8 s like Chains; new charge bars stay plain, since only Lightning and Shockwave keep colour.
 
+## 2026-10-15 (power redesign, docs first, code pending)
+
+- **Seven drafts and two built powers redesigned in the docs.** Renames: Venom → Venomous, Guarding Strike → Guardian Strike, Daze → Copper Shock, Sandstorm → Curse, Phase → Shulker Burst. Trims: Chains moves to **sentry**, Guardian Strike takes **vex** (swap).
+- **Cold Edge reworked:** each hit adds chill; 5 / 4 / 3 stacks freeze the mob for 1 / 1.5 / 2 s, and the next hit on a frozen mob deals ×1.6 and ends the freeze. The attack-speed debuff (−10 / 25 / 40%) is gone.
+- **Momentum → Marked** (trim wayfinder; the code class stays `Momentum`): a point-blank hit marks the mob, and the next point-blank hit on it deals ×1.5 / 2 / 2.5. The sprint run-up is gone, so the 17 Marked combinations now key off "a hit on a marked mob" instead of "a run-up swing", including the built Launch and Blast Step. *Open:* what counts as point blank (range), and whether Shatter's ×2 stacks with the freeze's ×1.6.
+- **Withering is now a charged soul burst:** every 12 hits release a burst of souls dealing 5 damage and Weakness to enemies within 3 blocks for 1 / 2 / 3 s (was on-hit Wither). The 17 Withering combinations now use the burst or Weakness instead of Wither; five were renamed (Soul Echo, Soul Bullets, Soul Arc among them). *Open:* Weakness level.
+- **Lightning charges in 10 hits** (was 2 full combos − 2 hits, which varied by weapon). Code and the Field Guide still use the old rule.
+- **Venomous:** a splash potion of poison thrown upwards from the target: Poison II for 2 / 3 / 4 s on enemies; if it hits the player it purifies their poison.
+- **Plunder:** drops are increased, and after 3–6 s (same at every level) part of them turn into emeralds (30 / 45 / 60%), plus a 5% chance of double boss loot. It is no longer a per-kill emerald roll.
+- **Guardian Strike:** every 3 kills within 10 s summon a vex that dies after 2 / 3 / 4 hits (was Resistance I on kill).
+- **Copper Shock:** 10 / 15 / 20% chance on a hit for a copper pulse that jumps to 4 / 5 / 6 enemies (was a charged daze).
+- **Rampaging:** every 2nd kill grants attack speed for 2 s (+20 / 25 / 30%); the count resets after each trigger (was 4 s, refreshed by every kill).
+- **Curse:** 5 / 10 / 15% chance on a hit for a random negative effect, 1.5 / 2 / 2.5 s (was a charged blinding sandstorm).
+- **Shulker Burst:** every 8 hits release 1 / 2 / 3 homing shulker bullets that levitate the target for 2 s (was a teleport).
+- **Shared Pain:** overkill goes to the nearest enemies within 3 blocks (every level), 1 / 2 / 3 of them; it never chains on from those recipients.
+- **Shatter:** now only ×2 lightning damage to frozen enemies, and lightning kills spread chill. The +15% to slowed enemies is dropped.
+- **Cold Edge on a shield** freezes the attacker for 1 s (was chilled hard), still every 10 s.
+- **70-odd draft combinations reworded** to fit (blind, daze, Resistance and teleport effects are gone); several were renamed (Dust Devil → Hexbolt, Stunbolt → Copper Storm, Shield Charge → Vanguard, …). See `POWERS.md`.
+- *Open:* Plunder's 5% boss-loot chance and 3–6 s window are used as given; Venomous's trigger (on hit, once per 8 s per target, carried over from Venom) need the user's confirmation.
+
 ## 2026-10-14 (smithing panel pass)
 
 - **Every power costs levels, the first 10** (then 20, 30, …); the first is no longer free.
