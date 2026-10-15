@@ -11,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Where features plug into combat on the server. A new perk or weapon mechanic registers here from
@@ -48,6 +49,7 @@ public final class CombatHooks {
 
 	private static final List<Scheduled> LATER = new ArrayList<>();
 	private static long now;
+	private static @Nullable DamageSource killingBlow;
 
 	private CombatHooks() {
 	}
@@ -106,9 +108,20 @@ public final class CombatHooks {
 		}
 		AttackHand swing = ComboTracker.currentSwing(player);
 		ItemStack weapon = swing != null ? swing.itemStack() : player.getMainHandItem();
-		for (KillEffect effect : KILL) {
-			effect.onKill(player, weapon, victim);
+		DamageSource outer = killingBlow;
+		killingBlow = source;
+		try {
+			for (KillEffect effect : KILL) {
+				effect.onKill(player, weapon, victim);
+			}
+		} finally {
+			killingBlow = outer;
 		}
+	}
+
+	/** The damage that made the kill whose {@link KillEffect}s are running, or null outside of them. */
+	public static @Nullable DamageSource killingBlow() {
+		return killingBlow;
 	}
 
 	static void directHit(ServerPlayer player, ItemStack weapon, LivingEntity target) {

@@ -29,8 +29,32 @@ import org.jspecify.annotations.Nullable;
  * <li>Singularity: a Shockwave drags the enemies beside its path into it.</li>
  * <li>Black Hole: every enemy Chains binds pulls the enemies around it in.</li>
  * <li>Cyclone: a kill draws the enemies around it in before its wind burst goes off.</li>
- * <li>Launch: a launching swing after a run-up throws the targets higher and the player up after them.</li>
- * <li>Blast Step: a kill by a swing after a run-up bursts the player onward.</li>
+ * <li>Launch: a launching swing on a marked mob throws the targets higher and the player up after them.</li>
+ * <li>Blast Step: a kill by a point-blank hit on a marked mob bursts the player onward.</li>
+ * <li>Thunderwave: every enemy the shockwave cuts is struck by a quarter-power bolt.</li>
+ * <li>Lightning Rod: the enemies around the target are pulled to it before the bolt lands.</li>
+ * <li>Thunder Charge: spending a mark adds 3 hits of Lightning charge.</li>
+ * <li>Storm Frenzy: while rampaging, Lightning charges twice as fast.</li>
+ * <li>Skybreaker: launched targets are struck by a half-power bolt at the top of their flight.</li>
+ * <li>Toxic Storm: every bolt leaves a Venomous splash where it strikes.</li>
+ * <li>Hexbolt: every curse that lands calls a quarter-power bolt on its target.</li>
+ * <li>Gilded Storm: a kill by the weapon's lightning drops three times the loot.</li>
+ * <li>Black Lightning: every bolt releases a Withering soul burst where it strikes.</li>
+ * <li>Shulker Storm: a Shulker Burst bullet that hits calls a quarter-power bolt on its target.</li>
+ * <li>Arc: a lightning kill's overkill reaches Shared Pain's enemies as bolts.</li>
+ * <li>Static Guard: each vex hit strikes its target with a quarter-power bolt.</li>
+ * <li>Copper Storm: each enemy a Copper Shock pulse reaches has an even chance of a quarter-power bolt.</li>
+ * <li>Gale Echo: Echo strikes push their targets back like a small gust.</li>
+ * <li>Whiplash: when Chains fires, the bound enemies are yanked to the target.</li>
+ * <li>Hurricane: while rampaging, death bursts are half again as wide.</li>
+ * <li>Toxic Gust: death bursts poison what they catch.</li>
+ * <li>Hexwind: death bursts may curse what they catch.</li>
+ * <li>Windfall: a share of a kill's drops charge up and burst like a wind charge a second later.</li>
+ * <li>Ashen Wind: death bursts also release a Withering soul burst.</li>
+ * <li>Shulker Gust: Shulker Burst bullets that hit throw their target back like a small gust.</li>
+ * <li>Shrapnel: every monster Shared Pain's overkill reaches bursts like a wind charge.</li>
+ * <li>Bulwark Gust: death bursts throw enemies away from the player.</li>
+ * <li>Spark Burst: every enemy a death burst pushes zaps one more with Copper Shock.</li>
  * </ul>
  */
 public enum Synergy {
@@ -46,8 +70,32 @@ public enum Synergy {
 	SINGULARITY("singularity", Perks.GRAVITY, Perks.SHOCKWAVE),
 	BLACK_HOLE("black_hole", Perks.GRAVITY, Perks.CHAINS),
 	CYCLONE("cyclone", Perks.GRAVITY, Perks.WIND_CHARGED),
-	LAUNCH("launch", Perks.MOMENTUM, Perks.UPPERCUT),
-	BLAST_STEP("blast_step", Perks.MOMENTUM, Perks.WIND_CHARGED);
+	LAUNCH("launch", Perks.MARKED, Perks.UPPERCUT),
+	BLAST_STEP("blast_step", Perks.MARKED, Perks.WIND_CHARGED),
+	THUNDERWAVE("thunderwave", Perks.LIGHTNING, Perks.SHOCKWAVE),
+	LIGHTNING_ROD("lightning_rod", Perks.LIGHTNING, Perks.GRAVITY),
+	THUNDER_CHARGE("thunder_charge", Perks.LIGHTNING, Perks.MARKED),
+	STORM_FRENZY("storm_frenzy", Perks.LIGHTNING, Perks.RAMPAGING),
+	SKYBREAKER("skybreaker", Perks.LIGHTNING, Perks.UPPERCUT),
+	TOXIC_STORM("toxic_storm", Perks.LIGHTNING, Perks.VENOMOUS),
+	HEXBOLT("hexbolt", Perks.LIGHTNING, Perks.CURSE),
+	GILDED_STORM("gilded_storm", Perks.LIGHTNING, Perks.PLUNDER),
+	BLACK_LIGHTNING("black_lightning", Perks.LIGHTNING, Perks.WITHERING),
+	SHULKER_STORM("shulker_storm", Perks.LIGHTNING, Perks.SHULKER_BURST),
+	ARC("arc", Perks.LIGHTNING, Perks.SHARED_PAIN),
+	STATIC_GUARD("static_guard", Perks.LIGHTNING, Perks.GUARDIAN_STRIKE),
+	COPPER_STORM("copper_storm", Perks.LIGHTNING, Perks.COPPER_SHOCK),
+	GALE_ECHO("gale_echo", Perks.WIND_CHARGED, Perks.ECHO),
+	WHIPLASH("whiplash", Perks.WIND_CHARGED, Perks.CHAINS),
+	HURRICANE("hurricane", Perks.WIND_CHARGED, Perks.RAMPAGING),
+	TOXIC_GUST("toxic_gust", Perks.WIND_CHARGED, Perks.VENOMOUS),
+	HEXWIND("hexwind", Perks.WIND_CHARGED, Perks.CURSE),
+	WINDFALL("windfall", Perks.WIND_CHARGED, Perks.PLUNDER),
+	ASHEN_WIND("ashen_wind", Perks.WIND_CHARGED, Perks.WITHERING),
+	SHULKER_GUST("shulker_gust", Perks.WIND_CHARGED, Perks.SHULKER_BURST),
+	SHRAPNEL("shrapnel", Perks.WIND_CHARGED, Perks.SHARED_PAIN),
+	BULWARK_GUST("bulwark_gust", Perks.WIND_CHARGED, Perks.GUARDIAN_STRIKE),
+	SPARK_BURST("spark_burst", Perks.WIND_CHARGED, Perks.COPPER_SHOCK);
 
 	private final String name;
 	private final List<ResourceKey<Enchantment>> perks;

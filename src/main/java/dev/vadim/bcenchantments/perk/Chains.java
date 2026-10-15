@@ -2,8 +2,10 @@ package dev.vadim.bcenchantments.perk;
 
 import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.SwingResult;
+import dev.vadim.bcenchantments.mob.Adaptation;
 import java.util.List;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
  * lightning at half the weapon's Lightning power and rooted for a moment.</li>
  * <li>{@link Synergy#FROZEN_CHAINS}: everything bound is chilled as by Cold Edge.</li>
  * <li>{@link Synergy#BLACK_HOLE}: every bound enemy pulls the free enemies around it in.</li>
+ * <li>{@link Synergy#WHIPLASH}: every bound enemy is yanked to the target before the root holds it.</li>
  * </ul>
  */
 public final class Chains implements ChargedPerk {
@@ -46,6 +49,11 @@ public final class Chains implements ChargedPerk {
 	private static final int CHAINED_ROOT_TICKS = 10;
 	/** Black Hole: how far around each bound enemy the free ones are pulled from. */
 	private static final double BLACK_HOLE_RADIUS = 3.5;
+	/** Whiplash: the yank's speed per block of distance, its cap, its lift, and how close is close enough. */
+	private static final double WHIPLASH_SPEED = 0.17;
+	private static final double WHIPLASH_MAX = 0.9;
+	private static final double WHIPLASH_LIFT = 0.3;
+	private static final double WHIPLASH_STOP = 1.5;
 	private static final DustParticleOptions LINK = new DustParticleOptions(0x8F9AA3, 1.0F);
 
 	private Chains() {
@@ -98,8 +106,12 @@ public final class Chains implements ChargedPerk {
 		boolean chainedLightning = Synergy.CHAINED_LIGHTNING.on(swing.weapon());
 		int cold = Synergy.FROZEN_CHAINS.on(swing.weapon()) ? Perks.level(swing.weapon(), Perks.COLD_EDGE) : 0;
 		int gravity = Synergy.BLACK_HOLE.on(swing.weapon()) ? Perks.level(swing.weapon(), Perks.GRAVITY) : 0;
+		boolean whiplash = Synergy.WHIPLASH.on(swing.weapon());
 		List<LivingEntity> held = bound;
 		for (LivingEntity target : bound) {
+			if (whiplash) {
+				yank(player.level(), target, anchor);
+			}
 			if (gravity > 0) {
 				// Each bound enemy pulls in the free ones around it; the bound ones stay put.
 				Gravity.pull(player, target.position(), BLACK_HOLE_RADIUS, Gravity.strength(gravity), e -> e == anchor || held.contains(e), true);
@@ -107,22 +119,43 @@ public final class Chains implements ChargedPerk {
 			link(player.level(), anchor, target);
 			if (chainedLightning) {
 				Lightning.strike(player, swing.weapon(), target, Lightning.damage(lightning) * CHAINED_BOLT);
-				Control.root(target, CHAINED_ROOT_TICKS);
-			} else {
-				Control.root(target, ROOT_TICKS);
+			}
+			if (!Adaptation.resists(target, Perks.CHAINS)) {
+				Control.root(target, chainedLightning ? CHAINED_ROOT_TICKS : ROOT_TICKS);
 			}
 			if (cold > 0) {
 				ColdEdge.chill(target, cold);
 			}
 		}
 		if (!chainedLightning) {
-			Control.root(anchor, ROOT_TICKS);
+			if (!Adaptation.resists(anchor, Perks.CHAINS)) {
+				Control.root(anchor, ROOT_TICKS);
+			}
 			if (cold > 0) {
 				ColdEdge.chill(anchor, cold);
 			}
 		}
 		player.level().playSound((Entity) null, anchor.getX(), anchor.getY(), anchor.getZ(), SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1.2F, 0.7F);
 		player.level().playSound((Entity) null, anchor.getX(), anchor.getY(), anchor.getZ(), SoundEvents.CHAIN_HIT, SoundSource.PLAYERS, 1.0F, 0.9F);
+	}
+
+	/**
+	 * Whiplash: throws {@code target} to {@code anchor}, fast enough to land about beside it. A root
+	 * only slows walking, so the throw carries it even while rooted. A Wind Charged counter holds it.
+	 */
+	private static void yank(ServerLevel world, LivingEntity target, LivingEntity anchor) {
+		if (Adaptation.resists(target, Perks.WIND_CHARGED)) {
+			return;
+		}
+		Vec3 to = anchor.position().subtract(target.position());
+		double distance = to.horizontalDistance();
+		if (distance < WHIPLASH_STOP) {
+			return;
+		}
+		Vec3 flat = to.multiply(1.0, 0.0, 1.0).normalize().scale(Math.min((distance - WHIPLASH_STOP) * WHIPLASH_SPEED, WHIPLASH_MAX));
+		target.setDeltaMovement(flat.x, WHIPLASH_LIFT, flat.z);
+		target.hurtMarked = true;
+		Particles.send(world, ParticleTypes.GUST, target.getX(), target.getY(0.5), target.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
 	}
 
 	/** A line of iron-grey dust from {@code from} to {@code to}, the chain. */

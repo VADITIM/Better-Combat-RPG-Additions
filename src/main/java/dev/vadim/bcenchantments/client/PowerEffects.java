@@ -40,8 +40,16 @@ public final class PowerEffects {
 		ECHO("echo", 24, 70),
 		WIND_CHARGED("wind_charged", 16, 70),
 		GRAVITY("gravity", 24, 70),
-		MOMENTUM("momentum", 16, 50),
+		MARKED("marked", 20, 60),
 		RAMPAGING("rampaging", 24, 60),
+		VENOMOUS("venomous", 24, 80),
+		CURSE("curse", 24, 70),
+		PLUNDER("plunder", 24, 60),
+		WITHERING("withering", 24, 70),
+		SHULKER_BURST("shulker_burst", 24, 60),
+		SHARED_PAIN("shared_pain", 20, 60),
+		GUARDIAN_STRIKE("guardian_strike", 20, 60),
+		COPPER_SHOCK("copper_shock", 18, 50),
 		/** The mace's Perfect Hit window; its frames follow the window, not the clock. */
 		PERFECT_HIT("perfect_hit", 6, 25);
 

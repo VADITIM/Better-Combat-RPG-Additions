@@ -1,0 +1,18 @@
+{
+	"description": {
+		"translate": "enchantment.bcenchantments.shulker_burst"
+	},
+	"supported_items": "#bcenchantments:none",
+	"weight": 2,
+	"max_level": 3,
+	"min_cost": {
+		"base": 10,
+		"per_level_above_first": 10
+	},
+	"max_cost": {
+		"base": 60,
+		"per_level_above_first": 10
+	},
+	"anvil_cost": 2,
+	"slots": ["mainhand", "offhand"]
+}

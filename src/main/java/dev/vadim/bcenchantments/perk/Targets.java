@@ -14,13 +14,14 @@ final class Targets {
 	private Targets() {
 	}
 
-	/** Anything living the player's effects may hurt: not the player, their allies or their pets. */
+	/** Anything living the player's effects may hurt: not the player, their allies, their pets or their vexes. */
 	static boolean harmable(ServerPlayer player, LivingEntity target) {
 		return target != player
 			&& target.isAlive()
 			&& !target.isSpectator()
 			&& !target.isAlliedTo(player)
-			&& !(target instanceof TamableAnimal pet && pet.isOwnedBy(player));
+			&& !(target instanceof TamableAnimal pet && pet.isOwnedBy(player))
+			&& !GuardianStrike.guardian(target);
 	}
 
 	/** Hostile mobs within {@code radius} of {@code center}, nearest first, leaving out {@code except}. */

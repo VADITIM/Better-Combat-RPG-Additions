@@ -18,7 +18,8 @@ Better Combat attack request
       └ ComboTracker.endSwing → SwingResult → CombatHooks.onSwing listeners
                                             → charge ChargedPerks → fire → ComboHudPayload to client
 Damage events → CombatHooks.onDirectHit / onKill (Fabric AFTER_DAMAGE / AFTER_DEATH)
-Server tick   → CombatHooks.onServerTick (ColdEdge, Updraft, Shockwave, Control, Impact, Rampaging); Momentum tracks sprinting on its own server tick
+Server tick   → CombatHooks.onServerTick (ColdEdge, Updraft, Shockwave, Control, Impact, Rampaging, Marked, Venomous, Curse, ShulkerBurst, GuardianStrike, Lightning)
+Kill hooks    → CombatHooks.killingBlow() names the damage that made the kill, for powers that care (Gilded Storm, Arc)
 Right click   → client/UpdraftInput (start of client tick) → AirMovePayload → Updraft.start (the air move)
                 While it runs: MinecraftMixin + AttackInteractorMixin drop clicks and swings on the client; PlayerMixin.attack and UseItemCallback refuse them on the server
 ```

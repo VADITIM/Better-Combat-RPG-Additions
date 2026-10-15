@@ -3,6 +3,7 @@ package dev.vadim.bcenchantments.perk;
 import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.combat.SwingResult;
+import dev.vadim.bcenchantments.mob.Adaptation;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -52,6 +53,7 @@ final class ColdEdge {
 		if (level <= 0) {
 			return;
 		}
+		Adaptation.used(swing.player(), swing.weapon(), Perks.COLD_EDGE);
 		if (swing.weapon().is(SWEEPING)) {
 			for (LivingEntity hit : swing.hits()) {
 				chill(hit, level);
@@ -64,12 +66,13 @@ final class ColdEdge {
 	static void onDirectHit(ServerPlayer player, ItemStack weapon, LivingEntity target) {
 		int level = Perks.level(weapon, Perks.COLD_EDGE);
 		if (level > 0) {
+			Adaptation.used(player, weapon, Perks.COLD_EDGE);
 			chill(target, level);
 		}
 	}
 
 	static void chill(LivingEntity target, int level) {
-		if (!target.isAlive()) {
+		if (!target.isAlive() || Adaptation.resists(target, Perks.COLD_EDGE)) {
 			return;
 		}
 		level = Math.min(level, SLOW.length);

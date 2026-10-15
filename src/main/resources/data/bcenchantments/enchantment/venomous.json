@@ -1,9 +1,9 @@
 {
 	"description": {
-		"translate": "enchantment.bcenchantments.momentum"
+		"translate": "enchantment.bcenchantments.venomous"
 	},
 	"supported_items": "#bcenchantments:none",
-	"weight": 3,
+	"weight": 2,
 	"max_level": 3,
 	"min_cost": {
 		"base": 10,

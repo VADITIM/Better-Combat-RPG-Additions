@@ -4,6 +4,7 @@ import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.CombatHooks;
 import dev.vadim.bcenchantments.combat.ComboTracker;
 import dev.vadim.bcenchantments.combat.SwingResult;
+import dev.vadim.bcenchantments.mob.Adaptation;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.particles.ParticleTypes;
@@ -23,7 +24,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
  * plain extra attack. It runs no swing perks of its own, such as Cold Edge, but it counts toward the
  * charge of the hand's other perks like any hit. With {@link Synergy#RESONANCE} the echo also sparks
  * a quarter-power lightning bolt on the swing's target; with {@link Synergy#FRENZY} it echoes every
- * third swing.
+ * third swing; with {@link Synergy#GALE_ECHO} each strike pushes its target back like a small gust.
  */
 public final class Echo implements ChargedPerk {
 	static final Echo INSTANCE = new Echo();
@@ -37,6 +38,8 @@ public final class Echo implements ChargedPerk {
 	/** Share of the swing's damage the echo deals, for levels 1 to 3. */
 	private static final float[] DAMAGE = {0.5F, 0.65F, 0.8F};
 	private static final float RESONANCE_BOLT = 0.25F;
+	/** Gale Echo: the gust's share of a death burst's push. */
+	private static final double GALE_PUSH = 0.6;
 
 	private Echo() {
 	}
@@ -84,18 +87,22 @@ public final class Echo implements ChargedPerk {
 		}
 		ServerLevel world = player.level();
 		List<LivingEntity> struck = new ArrayList<>();
+		boolean gale = Synergy.GALE_ECHO.on(swing.weapon());
 		for (LivingEntity target : swing.hits()) {
 			if (!target.isAlive() || target.level() != world) {
 				continue;
 			}
 			target.invulnerableTime = 0;
-			if (target.hurtServer(world, world.damageSources().playerAttack(player), damage)) {
+			if (target.hurtServer(world, world.damageSources().playerAttack(player), Adaptation.damage(target, Perks.ECHO, damage))) {
 				struck.add(target);
+				if (gale) {
+					WindBurst.gust(player, target, GALE_PUSH);
+				}
 			}
 			Particles.send(world, ParticleTypes.SCULK_CHARGE_POP, target.getX(), target.getY(0.5), target.getZ(), 8, 0.3, 0.4, 0.3, 0.02);
 			Particles.send(world, ParticleTypes.SWEEP_ATTACK, target.getX(), target.getY(0.5), target.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
 		}
-		if (resonance > 0.0F && swing.primary().isAlive()) {
+		if (resonance > 0.0F) {
 			Lightning.strike(player, swing.weapon(), swing.primary(), resonance);
 		}
 		LivingEntity at = swing.primary();

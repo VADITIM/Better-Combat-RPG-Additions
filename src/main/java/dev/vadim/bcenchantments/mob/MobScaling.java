@@ -1,8 +1,7 @@
 package dev.vadim.bcenchantments.mob;
 
 import dev.vadim.bcenchantments.TrimEnchantments;
-import dev.vadim.bcenchantments.progression.Refinement;
-import java.util.List;
+import dev.vadim.bcenchantments.perk.GuardianStrike;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
@@ -19,16 +18,16 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.item.ItemStack;
 
 /**
  * Hidden stat buffs for monsters. Health and damage are rolled per monster; armor and knockback
- * resistance scale with local difficulty and with how strong the nearby players' weapons are, so
- * powered weapons meet sturdier enemies instead of trivialising them. A monster is
+ * resistance scale with local difficulty and with how strong the nearby players' weapons are
+ * ({@link Adaptation}), so powered weapons meet sturdier enemies instead of trivialising them, and
+ * some learn to counter the power a player leans on. A monster is
  * scaled once, the first time it joins the world; the modifiers are permanent, so they are saved with
  * it and mark it as done. Fall damage grows with the added health, so mob farms still kill at the
  * same drop height. Bad Omen on a nearby player adds more on top ({@link Omen}), every bonus is
- * multiplied by where the monster spawns ({@link Place}), and a few monsters spawn as elites or
+ * multiplied by where the monster spawns ({@link Place}, structures included), and a few monsters spawn as elites or
  * captains ({@link Elites}). Monsters that can wear armor may spawn in it, by the spot's tier
  * ({@link MobArmor}).
  */
@@ -45,10 +44,12 @@ public final class MobScaling {
 		ServerEntityEvents.ENTITY_LOAD.register(MobScaling::onLoad);
 		Omen.init();
 		Elites.init();
+		Landmark.init();
+		Adaptation.init();
 	}
 
 	private static void onLoad(Entity entity, ServerLevel world) {
-		if (!(entity instanceof Mob mob) || !(entity instanceof Enemy)) {
+		if (!(entity instanceof Mob mob) || !(entity instanceof Enemy) || GuardianStrike.guardian(entity)) {
 			return;
 		}
 		AttributeInstance maxHealth = mob.getAttribute(Attributes.MAX_HEALTH);
@@ -56,9 +57,10 @@ public final class MobScaling {
 			return;
 		}
 		float difficulty = world.getCurrentDifficultyAt(mob.blockPosition()).getSpecialMultiplier();
-		int power = Math.min(nearbyPower(world, mob), MobBalance.MAX_POWER);
+		double power = Adaptation.strongest(world, mob).power();
 		int omen = nearbyOmen(world, mob);
-		double place = Place.multiplier(world, mob.blockPosition());
+		Place.Spot spot = Place.of(world, mob.blockPosition());
+		double place = spot.multiplier();
 		double rank = Elites.promote(world, mob,
 			(MobBalance.ELITE_CHANCE + MobBalance.ELITE_PER_OMEN * omen + MobBalance.ELITE_PER_POWER * power) * place);
 
@@ -74,7 +76,9 @@ public final class MobScaling {
 		add(mob, Attributes.KNOCKBACK_RESISTANCE, KNOCKBACK_RESISTANCE, AttributeModifier.Operation.ADD_VALUE,
 			(MobBalance.KNOCKBACK_RESISTANCE_BASE + MobBalance.KNOCKBACK_RESISTANCE_PER_DIFFICULTY * difficulty
 				+ MobBalance.KNOCKBACK_RESISTANCE_PER_POWER * power + MobBalance.OMEN_KNOCKBACK_RESISTANCE * omen) * place);
-		MobArmor.equip(world, mob, Place.tier(world, mob.blockPosition(), omen));
+		MobArmor.equip(world, mob, Place.tier(spot, omen));
+		// After Elites, so a countering elite is named "Insulated Frost Zombie".
+		Adaptation.maybeCounter(world, mob);
 		// Keeps the share of health it had, so a fresh spawn starts full and a hurt one stays as hurt.
 		mob.setHealth(healthShare * mob.getMaxHealth());
 	}
@@ -118,27 +122,4 @@ public final class MobScaling {
 		return omen;
 	}
 
-	/**
-	 * The highest weapon power among players near {@code mob}: on what they hold in either hand, the
-	 * trim power levels plus a bonus for each power pair.
-	 */
-	private static int nearbyPower(ServerLevel world, Mob mob) {
-		int power = 0;
-		double radiusSqr = MobBalance.POWER_RADIUS * MobBalance.POWER_RADIUS;
-		for (ServerPlayer player : world.players()) {
-			if (!player.isSpectator() && player.distanceToSqr(mob) <= radiusSqr) {
-				power = Math.max(power, weaponPower(player.getMainHandItem()) + weaponPower(player.getOffhandItem()));
-			}
-		}
-		return power;
-	}
-
-	private static int weaponPower(ItemStack stack) {
-		List<Refinement.Power> powers = Refinement.powersOf(stack);
-		int power = MobBalance.PAIR_POWER * (powers.size() / 2);
-		for (Refinement.Power each : powers) {
-			power += each.level();
-		}
-		return power;
-	}
 }

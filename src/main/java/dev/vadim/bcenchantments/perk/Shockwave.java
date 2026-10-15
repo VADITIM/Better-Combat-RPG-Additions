@@ -2,6 +2,7 @@ package dev.vadim.bcenchantments.perk;
 
 import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.SwingResult;
+import dev.vadim.bcenchantments.mob.Adaptation;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,7 +18,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,7 +29,8 @@ import net.minecraft.world.phys.Vec3;
  * a row that each hit three or more enemies. It cuts through everything in its path once, kicks up
  * the ground it passes over like the Dungeons shockwave, and breaks on walls. With
  * {@link Synergy#TEMPEST} it throws what it hits much harder, and an enemy slammed into a wall takes
- * knockback damage. With {@link Synergy#SINGULARITY} it drags the enemies beside its path into it.
+ * knockback damage. With {@link Synergy#SINGULARITY} it drags the enemies beside its path into it;
+ * with {@link Synergy#THUNDERWAVE} every enemy it cuts is struck by a quarter-power lightning bolt.
  */
 public final class Shockwave implements ChargedPerk {
 	static final Shockwave INSTANCE = new Shockwave();
@@ -55,6 +56,8 @@ public final class Shockwave implements ChargedPerk {
 	private static final double SINGULARITY_RADIUS = 4.0;
 	private static final double SINGULARITY_LEAD = 0.0;
 	private static final double SINGULARITY_PULL = 1.2;
+	/** Thunderwave: share of Lightning's damage each bolt deals. */
+	private static final float THUNDERWAVE = 0.25F;
 
 	private static final class Wave {
 		final ServerPlayer owner;
@@ -67,12 +70,17 @@ public final class Shockwave implements ChargedPerk {
 		final float slam;
 		/** Singularity's pull speed, 0 without it. */
 		final double gravity;
+		/** Thunderwave's bolt damage, 0 without it, and the weapon its bolts come from. */
+		final float thunder;
+		final ItemStack weapon;
 		final Set<Entity> hit = new HashSet<>();
 		Vec3 pos;
 		double travelled;
 
-		Wave(ServerPlayer owner, ServerLevel level, Vec3 pos, Vec3 dir, int enchantLevel, boolean tempest, int gravity) {
+		Wave(ServerPlayer owner, ItemStack weapon, ServerLevel level, Vec3 pos, Vec3 dir, int enchantLevel, boolean tempest, int gravity) {
 			this.owner = owner;
+			this.weapon = weapon;
+			this.thunder = Synergy.THUNDERWAVE.on(weapon) ? Lightning.damage(Perks.level(weapon, Perks.LIGHTNING)) * THUNDERWAVE : 0.0F;
 			this.level = level;
 			this.pos = pos;
 			this.dir = dir;
@@ -118,10 +126,10 @@ public final class Shockwave implements ChargedPerk {
 	@Override
 	public void fire(SwingResult swing, int level) {
 		int gravity = Synergy.SINGULARITY.on(swing.weapon()) ? Perks.level(swing.weapon(), Perks.GRAVITY) : 0;
-		launch(swing.player(), level, Synergy.TEMPEST.on(swing.weapon()), gravity);
+		launch(swing.player(), swing.weapon().copy(), level, Synergy.TEMPEST.on(swing.weapon()), gravity);
 	}
 
-	private static void launch(ServerPlayer player, int level, boolean tempest, int gravity) {
+	private static void launch(ServerPlayer player, ItemStack weapon, int level, boolean tempest, int gravity) {
 		level = Math.min(level, DAMAGE.length);
 		ServerLevel world = player.level();
 		Vec3 look = player.getLookAngle();
@@ -133,7 +141,7 @@ public final class Shockwave implements ChargedPerk {
 		}
 		dir = dir.normalize();
 		Vec3 start = player.position().add(0.0, HEIGHT, 0.0).add(dir.scale(0.6));
-		WAVES.add(new Wave(player, world, start, dir, level, tempest, gravity));
+		WAVES.add(new Wave(player, weapon, world, start, dir, level, tempest, gravity));
 
 		world.playSound((Entity) null, start.x, start.y, start.z, SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 0.6F);
 		world.playSound((Entity) null, start.x, start.y, start.z, SoundEvents.TRIDENT_RIPTIDE_1, SoundSource.PLAYERS, 0.7F, 1.4F);
@@ -170,8 +178,11 @@ public final class Shockwave implements ChargedPerk {
 			for (LivingEntity target : wave.level.getEntitiesOfClass(LivingEntity.class, box, e -> canHit(wave, e))) {
 				wave.hit.add(target);
 				target.invulnerableTime = 0;
-				target.hurtServer(wave.level, wave.level.damageSources().playerAttack(wave.owner), wave.damage);
-				if (wave.slam > 0.0F) {
+				boolean countered = Adaptation.resists(target, Perks.SHOCKWAVE);
+				target.hurtServer(wave.level, wave.level.damageSources().playerAttack(wave.owner), countered ? Adaptation.reduced(wave.damage) : wave.damage);
+				if (countered) {
+					// Braced: it takes the cut but holds its ground.
+				} else if (wave.slam > 0.0F) {
 					target.setDeltaMovement(wave.dir.x * TEMPEST_PUSH, TEMPEST_LIFT, wave.dir.z * TEMPEST_PUSH);
 					Impact.track(target, wave.owner, wave.slam, TEMPEST_TRACK_TICKS);
 				} else {
@@ -179,6 +190,9 @@ public final class Shockwave implements ChargedPerk {
 				}
 				target.hurtMarked = true;
 				Particles.send(wave.level, ParticleTypes.CRIT, target.getX(), target.getY(0.5), target.getZ(), 4, 0.3, 0.3, 0.3, 0.3);
+				if (wave.thunder > 0.0F) {
+					Lightning.strike(wave.owner, wave.weapon, target, wave.thunder);
+				}
 			}
 
 			if (wave.gravity > 0.0) {
@@ -195,12 +209,7 @@ public final class Shockwave implements ChargedPerk {
 	}
 
 	private static boolean canHit(Wave wave, LivingEntity target) {
-		return target != wave.owner
-			&& target.isAlive()
-			&& !target.isSpectator()
-			&& !wave.hit.contains(target)
-			&& !target.isAlliedTo(wave.owner)
-			&& !(target instanceof TamableAnimal pet && pet.isOwnedBy(wave.owner));
+		return !wave.hit.contains(target) && Targets.harmable(wave.owner, target);
 	}
 
 	private static void draw(Wave wave) {

@@ -810,7 +810,7 @@ final class Designer extends JComponent {
 			host.message("Select something first: click it.");
 			return;
 		}
-		if (p.id().equals("panel.box") || p.id().equals("guide.box")) {
+		if (Edits.window(p)) {
 			host.message("The window itself can't be removed; recolour it from the right-click menu.");
 			return;
 		}
@@ -925,7 +925,7 @@ final class Designer extends JComponent {
 					host.message("Removed every " + kind + " row. Removed in the toolbar brings them back.");
 				});
 			}
-		} else if (!p.id().equals("panel.box") && !p.id().equals("guide.box")) {
+		} else if (!Edits.window(p)) {
 			if (p.ref() != null && added == null) {
 				item(m, "Remove from this row" + (only ? "   Del" : ""), () -> host.message(edits.remove(p, true)));
 			}

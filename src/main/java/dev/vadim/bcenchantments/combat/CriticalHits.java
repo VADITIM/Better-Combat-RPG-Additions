@@ -2,6 +2,7 @@ package dev.vadim.bcenchantments.combat;
 
 import dev.vadim.bcenchantments.TrimEnchantments;
 import dev.vadim.bcenchantments.network.CritRollPayload;
+import dev.vadim.bcenchantments.weapon.SpearStyle;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -67,8 +69,15 @@ public final class CriticalHits {
 			double chance = baseChance(item);
 			ItemAttributeModifiers modifiers = item.components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 			ItemAttributeModifiers.Builder rebuilt = ItemAttributeModifiers.builder();
+			boolean spear = BuiltInRegistries.ITEM.getKey(item).getPath().endsWith("_spear");
 			for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
-				rebuilt.add(entry.attribute(), entry.modifier(), entry.slot(), entry.display());
+				AttributeModifier modifier = entry.modifier();
+				// Every spear swings at the same speed; only damage sets the materials apart.
+				if (spear && entry.matches(Attributes.ATTACK_SPEED, Item.BASE_ATTACK_SPEED_ID)) {
+					modifier = new AttributeModifier(Item.BASE_ATTACK_SPEED_ID,
+						SpearStyle.ATTACK_SPEED - Attributes.ATTACK_SPEED.value().getDefaultValue(), modifier.operation());
+				}
+				rebuilt.add(entry.attribute(), modifier, entry.slot(), entry.display());
 			}
 			// The default tooltip line would read "+0.1"; this one reads as a percentage, like the weapon's other stats.
 			rebuilt.add(CRITICAL_CHANCE, new AttributeModifier(WEAPON_CHANCE, chance, AttributeModifier.Operation.ADD_VALUE),

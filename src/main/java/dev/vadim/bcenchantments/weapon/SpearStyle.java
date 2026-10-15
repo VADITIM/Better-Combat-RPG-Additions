@@ -35,6 +35,9 @@ public final class SpearStyle implements WeaponStyle {
 	/** Every stab is this much faster than the cooldowns above (+75%). */
 	private static final float SPEED = 1.75F;
 
+	/** Every spear's attack speed, whatever its material: the copper spear's, rounded up. */
+	public static final double ATTACK_SPEED = 1.2;
+
 	/** The heavy thrust's knockback, relative to a normal hit's. */
 	private static final double HEAVY_KNOCKBACK = 2.2;
 

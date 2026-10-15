@@ -2,6 +2,7 @@ package dev.vadim.bcenchantments.perk;
 
 import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.SwingResult;
+import dev.vadim.bcenchantments.mob.Adaptation;
 import java.util.function.Predicate;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -25,6 +26,8 @@ public final class Gravity {
 	/** Pull radius around the target and pull speed for levels 1 to 3. */
 	private static final double[] RADIUS = {3.0, 4.0, 5.0};
 	private static final double[] PULL = {0.35, 0.45, 0.55};
+	/** Share of that pull a plain landed swing uses; the synergies pull with the full one. */
+	private static final double SWING_SHARE = 0.5;
 	/** Enemies closer than this stay where they are, so a pull never stacks them inside the target. */
 	private static final double MIN_DISTANCE = 1.2;
 
@@ -37,7 +40,8 @@ public final class Gravity {
 			return;
 		}
 		LivingEntity target = swing.primary();
-		pull(swing.player(), target.position(), RADIUS[level - 1], PULL[level - 1], enemy -> enemy == target, true);
+		Adaptation.used(swing.player(), swing.weapon(), Perks.GRAVITY);
+		pull(swing.player(), target.position(), RADIUS[level - 1], PULL[level - 1] * SWING_SHARE, enemy -> enemy == target, true);
 	}
 
 	private static int level(SwingResult swing) {
@@ -71,7 +75,7 @@ public final class Gravity {
 	/** Drags {@code enemy} toward {@code center} at {@code speed}; false if it is already there. */
 	private static boolean drag(ServerLevel world, LivingEntity enemy, Vec3 center, double speed) {
 		Vec3 toward = center.subtract(enemy.position()).multiply(1.0, 0.0, 1.0);
-		if (toward.lengthSqr() < MIN_DISTANCE * MIN_DISTANCE) {
+		if (toward.lengthSqr() < MIN_DISTANCE * MIN_DISTANCE || Adaptation.resists(enemy, Perks.GRAVITY)) {
 			return false;
 		}
 		Vec3 motion = toward.normalize().scale(speed);

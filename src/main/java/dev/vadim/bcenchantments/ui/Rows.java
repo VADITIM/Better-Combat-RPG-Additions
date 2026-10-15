@@ -413,6 +413,40 @@ public final class Rows {
 		}
 	}
 
+	// ---- Difficulty panel ----
+
+	/** Weapons side by side, each with what it adds beside it, as many as fit the width. */
+	public record Weapons(List<ItemRef> items, List<Rich> values) implements Row {
+		@Override
+		public String kind() {
+			return "weapons";
+		}
+
+		@Override
+		public int height(Ctx c, int width) {
+			return c.num("weapons.slot", "size", 18) + 1;
+		}
+
+		@Override
+		public void draw(Ctx c, int x, int y, int width) {
+			int gap = c.num("weapons", "gap", 6);
+			int textGap = c.num("weapons", "text_gap", 2);
+			Ctx.Tx style = tx("body");
+			int cx = x;
+			for (int i = 0; i < items.size(); i++) {
+				Rich value = values.get(i);
+				int size = c.num("weapons.slot", "size", 18);
+				int need = size + textGap + c.width("weapons.value", value, style);
+				if (cx + need > x + width) {
+					break;
+				}
+				c.slot("weapons.slot", items.get(i), cx, y);
+				c.text("weapons.value", value, cx + size + textGap, y + (size - c.line()) / 2 + 1, style);
+				cx += need + gap;
+			}
+		}
+	}
+
 	// ---- Field Guide ----
 
 	/** A wrapped paragraph in body text. */

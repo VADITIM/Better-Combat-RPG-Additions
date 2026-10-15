@@ -36,7 +36,15 @@ final class Edits {
 	/** Whether dragging {@code p} moves it: not a row, the window itself, the scroll bar or the cost tip. */
 	static boolean movable(Ctx.Part p) {
 		String id = p.id();
-		return !p.kind().equals("row") && !id.equals("panel.box") && !id.equals("guide.box") && !id.startsWith("scroll.") && !id.startsWith("tip.");
+		return !p.kind().equals("row") && !window(p) && !id.startsWith("scroll.") && !id.startsWith("tip.");
+	}
+
+	/** Whether {@code p} is a view's window itself, which can be recoloured but not moved or removed. */
+	static boolean window(Ctx.Part p) {
+		return switch (p.id()) {
+			case "panel.box", "guide.box", "difficulty.box" -> true;
+			default -> false;
+		};
 	}
 
 	/** The key for {@code p}'s offset along {@code axis}: its own, or with {@code only} the one for it in its row. */

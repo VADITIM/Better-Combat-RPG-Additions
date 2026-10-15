@@ -5,7 +5,6 @@ import dev.vadim.bcenchantments.combat.CombatHooks;
 import dev.vadim.bcenchantments.progression.Refinement;
 import java.util.List;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.ResourceKey;
@@ -28,24 +27,24 @@ public final class Perks {
 	public static final ResourceKey<Enchantment> ECHO = key("echo");
 	public static final ResourceKey<Enchantment> WIND_CHARGED = key("wind_charged");
 	public static final ResourceKey<Enchantment> GRAVITY = key("gravity");
-	public static final ResourceKey<Enchantment> MOMENTUM = key("momentum");
+	public static final ResourceKey<Enchantment> MARKED = key("marked");
 	public static final ResourceKey<Enchantment> RAMPAGING = key("rampaging");
-	// Designed, not built yet: their trims are refused until they are (Refinement.Perk#built).
-	public static final ResourceKey<Enchantment> VENOM = key("venom");
-	public static final ResourceKey<Enchantment> SANDSTORM = key("sandstorm");
+	public static final ResourceKey<Enchantment> VENOMOUS = key("venomous");
+	public static final ResourceKey<Enchantment> CURSE = key("curse");
 	public static final ResourceKey<Enchantment> PLUNDER = key("plunder");
 	public static final ResourceKey<Enchantment> WITHERING = key("withering");
-	public static final ResourceKey<Enchantment> PHASE = key("phase");
+	public static final ResourceKey<Enchantment> SHULKER_BURST = key("shulker_burst");
 	public static final ResourceKey<Enchantment> SHARED_PAIN = key("shared_pain");
-	public static final ResourceKey<Enchantment> GUARDING_STRIKE = key("guarding_strike");
-	public static final ResourceKey<Enchantment> DAZE = key("daze");
+	public static final ResourceKey<Enchantment> GUARDIAN_STRIKE = key("guardian_strike");
+	public static final ResourceKey<Enchantment> COPPER_SHOCK = key("copper_shock");
 
 	/** Every built perk, for anything that weighs how strong a weapon is. */
 	public static final List<ResourceKey<Enchantment>> ALL = List.of(LIGHTNING, SHOCKWAVE, COLD_EDGE, UPPERCUT, CHAINS, ECHO, WIND_CHARGED,
-		GRAVITY, MOMENTUM, RAMPAGING);
+		GRAVITY, MARKED, RAMPAGING, VENOMOUS, CURSE, PLUNDER, WITHERING, SHULKER_BURST, SHARED_PAIN, GUARDIAN_STRIKE, COPPER_SHOCK);
 
 	/** Perks that charge up over a combo, in the order the HUD shows their rows. Both sides index into this list. */
-	public static final List<ChargedPerk> CHARGED = List.of(Lightning.INSTANCE, Shockwave.INSTANCE, Chains.INSTANCE, Echo.INSTANCE);
+	public static final List<ChargedPerk> CHARGED = List.of(Lightning.INSTANCE, Shockwave.INSTANCE, Chains.INSTANCE, Echo.INSTANCE,
+		Withering.INSTANCE, ShulkerBurst.INSTANCE);
 
 	private Perks() {
 	}
@@ -63,13 +62,33 @@ public final class Perks {
 		CombatHooks.onKill(WindCharged::onKill);
 		CombatHooks.onKill(Lightning::onKill);
 		CombatHooks.onSwing(Gravity::onSwing);
-		// After Uppercut, which reads the run-up this spends.
-		CombatHooks.onSwing(Momentum::onSwing);
-		CombatHooks.onKill(Momentum::onKill);
-		ServerTickEvents.END_SERVER_TICK.register(Momentum::tick);
+		// After Uppercut, which reads the mark this spends.
+		CombatHooks.onSwing(Marked::onSwing);
+		CombatHooks.onDirectHit(Marked::onDirectHit);
+		CombatHooks.onKill(Marked::onKill);
+		CombatHooks.onServerTick(Marked::tick);
 		CombatHooks.onKill(Rampaging::onKill);
 		CombatHooks.onServerTick(Rampaging::tick);
+		CombatHooks.onSwing(Venomous::onSwing);
+		CombatHooks.onDirectHit(Venomous::onDirectHit);
+		CombatHooks.onServerTick(Venomous::tick);
+		CombatHooks.onSwing(Curse::onSwing);
+		CombatHooks.onDirectHit(Curse::onDirectHit);
+		CombatHooks.onServerTick(Curse::tick);
+		CombatHooks.onKill(Plunder::onKill);
+		CombatHooks.onServerTick(ShulkerBurst::tick);
+		ServerLivingEntityEvents.AFTER_DAMAGE.register(ShulkerBurst::afterDamage);
+		CombatHooks.onKill(GuardianStrike::onKill);
+		CombatHooks.onServerTick(GuardianStrike::tick);
+		ServerLivingEntityEvents.ALLOW_DAMAGE.register(GuardianStrike::allowDamage);
+		ServerLivingEntityEvents.AFTER_DAMAGE.register(GuardianStrike::afterDamage);
+		CombatHooks.onSwing(CopperShock::onSwing);
+		CombatHooks.onDirectHit(CopperShock::onDirectHit);
+		CombatHooks.onKill(SharedPain::onKill);
+		ServerLivingEntityEvents.ALLOW_DAMAGE.register(SharedPain::beforeDamage);
+		ServerLivingEntityEvents.AFTER_DAMAGE.register(SharedPain::afterDamage);
 		ServerLivingEntityEvents.AFTER_DAMAGE.register(MaceTempest::afterDamage);
+		CombatHooks.onServerTick(Lightning::tick);
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) ->
 			!(entity instanceof ServerPlayer player && (Updraft.forgivesFall(player, source) || Uppercut.forgivesFall(player, source))));
 	}

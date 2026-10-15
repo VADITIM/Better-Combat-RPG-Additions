@@ -2,6 +2,7 @@ package dev.vadim.bcenchantments.perk;
 
 import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.combat.SwingResult;
+import dev.vadim.bcenchantments.mob.Adaptation;
 import dev.vadim.bcenchantments.weapon.WeaponStyles;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -52,16 +53,21 @@ public final class Uppercut {
 			return;
 		}
 		ServerLevel world = player.level();
+		Adaptation.used(player, swing.weapon(), Perks.UPPERCUT);
 		boolean updraft = Synergy.UPDRAFT.on(swing.weapon());
 		// Updraft sends the player up on its own; Launch only follows the targets without it.
-		double speed = Momentum.launch(player, swing.weapon(), LAUNCH[level - 1], !updraft);
+		double speed = Marked.launch(player, swing.weapon(), swing.primary(), LAUNCH[level - 1], !updraft);
 		for (LivingEntity target : swing.hits()) {
+			if (Adaptation.resists(target, Perks.UPPERCUT)) {
+				continue;
+			}
 			if (updraft) {
 				target.setDeltaMovement(0.0, speed, 0.0);
 				target.hurtMarked = true;
 			} else {
 				launch(target, speed);
 			}
+			Lightning.skybreaker(player, swing.weapon(), target);
 			Particles.send(world, ParticleTypes.POOF, target.getX(), target.getY(), target.getZ(), 6, 0.3, 0.05, 0.3, 0.02);
 			Particles.send(world, ParticleTypes.CRIT, target.getX(), target.getY(0.5), target.getZ(), 8, 0.2, 0.4, 0.2, 0.25);
 		}

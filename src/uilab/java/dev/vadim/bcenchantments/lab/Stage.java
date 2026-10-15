@@ -1,6 +1,7 @@
 package dev.vadim.bcenchantments.lab;
 
 import dev.vadim.bcenchantments.ui.Ctx;
+import dev.vadim.bcenchantments.ui.DifficultyView;
 import dev.vadim.bcenchantments.ui.GuideView;
 import dev.vadim.bcenchantments.ui.ItemRef;
 import dev.vadim.bcenchantments.ui.Rich;
@@ -14,11 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The fake game screen: Minecraft's dimmed background, the smithing table with its two buttons, or the
- * Field Guide, drawn through the same shared code as the mod. Holds the state a click changes.
+ * The fake game screen: Minecraft's dimmed background, the smithing table with its two buttons, the
+ * Field Guide, or the inventory with the difficulty panel above it, drawn through the same shared code as the mod. Holds the state a click changes.
  */
 final class Stage {
 	static final int TABLE_SLOT_Y = 48;
+	static final int INVENTORY_WIDTH = 176;
+	static final int INVENTORY_HEIGHT = 166;
 
 	final Assets assets;
 	final McFont font;
@@ -29,9 +32,13 @@ final class Stage {
 	final Ctx ctx;
 	final Scenarios.State state = new Scenarios.State();
 	final List<Scenarios.Smithing> tables;
+	final List<Scenarios.Difficulty> inventories;
 
 	/** The view on show: a smithing setup by index, or -1 for the Field Guide. */
 	int view;
+	/** The inventory on show, by index, over {@link #view}; -1 when none is. */
+	int inventory = -1;
+	final SmithingView.Scroll inventoryScroll = new SmithingView.Scroll();
 	boolean panelOpen = true;
 	boolean showTable = true;
 	long enterAt;
@@ -56,18 +63,29 @@ final class Stage {
 		this.canvas = new Canvas2D(assets, font);
 		this.scenarios = new Scenarios(lang);
 		this.tables = scenarios.smithing();
+		this.inventories = scenarios.difficulty();
 		this.ctx = new Ctx(canvas, sheet);
 		this.ctx.record = true;
 		this.view = 2;
 	}
 
 	boolean guide() {
-		return view < 0;
+		return inventory < 0 && view < 0;
 	}
 
-	/** The view on show as {@link dev.vadim.bcenchantments.ui.Layout} names it: {@code panel} or {@code guide.<tab>}. */
+	/** Whether the inventory with its difficulty panel is on show. */
+	boolean inventory() {
+		return inventory >= 0;
+	}
+
+	/** Where the inventories start in the view picker: after the smithing setups and the four guide tabs. */
+	int firstInventory() {
+		return tables.size() + 4;
+	}
+
+	/** The view on show as {@link dev.vadim.bcenchantments.ui.Layout} names it: {@code panel}, {@code guide.<tab>} or {@code difficulty}. */
 	String viewName() {
-		return guide() ? "guide." + state.tab : "panel";
+		return inventory() ? "difficulty" : guide() ? "guide." + state.tab : "panel";
 	}
 
 	void replay(long now) {
@@ -76,8 +94,18 @@ final class Stage {
 		tabAt = now;
 	}
 
-	/** Shows smithing setup {@code index}, or Field Guide tab {@code index - setups} from there on. */
+	/** Shows smithing setup {@code index}, Field Guide tab {@code index - setups} from there on, then the inventories. */
 	void select(int index, long now) {
+		if (index >= firstInventory()) {
+			int pick = Math.min(inventories.size() - 1, index - firstInventory());
+			if (pick != inventory) {
+				inventory = pick;
+				inventoryScroll.value = 0;
+			}
+			replay(now);
+			return;
+		}
+		inventory = -1;
 		if (index >= tables.size()) {
 			if (!guide()) {
 				view = -1 - view;
@@ -103,7 +131,7 @@ final class Stage {
 
 	/** The index {@link #select} would take to show what is on screen now. */
 	int selected() {
-		return guide() ? tables.size() + state.tab : view;
+		return inventory() ? firstInventory() + inventory : guide() ? tables.size() + state.tab : view;
 	}
 
 	private static float easeOut(float t) {
@@ -125,7 +153,9 @@ final class Stage {
 		ctx.begin(mx, my);
 		panelBounds = null;
 		rowsView = null;
-		if (guide()) {
+		if (inventory()) {
+			inventory(g, now);
+		} else if (guide()) {
 			float alpha = easeOut((now - enterAt) / 350.0F);
 			float switched = easeOut((now - tabAt) / 250.0F);
 			rowsView = GuideView.draw(ctx, guiWidth, guiHeight, scenarios.guideTitle(), scenarios.guideHint(), scenarios.tabLabels(), state.tab, this::selectTab,
@@ -189,6 +219,27 @@ final class Stage {
 		}
 	}
 
+	/** The survival inventory, centred, with the sample's weapons on its hotbar and the difficulty panel above it. */
+	private void inventory(Graphics2D g, long now) {
+		Scenarios.Difficulty sc = inventories.get(inventory);
+		tableLeft = (guiWidth - INVENTORY_WIDTH) / 2;
+		tableTop = (guiHeight - INVENTORY_HEIGHT) / 2;
+		if (showTable) {
+			BufferedImage texture = assets.image("textures/gui/container/inventory.png");
+			if (texture != null) {
+				g.drawImage(texture.getSubimage(0, 0, INVENTORY_WIDTH, INVENTORY_HEIGHT), tableLeft, tableTop, null);
+			}
+			for (int i = 0; i < sc.hotbar().size(); i++) {
+				slotItem(sc.hotbar().get(i), 8 + 18 * i, 142);
+			}
+			font.draw(g, lang.raw("container.crafting"), tableLeft + 97, tableTop + 8, 0xFF404040, false);
+		}
+		int[] bounds = new int[4];
+		rowsView = DifficultyView.draw(ctx, sc.rows().get(), guiWidth, tableLeft, tableTop, INVENTORY_WIDTH, easeOut((now - enterAt) / 350.0F),
+			inventoryScroll, bounds);
+		panelBounds = rowsView == null ? null : bounds;
+	}
+
 	private void slotItem(ItemRef item, int x, int y) {
 		if (item != null && !item.empty()) {
 			canvas.item(item, tableLeft + x, tableTop + y);
@@ -235,7 +286,7 @@ final class Stage {
 
 	/** What a click at ({@code x}, {@code y}) does, as the game would do it; true if it hit something. */
 	boolean click(int x, int y, long now) {
-		if (!guide() && showTable) {
+		if (!guide() && !inventory() && showTable) {
 			int bx = tableLeft + SmithingView.TABLE_WIDTH + 4;
 			if (x >= bx && x < bx + 20 && y >= tableTop && y < tableTop + 20) {
 				panelOpen = !panelOpen;
@@ -272,7 +323,7 @@ final class Stage {
 	}
 
 	void scroll(int x, int y, double amount) {
-		SmithingView.Scroll s = guide() ? guideScroll[state.tab] : scroll;
+		SmithingView.Scroll s = inventory() ? inventoryScroll : guide() ? guideScroll[state.tab] : scroll;
 		boolean inside = guide() || panelBounds != null && x >= panelBounds[0] && x < panelBounds[2] && y >= panelBounds[1] && y < panelBounds[3];
 		if (inside) {
 			s.value = Math.max(0.0F, Math.min(s.max, s.value - (float) amount * 20));

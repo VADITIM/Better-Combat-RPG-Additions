@@ -42,7 +42,7 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 
 /**
- * The UI lab: the smithing panel and the Field Guide drawn by the mod's own code, with Minecraft's font and
+ * The UI lab: the smithing panel, the Field Guide and the inventory's difficulty panel drawn by the mod's own code, with Minecraft's font and
  * textures, no game needed, and edited in place: select, drag, reorder, reword, recolour, add and remove on
  * the screen itself ({@link Designer}). Ctrl+S writes {@code style.json} and the lang file, which the next
  * build ships.
@@ -169,6 +169,9 @@ public final class Lab {
 			System.out.println("Wrote " + shot + " (" + w + "x" + h + " at scale " + scale + ")");
 			return;
 		}
+		if (view >= 0) {
+			stage.select(view, now - 10_000);
+		}
 		boolean smoke = smokeTest;
 		String windowShot = windowShotPath;
 		darkMode();
@@ -267,7 +270,10 @@ public final class Lab {
 		BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		long now = System.currentTimeMillis();
 		List<String> expansions = List.of("", "cold_edge");
-		for (int view = 0; view <= stage.tables.size(); view++) {
+		for (int view = 0; view < stage.firstInventory() + stage.inventories.size(); view++) {
+			if (view > stage.tables.size() && view < stage.firstInventory()) {
+				continue; // The guide's tabs are all drawn from its first entry.
+			}
 			stage.select(view, now - 10_000);
 			for (String expansion : expansions) {
 				for (int tab = 0; tab < (view == stage.tables.size() ? 4 : 1); tab++) {
@@ -309,6 +315,9 @@ public final class Lab {
 		}
 		for (Rich tab : stage.scenarios.tabLabels()) {
 			views.addItem("Field Guide: " + tab.plain());
+		}
+		for (Scenarios.Difficulty d : stage.inventories) {
+			views.addItem("Inventory difficulty: " + d.name());
 		}
 		views.setMaximumRowCount(16);
 		views.setSelectedIndex(stage.selected());

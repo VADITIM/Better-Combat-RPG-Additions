@@ -32,6 +32,15 @@ Fall damage must be scaled by the health that was added (`MobScaling.fallDamage`
 **A monster that rolled exactly 0 bonus health is scaled again on every load.**
 The scaled marker is the health modifier, and `add` skips zero amounts. A double roll of exactly 0 is practically impossible.
 
+**The client can't see structures.**
+Structure starts live only on the server, so `Place.of` takes the `Landmark` as an argument: the server looks it up (`Landmark.at`), the client uses the one `LandmarkPayload` last sent (every 10 ticks, on change). Monsters already scaled before a structure's tag changed keep their old numbers.
+
+**Counting power fires changes the held stack.**
+`Adaptation.used` writes `bcenchantments:power_usage` on the weapon in the hand mid-fight. `ItemInHandRendererMixin` keeps that from playing the hand's swap animation; the attack cooldown is safe because vanilla resets it only for a different item. A new power must call `Adaptation.used` where it goes off and `Adaptation.resists` (or `damage`) where it touches a target, or it is never adapted to or countered.
+
+**Landmarks count pieces, not the structure's whole box.**
+`getStructureWithPieceAt` checks piece bounding boxes, so the open ground between a mansion's walls or around a monument's outline is not inside. Overlaps go to the hardest landmark (the enum is ordered hardest first).
+
 ## Build and tooling
 
 **A static `init()` in a `Screen` subclass fails to compile.**

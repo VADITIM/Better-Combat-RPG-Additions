@@ -237,16 +237,16 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		ECHO(Perks.ECHO, true),
 		WIND_CHARGED(Perks.WIND_CHARGED, true),
 		GRAVITY(Perks.GRAVITY, true),
-		MOMENTUM(Perks.MOMENTUM, true),
+		MARKED(Perks.MARKED, true),
 		RAMPAGING(Perks.RAMPAGING, true),
-		VENOM(Perks.VENOM, false),
-		SANDSTORM(Perks.SANDSTORM, false),
-		PLUNDER(Perks.PLUNDER, false),
-		WITHERING(Perks.WITHERING, false),
-		PHASE(Perks.PHASE, false),
-		SHARED_PAIN(Perks.SHARED_PAIN, false),
-		GUARDING_STRIKE(Perks.GUARDING_STRIKE, false),
-		DAZE(Perks.DAZE, false);
+		VENOMOUS(Perks.VENOMOUS, true),
+		CURSE(Perks.CURSE, true),
+		PLUNDER(Perks.PLUNDER, true),
+		WITHERING(Perks.WITHERING, true),
+		SHULKER_BURST(Perks.SHULKER_BURST, true),
+		SHARED_PAIN(Perks.SHARED_PAIN, true),
+		GUARDIAN_STRIKE(Perks.GUARDIAN_STRIKE, true),
+		COPPER_SHOCK(Perks.COPPER_SHOCK, true);
 
 		final ResourceKey<Enchantment> enchantment;
 		final boolean built;
@@ -292,19 +292,19 @@ public record Refinement(int level, int gems, int cost, float damage, float atta
 		Map.entry("tide", Perk.COLD_EDGE),
 		Map.entry("silence", Perk.ECHO),
 		Map.entry("ward", Perk.SHOCKWAVE),
-		Map.entry("vex", Perk.CHAINS),
+		Map.entry("sentry", Perk.CHAINS),
 		Map.entry("eye", Perk.GRAVITY),
-		Map.entry("wayfinder", Perk.MOMENTUM),
+		Map.entry("wayfinder", Perk.MARKED),
 		Map.entry("snout", Perk.RAMPAGING),
 		Map.entry("raiser", Perk.UPPERCUT),
-		Map.entry("wild", Perk.VENOM),
-		Map.entry("dune", Perk.SANDSTORM),
+		Map.entry("wild", Perk.VENOMOUS),
+		Map.entry("dune", Perk.CURSE),
 		Map.entry("coast", Perk.PLUNDER),
 		Map.entry("rib", Perk.WITHERING),
-		Map.entry("spire", Perk.PHASE),
+		Map.entry("spire", Perk.SHULKER_BURST),
 		Map.entry("host", Perk.SHARED_PAIN),
-		Map.entry("sentry", Perk.GUARDING_STRIKE),
-		Map.entry("shaper", Perk.DAZE)
+		Map.entry("vex", Perk.GUARDIAN_STRIKE),
+		Map.entry("shaper", Perk.COPPER_SHOCK)
 	);
 	/** The powers a shield can take from a trim, each working on a blocked hit; see {@code ShieldPowers}. */
 	private static final Set<Perk> SHIELD_PERKS = EnumSet.of(Perk.WIND_CHARGED, Perk.COLD_EDGE);

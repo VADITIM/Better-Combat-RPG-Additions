@@ -1,5 +1,6 @@
 package dev.vadim.bcenchantments.combat;
 
+import dev.vadim.bcenchantments.mob.Adaptation;
 import dev.vadim.bcenchantments.network.ComboHudPayload;
 import dev.vadim.bcenchantments.perk.ChargedPerk;
 import dev.vadim.bcenchantments.perk.Perks;
@@ -193,6 +194,19 @@ public final class ComboTracker {
 		sync(player, streak, hand.isOffHand(), charge(own, extra, source));
 	}
 
+	/**
+	 * Adds {@code amount} to {@code perk}'s charge on the hand of {@code swing}, from a swing effect. The swing's
+	 * own charging runs right after the swing effects, so a charge this fills fires with that swing.
+	 */
+	public static void addCharge(SwingResult swing, ChargedPerk perk, int amount) {
+		Streak streak = STREAKS.computeIfAbsent(swing.player(), p -> new Streak());
+		int index = Perks.CHARGED.indexOf(perk);
+		if (index >= 0) {
+			HandStreak own = swing.hand().isOffHand() ? streak.offHand : streak.mainHand;
+			own.charges[index] += amount;
+		}
+	}
+
 	/** Advances every charged perk but {@code skip} by {@code swing}, fires the full ones and returns their bits. */
 	private static int charge(HandStreak own, SwingResult swing, ChargedPerk skip) {
 		int fired = 0;
@@ -210,6 +224,7 @@ public final class ComboTracker {
 			if (own.charges[i] >= perk.required(swing.weapon(), own.attacks)) {
 				own.charges[i] = 0;
 				perk.fire(swing, level);
+				Adaptation.used(swing.player(), swing.weapon(), perk.enchantment());
 				fired |= 1 << i;
 			}
 		}

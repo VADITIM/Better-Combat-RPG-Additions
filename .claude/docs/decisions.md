@@ -2,6 +2,23 @@
 
 Shipped work and why it was built this way, newest first. Dates are when it was decided.
 
+## 2026-10-15 (batch 2: Wind Charged's combinations)
+
+- **The review's changes were taken as written:** Toxic Gust poisons for 1.5 s, Hexwind curses 40% of what it catches, Windfall makes 25% of a Plunder kill's drops charge and burst (2 damage) instead of blowing loot to the player, Shrapnel bursts the monsters the overkill reaches (4 damage) instead of adding the overkill to the death burst, and Spark Burst zaps one enemy per pushed enemy instead of a full pulse.
+- **Shrapnel kills pass nothing on,** like overkill kills, so a burst cannot run through a crowd.
+- **Gale Echo and Shulker Gust share one small-gust push** (`WindBurst.gust`), at 60% and 80% of a death burst's push; a Wind Charged counter (Anchored) ignores it, and Whiplash's yank too.
+
+## 2026-10-15 (batch 1: all 18 powers, Lightning's combinations)
+
+- **The review page is the design target.** Combinations are built in batches, one power's 17 at a time; Lightning went first. Planned combinations and their review notes live in `POWERS.md`.
+- **Marked replaces Momentum** (wayfinder): a point-blank hit (2.5 blocks) marks for 5 s, the next point-blank hit spends it for ×1.5 / 2 / 2.5 as a second hit. Launch and Blast Step now read the mark instead of a run-up.
+- **Seven powers built:** Venomous, Curse, Plunder, Withering, Shulker Burst, Guardian Strike, Copper Shock. Vex grants Guardian Strike and sentry Chains, so the vex trim matches the summoned vex.
+- **Shared Pain no longer chains:** 1 / 2 / 3 nearest monsters within 3 blocks each take the whole overkill, and a kill by it passes nothing on (needed for Jackpot's planned Streak).
+- **Plunder converts 10% of the items left on the ground after 7 s,** not all of them, to keep emeralds scarce; the review notes on Mugging, Shakedown and Treasure Guard still threaten that.
+- **Summoned vexes lose their own targeting** (`MobAccessor`), hunt monsters within 12 blocks of their owner, take no damage from any player and are skipped by monster scaling and by the player's own area powers.
+- **Gravity's own pull halved** (a plain swing pulls with half; Singularity, Black Hole and Cyclone keep the full pull) and **Lightning Rod pulls at 150%**. A Lightning Rod bolt whose target dies during the pull goes to the nearest enemy where it stood.
+- **Withering and Shulker Burst count enemies hit, not swings,** and survive misses for 8 s like Chains; new charge bars stay plain, since only Lightning and Shockwave keep colour.
+
 ## 2026-10-14 (smithing panel pass)
 
 - **Every power costs levels, the first 10** (then 20, 30, …); the first is no longer free.
@@ -60,12 +77,16 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 **Monsters**
 
 - **Spawn cap ×1.8.** Health +0–30% per monster (mean of three rolls, so middle values are common). Damage +0–15%, rolled evenly. Health no longer scales with difficulty or player power; armor and knockback resistance still do.
-- **Difficulty plan (from an outside proposal), what was taken:** elites and captains, status attacks, place multipliers, and a power measure that counts power pairs. *Rejected:* a threat level from recent power damage and adaptive resistance (both punish using the powers you earned), Echo Strain weapon upkeep (a chore, and experience cost already balances powers), and flanking AI (a rewrite of vanilla AI for little gain).
+- **Difficulty plan (from an outside proposal), what was taken:** elites and captains, status attacks, place multipliers, and a power measure that counts power pairs. *Rejected:* a threat level from recent power damage and adaptive resistance (both punish using the powers you earned; adaptive resistance was later asked for and added, see Adaptation), Echo Strain weapon upkeep (a chore, and experience cost already balances powers), and flanking AI (a rewrite of vanilla AI for little gain).
 - **Elites hurt with statuses, not damage.** Frost, Weakening and Shredding add pressure without turning monsters into sponges. Captains are the kill-first target that breaks up click-and-slash fights; the ominous banner reuses vanilla's raid-captain look. Ranks are entity tags, saved with the monster, and their health goes into the same health modifier so mob farms keep their drop height.
 - **Place multiplies every bonus.** Near spawn ×0.5 keeps the home base calm; caves ×1.25, Deep Dark and Nether ×1.5, Soul Sand Valley and Basalt Deltas ×1.65, End ×1.75.
+- **Structures are places of their own** (`mob/Landmark`). Each is a structure tag, `bcenchantments:difficulty/<name>`, so modded structures can join by datapack. They climb with a playthrough: ruins ×1.15, temples ×1.25, mineshafts ×1.4 and outposts ×1.5 (Hard), monuments ×1.6, strongholds ×1.75, fortresses ×1.8 (Very Hard), mansions ×1.9, bastions and ancient cities ×2, end cities ×2.1 (Extreme). Inside a piece the harder of structure and surroundings counts, separately for multiplier and tier, so a structure never makes a spot easier. Villages are left out to stay a refuge; trial chambers because ominous bottles already scale them. Possible Death stays reachable only through Bad Omen.
 - **Each place also has a named tier** (Regular to Possible Death) that picks monster armor and is shown on the HUD. Bad Omen raises it, so Possible Death is only reached by choice. Armor drops at 4% (vanilla 8.5%) so farms don't flood with it.
 - **The trident is the spacing weapon.** Sword is close combat, spear versatile reach, trident specialised reach plus mobility: Perfect Spacing at the end of its reach, with Loyalty, Riptide and Channeling feeding it. It has less reach than the spear and no bonus up close, so it is not a better spear.
 - **Player power counts pairs.** Weapons hold unlimited powers now, so the measure is power levels + 2 per pair, capped at 30 instead of 12, with smaller per-point armor and knockback resistance.
+- **Player power counts every weapon carried, each less** (`mob/Adaptation`). Only held weapons used to count, so swapping to a bare weapon before a fight dodged the scaling. Now the strongest carried weapon counts in full and each further one half the last, so a second weapon matters and a tenth barely does.
+- **Adaptation: monsters counter the power a player leans on** (the user asked for it, reversing the earlier rejection). It pushes players to swap weapons rather than ride one build forever. Kept fair: at most 20% of spawns, counters remove a power's control and cut its damage to a quarter rather than healing or reflecting, and the count lives on the weapon, so the player controls it (swap, store or lose the weapon). Fires to full adaptation differ by power kind so a Cold Edge user (every swing) and a Lightning user (one bolt a long streak) adapt at a similar pace.
+- **The difficulty line moved into the inventory.** The corner HUD line was removed; the panel above the inventory shows the place, Bad Omen, weapon power per weapon and adaptation. It reads the same code as the server (`Place`, `Adaptation`), plus the landmark the server sends.
 - **Ominous bottles are the difficulty dial.** Bad Omen I–V adds health +6%, damage +3%, armor +0.5 and knockback resistance +0.02 per level to monsters spawning near the player, and the player's monster kills drop an emerald at 4% + 1% per level, plus an echo shard at 0.2% at level V. It reuses a vanilla item, it is opt-in, and it pays in the refinement currencies. The buff is applied at spawn like the rest of the scaling, so drinking a bottle affects new monsters, not ones already loaded.
 
 **Settings and guide**

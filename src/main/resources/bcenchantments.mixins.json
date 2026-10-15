@@ -6,6 +6,7 @@
 		"AnvilMenuMixin",
 		"ArmorStandMixin",
 		"LivingEntityMixin",
+		"MobAccessor",
 		"MobCategoryMixin",
 		"MobMixin",
 		"PlayerAttackHelperMixin",
@@ -17,8 +18,10 @@
 		"WeaponRegistryMixin"
 	],
 	"client": [
+		"AbstractContainerScreenAccessor",
 		"AttackInteractorMixin",
 		"HudMixin",
+		"ItemInHandRendererMixin",
 		"ItemLayerRenderStateMixin",
 		"ItemModelResolverMixin",
 		"ItemStackRenderStateMixin",

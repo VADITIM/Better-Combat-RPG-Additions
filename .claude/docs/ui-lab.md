@@ -1,6 +1,6 @@
 # UI lab
 
-A designer for the smithing panel and the Field Guide, run without Minecraft: select, drag, reorder, reword, recolour, add and remove right on the screen.
+A designer for the smithing panel, the Field Guide and the inventory's difficulty panel, run without Minecraft: select, drag, reorder, reword, recolour, add and remove right on the screen.
 
 Run it from the project folder:
 
@@ -8,13 +8,13 @@ Run it from the project folder:
 ./gradlew uiLab
 ```
 
-It draws the mod's own `ui` code with Minecraft's font and textures, read from the client jar in Loom's cache (so run `./gradlew build` once first). The vanilla smithing table, its `<` and `?` buttons and the dimmed background are drawn too.
+It draws the mod's own `ui` code with Minecraft's font and textures, read from the client jar in Loom's cache (so run `./gradlew build` once first). The vanilla smithing table, its `<` and `?` buttons, the survival inventory and the dimmed background are drawn too (the *Vanilla table* box hides the table or inventory).
 
 ## Using it
 
 The window is the screen plus two toolbars; the status line at the bottom always says what you can do next.
 
-- **Pick a view** in the first box: seven smithing table setups (empty, refining, fully refined, a power waiting, a blocked upgrade, a shield, a lesser weapon) or one of the Field Guide's four tabs.
+- **Pick a view** in the first box: seven smithing table setups (empty, refining, fully refined, a power waiting, a blocked upgrade, a shield, a lesser weapon), one of the Field Guide's four tabs, or one of three inventories with the difficulty panel above them (plains with no weapons; one weapon, early adaptation; a Stronghold with Bad Omen III and four weapons). Scroll over the difficulty panel to scroll it.
 - **Design / Play** (Ctrl+P): Design edits; Play clicks through it as in game (open trims, switch tabs, `<`, `?`, Esc).
 
 In Design:
@@ -39,7 +39,7 @@ Removals, moves and added rows sit next to the look, so the game reads them from
 - `"remove.<id>": true`: a part (`stat.arrow`), one part in one row (`stat.arrow@panel/stat#0`), every row of a kind (`row.stat`), or one row by its reference, `view/anchor`. The old name `hide.` still works.
 - `"move.<view/anchor>": "after:<anchor>"` (or `before:`): a row moved next to another. If that one is not shown (another weapon, another state), the row stays where the code puts it.
 - `"<part>@<view/anchor>.dx"` / `.dy`: one part moved in one row, on top of the part's own `dx`/`dy`.
-- `"add.<n>:<field>"`: an added row. `view` is `panel` or `guide.0` to `guide.3`; `at` is the anchor it sits `after` or `before` (`place`); then `type`, `text`, `sub`, `items`, `tone`, `align`, `size`, `overlay`. Its parts are `add.<n>.text`, `add.<n>.slot` and so on, each with its own look. Added text is literal, not a lang key.
+- `"add.<n>:<field>"`: an added row. `view` is `panel`, `guide.0` to `guide.3` or `difficulty`; `at` is the anchor it sits `after` or `before` (`place`); then `type`, `text`, `sub`, `items`, `tone`, `align`, `size`, `overlay`. Its parts are `add.<n>.text`, `add.<n>.slot` and so on, each with its own look. Added text is literal, not a lang key.
 - An anchor is `kind[lang key]` for a row whose text has a key (`stat[panel.bcenchantments.stat.speed]`), `kind#i` for one without, `add.<n>` for an added row, `^` the top, `$` the bottom. A row added next to a row the game does not show at the moment is not shown either.
 
 Rows whose number changes with the weapon (`trim#0`, `trim#1`, ...) are anchored by position, so a move or a one-row edit stays with the position, not with the trim.
@@ -60,15 +60,16 @@ Rows whose number changes with the weapon (`trim#0`, `trim#1`, ...) are anchored
 ./gradlew uiLab "-PlabArgs=--shot out.png --view 2 --scale 2 --size 854x480 --mouse 150,120"
 ```
 
-Renders one frame and exits: `--view` 0-6 is a smithing setup, `-1` the Field Guide (`--tab 0-3`); `--expand cold_edge` opens a trim row; `--outline` and `--select <part>` draw outlines. `--jar <path>` uses another client jar.
+Renders one frame and exits: `--view` 0-6 is a smithing setup, `-1` the Field Guide (`--tab 0-3`), 11-13 an inventory with the difficulty panel; `--expand cold_edge` opens a trim row; `--outline` and `--select <part>` draw outlines. `--jar <path>` uses another client jar.
 
 `--window-shot out.png` opens the whole lab, selects a stat label, hovers a row's grip and saves the window as an image.
 
-`--smoke` opens the window and, in memory (nothing is saved), moves a part everywhere and in one row, moves rows and a section, removes a part and a row, adds, copies and deletes rows, undoes everything back to the start and redoes a step; it exits non-zero if anything is off.
+`--smoke` opens the window and, in memory (nothing is saved), moves a part everywhere and in one row, moves rows and a section, removes a part and a row, adds, copies and deletes rows, undoes everything back to the start and redoes a step; it exits non-zero if anything is off. Add `--view <n>` to test another view (`--smoke --view 13` for the difficulty panel).
 
 ## Limits
 
 - Items without a flat sprite in the jar (the shield) show a placeholder; the glint is a purple tint, not the animation.
-- The HUD (combo count, health bars, difficulty) is not in the lab.
+- The HUD (combo count, health bars) is not in the lab.
+- The inventory is the bare texture with weapons on its hotbar: no player model, armour or other items.
 - `style.json` is read once at game start; there is no in-game hot reload.
 - A part moves inside its row; rows keep the height the code gives them, so a part moved past its row's edge overlaps the next row.

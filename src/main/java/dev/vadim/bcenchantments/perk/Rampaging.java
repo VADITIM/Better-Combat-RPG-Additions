@@ -2,6 +2,7 @@ package dev.vadim.bcenchantments.perk;
 
 import dev.vadim.bcenchantments.Particles;
 import dev.vadim.bcenchantments.TrimEnchantments;
+import dev.vadim.bcenchantments.mob.Adaptation;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -38,9 +39,10 @@ final class Rampaging {
 
 	static void onKill(ServerPlayer player, ItemStack weapon, LivingEntity victim) {
 		int level = Math.min(Perks.level(weapon, Perks.RAMPAGING), SPEED.length);
-		if (level <= 0 || !(victim instanceof Enemy)) {
+		if (level <= 0 || !(victim instanceof Enemy) || Adaptation.resists(victim, Perks.RAMPAGING)) {
 			return;
 		}
+		Adaptation.used(player, weapon, Perks.RAMPAGING);
 		AttributeInstance speed = player.getAttribute(Attributes.ATTACK_SPEED);
 		if (speed == null) {
 			return;
@@ -55,6 +57,12 @@ final class Rampaging {
 		}
 		Particles.send(player.level(), ParticleTypes.ANGRY_VILLAGER, player.getX(), player.getY(1.1), player.getZ(), 2, 0.3, 0.2, 0.3, 0.0);
 		RAMPAGING.put(player, player.tickCount + TICKS);
+	}
+
+	/** Whether {@code player} is on a rampage right now. */
+	static boolean active(ServerPlayer player) {
+		Integer until = RAMPAGING.get(player);
+		return until != null && player.tickCount <= until;
 	}
 
 	static void tick() {

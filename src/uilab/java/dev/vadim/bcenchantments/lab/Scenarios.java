@@ -7,9 +7,10 @@ import dev.vadim.bcenchantments.ui.Rows;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
- * Sample states for the smithing panel and the Field Guide, built from the same rows the mod builds and
+ * Sample states for the smithing panel, the Field Guide and the inventory's difficulty panel, built from the same rows the mod builds and
  * the real lang entries. They stand in for the game state the mod reads; the mod decides which rows a
  * real weapon gets, the lab only has to show every kind of row in believable company.
  */
@@ -32,20 +33,20 @@ final class Scenarios {
 		new PerkInfo("shockwave", "ward", 0x2EE6FF, true, true),
 		new PerkInfo("cold_edge", "tide", -1, true, false),
 		new PerkInfo("uppercut", "raiser", -1, true, false),
-		new PerkInfo("chains", "vex", 0x9FB0BE, true, true),
+		new PerkInfo("chains", "sentry", 0x9FB0BE, true, true),
 		new PerkInfo("echo", "silence", 0xA98BFF, true, true),
 		new PerkInfo("wind_charged", "flow", -1, true, false),
 		new PerkInfo("gravity", "eye", -1, true, false),
-		new PerkInfo("momentum", "wayfinder", -1, true, false),
+		new PerkInfo("marked", "wayfinder", -1, true, false),
 		new PerkInfo("rampaging", "snout", -1, true, false),
-		new PerkInfo("venom", "wild", -1, false, false),
-		new PerkInfo("sandstorm", "dune", -1, false, false),
-		new PerkInfo("plunder", "coast", -1, false, false),
-		new PerkInfo("withering", "rib", -1, false, false),
-		new PerkInfo("phase", "spire", -1, false, false),
-		new PerkInfo("shared_pain", "host", -1, false, false),
-		new PerkInfo("guarding_strike", "sentry", -1, false, false),
-		new PerkInfo("daze", "shaper", -1, false, false));
+		new PerkInfo("venomous", "wild", -1, true, false),
+		new PerkInfo("curse", "dune", -1, true, false),
+		new PerkInfo("plunder", "coast", -1, true, false),
+		new PerkInfo("withering", "rib", -1, true, true),
+		new PerkInfo("shulker_burst", "spire", -1, true, true),
+		new PerkInfo("shared_pain", "host", -1, true, false),
+		new PerkInfo("guardian_strike", "vex", -1, true, false),
+		new PerkInfo("copper_shock", "shaper", -1, true, false));
 
 	private record Combo(String id, String a, String b) {
 	}
@@ -57,7 +58,19 @@ final class Scenarios {
 		new Combo("tempest", "shockwave", "wind_charged"), new Combo("frenzy", "echo", null),
 		new Combo("shatter", "cold_edge", "lightning"), new Combo("singularity", "gravity", "shockwave"),
 		new Combo("black_hole", "gravity", "chains"), new Combo("cyclone", "gravity", "wind_charged"),
-		new Combo("launch", "momentum", "uppercut"), new Combo("blast_step", "momentum", "wind_charged"));
+		new Combo("launch", "marked", "uppercut"), new Combo("blast_step", "marked", "wind_charged"),
+		new Combo("thunderwave", "lightning", "shockwave"), new Combo("lightning_rod", "lightning", "gravity"),
+		new Combo("thunder_charge", "lightning", "marked"), new Combo("storm_frenzy", "lightning", "rampaging"),
+		new Combo("skybreaker", "lightning", "uppercut"), new Combo("toxic_storm", "lightning", "venomous"),
+		new Combo("hexbolt", "lightning", "curse"), new Combo("gilded_storm", "lightning", "plunder"),
+		new Combo("black_lightning", "lightning", "withering"), new Combo("shulker_storm", "lightning", "shulker_burst"),
+		new Combo("arc", "lightning", "shared_pain"), new Combo("static_guard", "lightning", "guardian_strike"),
+		new Combo("copper_storm", "lightning", "copper_shock"), new Combo("gale_echo", "wind_charged", "echo"),
+		new Combo("whiplash", "wind_charged", "chains"), new Combo("hurricane", "wind_charged", "rampaging"),
+		new Combo("toxic_gust", "wind_charged", "venomous"), new Combo("hexwind", "wind_charged", "curse"),
+		new Combo("windfall", "wind_charged", "plunder"), new Combo("ashen_wind", "wind_charged", "withering"),
+		new Combo("shulker_gust", "wind_charged", "shulker_burst"), new Combo("shrapnel", "wind_charged", "shared_pain"),
+		new Combo("bulwark_gust", "wind_charged", "guardian_strike"), new Combo("spark_burst", "wind_charged", "copper_shock"));
 
 	private final Lang lang;
 
@@ -305,6 +318,54 @@ final class Scenarios {
 		}
 		rows.add(new Rows.Text(p("how_trim"), "faint"));
 		return rows;
+	}
+
+	// ---- Difficulty panel ----
+
+	/** One inventory: the weapons on its hotbar and the rows the difficulty panel above it shows. */
+	record Difficulty(String name, List<ItemRef> hotbar, Supplier<List<Row>> rows) {
+	}
+
+	/** {@code MobBalance.MAX_POWER} and {@code COUNTER_MAX_SHARE}, which the lab cannot reach. */
+	private static final int MAX_POWER = 30;
+	private static final int MAX_COUNTER = 20;
+
+	List<Difficulty> difficulty() {
+		ItemRef sword = ItemRef.of("diamond_sword").glinting();
+		ItemRef axe = ItemRef.of("netherite_axe").glinting();
+		ItemRef trident = ItemRef.of("trident").glinting();
+		ItemRef mace = ItemRef.of("mace").glinting();
+		return List.of(
+			new Difficulty("Plains, no weapons", List.of(), () -> List.of(
+				where(lang.tr("biome.minecraft.plains"), "regular", "1"),
+				power("0"),
+				new Rows.Text(d("no_weapons"), "muted"),
+				new Rows.Text(d("not_adapted"), "muted"))),
+			new Difficulty("One weapon, early adaptation", List.of(sword), () -> List.of(
+				where(lang.tr("biome.minecraft.dripstone_caves"), "hard", "1.3"),
+				power("6"),
+				new Rows.Weapons(List.of(sword), List.of(d("weapon", "6"))),
+				new Rows.Stat(d("adapted"), perkName("chains"), null),
+				new Rows.Stat(d("countering"), d("countering.value", 3, MAX_COUNTER), null))),
+			new Difficulty("Stronghold, Bad Omen III, four weapons", List.of(sword, axe, trident, mace), () -> List.of(
+				where(lang.tr("landmark.bcenchantments.stronghold"), "possible_death", "1.8"),
+				new Rows.Stat(d("omen"), Rich.of("III"), null),
+				power("23.5"),
+				new Rows.Weapons(List.of(sword, axe, trident, mace), List.of(d("weapon", "12"), d("weapon", "6"), d("weapon", "3.5"), d("weapon", "2"))),
+				new Rows.Stat(d("adapted"), perkName("lightning"), null),
+				new Rows.Stat(d("countering"), d("countering.value", 20, MAX_COUNTER), null))));
+	}
+
+	private Rich d(String key, Object... args) {
+		return p("difficulty." + key, args);
+	}
+
+	private Rows.Stat where(Rich place, String tier, String multiplier) {
+		return new Rows.Stat(place, d("tier", lang.tr("difficulty.bcenchantments." + tier), multiplier), null);
+	}
+
+	private Rows.Stat power(String value) {
+		return new Rows.Stat(d("power"), d("power.value", value, MAX_POWER), null);
 	}
 
 	// ---- Field Guide ----

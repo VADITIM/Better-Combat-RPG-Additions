@@ -205,21 +205,162 @@ def gravity(frames):
     return out
 
 
-def momentum(frames):
-    """Speed lines rush from the handle to the tip."""
+def marked(frames):
+    """A crosshair closes in on the middle of the weapon, flashes, and lets go."""
     color = rgb(0xFFB347)
-    lanes = (-3, -1, 1, 3)
     out = []
     for f in range(frames):
         img = blank()
+        t = f / frames
+        gap = max(1.0, 7.0 * (1 - t / 0.6))
+        flash = max(0.0, 1 - abs(t - 0.65) / 0.1)
+        fade = 1.0 if t < 0.75 else max(0.0, 1 - (t - 0.75) / 0.25)
+        for d in range(0, 3):
+            for sx, sy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                x = round(7.5 + sx * (gap + d))
+                y = round(7.5 + sy * (gap + d))
+                add(img, x, y, color, (0.9 - d * 0.25) * fade)
+        for y in range(6, 10):
+            for x in range(6, 10):
+                add(img, x, y, color, flash * (1 - math.hypot(x - 7.5, y - 7.5) / 3))
+        out.append(img)
+    return out
+
+
+def venomous(frames):
+    """Green drops bead on the weapon and drip from the tip toward the handle."""
+    color = rgb(0x7BD34A)
+    rng = random.Random(5)
+    drops = [(rng.randrange(SIZE), rng.randrange(SIZE), rng.randrange(frames)) for _ in range(9)]
+    out = []
+    for f in range(frames):
+        img = blank()
+        for x, y, phase in drops:
+            t = ((f - phase) % frames) / frames
+            fall = round(t * 6)
+            add(img, x, y + fall, color, 1 - t)
+            add(img, x, y + fall - 1, color, (1 - t) * 0.4)
         for y in range(SIZE):
             for x in range(SIZE):
-                a = across(x, y)
-                for n, lane in enumerate(lanes):
-                    if abs(a - lane * 0.71) < 0.5:
-                        t = (along(x, y) * frames * 0.8 - f * 1.6 - n * 3) % (frames * 0.8)
-                        if t < 4:
-                            add(img, x, y, color, 1 - t / 4)
+                if abs(across(x, y)) < 0.8 and (x * 2 + y + f) % 9 == 0:
+                    add(img, x, y, color, 0.3)
+        out.append(img)
+    return out
+
+
+def curse(frames):
+    """Dark purple runes flicker in and out along the weapon."""
+    color = rgb(0x9B3FD6)
+    rng = random.Random(13)
+    runes = [(rng.randrange(2, SIZE - 2), rng.randrange(2, SIZE - 2), rng.randrange(frames)) for _ in range(7)]
+    shapes = (((0, -1), (0, 0), (0, 1), (-1, 0)), ((-1, -1), (0, 0), (1, 1), (1, -1)), ((0, -1), (-1, 1), (1, 1), (0, 0)))
+    out = []
+    for f in range(frames):
+        img = blank()
+        for i, (x, y, phase) in enumerate(runes):
+            t = ((f - phase) % frames) / frames
+            s = max(0.0, 1 - abs(t - 0.2) / 0.2)
+            if (f + i) % 3 == 0:
+                s *= 0.6
+            for dx, dy in shapes[i % len(shapes)]:
+                add(img, x + dx, y + dy, color, s)
+        out.append(img)
+    return out
+
+
+def plunder(frames):
+    """Emerald glints run up the weapon one after another, a coin catching the light."""
+    color = rgb(0x3CE07A)
+    out = []
+    for f in range(frames):
+        img = blank()
+        for k in range(3):
+            t = ((f + k * frames / 3) % frames) / frames
+            if t > 0.5:
+                continue
+            head = t * 2
+            for y in range(SIZE):
+                for x in range(SIZE):
+                    d = abs(along(x, y) - head)
+                    if d < 0.07 and abs(across(x, y)) < 3:
+                        add(img, x, y, color, (1 - d / 0.07) * 0.9)
+        out.append(img)
+    return out
+
+
+def withering(frames):
+    """Pale soul wisps rise off the weapon and fade, the colour of soul fire."""
+    color = rgb(0x6FE3E8)
+    wisps = [(x, (x * 7) % frames) for x in range(1, SIZE, 3)]
+    out = []
+    for f in range(frames):
+        img = blank()
+        for x, phase in wisps:
+            t = ((f + phase) % frames) / frames
+            y = round(SIZE - 1 - t * SIZE)
+            wobble = round(math.sin((t * 6) + x) * 1.2)
+            add(img, x + wobble, y, color, 1 - t)
+            add(img, x + wobble, y + 1, color, (1 - t) * 0.4)
+        out.append(img)
+    return out
+
+
+def shulker_burst(frames):
+    """Three bright bullets orbit the middle of the weapon."""
+    color = rgb(0xF2E3FF)
+    out = []
+    for f in range(frames):
+        img = blank()
+        for k in range(3):
+            angle = f / frames * 2 * math.pi + k * 2 * math.pi / 3
+            x = 7.5 + 5 * math.cos(angle)
+            y = 7.5 + 5 * math.sin(angle)
+            add(img, round(x), round(y), color, 1.0)
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                add(img, round(x) + dx, round(y) + dy, color, 0.35)
+            tx = 7.5 + 5 * math.cos(angle - 0.4)
+            ty = 7.5 + 5 * math.sin(angle - 0.4)
+            add(img, round(tx), round(ty), color, 0.3)
+        out.append(img)
+    return out
+
+
+def guardian_strike(frames):
+    """A pale wing flaps over the weapon, twice, then rests."""
+    color = rgb(0xCFE3F0)
+    out = []
+    for f in range(frames):
+        img = blank()
+        t = f / frames
+        flap = abs(math.sin(t * 2 * math.pi * 2)) if t < 0.5 else 0.0
+        for i in range(6):
+            length = 6 - i
+            angle = -0.6 - flap * 0.9 + i * 0.25
+            for r in range(length):
+                x = round(6 + r * math.cos(angle))
+                y = round(9 + r * math.sin(angle) - i * 0.3)
+                add(img, x, y, color, (0.8 - r * 0.08) * (0.4 + 0.6 * (1 - t)))
+        out.append(img)
+    return out
+
+
+def copper_shock(frames):
+    """A copper spark jumps between points on the weapon, leaving short arcs."""
+    color = rgb(0xE88A4A)
+    rng = random.Random(3)
+    points = [(rng.randrange(1, SIZE - 1), rng.randrange(1, SIZE - 1)) for _ in range(6)]
+    out = []
+    for f in range(frames):
+        img = blank()
+        step = f // 3
+        if step < len(points) - 1:
+            (x0, y0), (x1, y1) = points[step], points[step + 1]
+            n = max(abs(x1 - x0), abs(y1 - y0), 1)
+            for i in range(n + 1):
+                x = round(x0 + (x1 - x0) * i / n + rng.choice((-1, 0, 0, 1)) * (0 < i < n))
+                y = round(y0 + (y1 - y0) * i / n)
+                add(img, x, y, color, 0.9 if f % 3 == 0 else 0.45)
+            add(img, x1, y1, color, 1.0)
         out.append(img)
     return out
 
@@ -236,6 +377,23 @@ def rampaging(frames):
             for x in range(SIZE):
                 edge = 0.35 + 0.65 * (abs(across(x, y)) / 8)
                 add(img, x, y, color, beat * 0.4 * edge + (0.12 if (x * 3 + y * 5 + f) % 11 == 0 else 0))
+        out.append(img)
+    return out
+
+
+def shared_pain(frames):
+    """A red pulse runs from the handle to the tip and leaps off the end, then the weapon rests."""
+    color = rgb(0xE0245E)
+    out = []
+    for f in range(frames):
+        img = blank()
+        t = f / frames
+        head = t * 1.6 - 0.3
+        for y in range(SIZE):
+            for x in range(SIZE):
+                d = abs(along(x, y) - head)
+                if d < 0.18:
+                    add(img, x, y, color, (1 - d / 0.18) * 0.6 * (1 - abs(across(x, y)) / 9))
         out.append(img)
     return out
 
@@ -278,8 +436,16 @@ EFFECTS = {
     "echo": (echo, 24),
     "wind_charged": (wind_charged, 16),
     "gravity": (gravity, 24),
-    "momentum": (momentum, 16),
+    "marked": (marked, 20),
     "rampaging": (rampaging, 24),
+    "venomous": (venomous, 24),
+    "curse": (curse, 24),
+    "plunder": (plunder, 24),
+    "withering": (withering, 24),
+    "shulker_burst": (shulker_burst, 24),
+    "shared_pain": (shared_pain, 20),
+    "guardian_strike": (guardian_strike, 20),
+    "copper_shock": (copper_shock, 18),
     "perfect_hit": (perfect_hit, 6),
 }
 

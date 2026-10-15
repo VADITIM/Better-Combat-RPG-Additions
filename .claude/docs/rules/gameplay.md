@@ -19,5 +19,6 @@ The user stated these rules for this project. They override V/AS, defaults and o
 - **Attack Speed is not a power.** Refinement grants it: +0.05 per level, +0.25 at level 5. Level points (one per level, +3% to the chosen stat) never go to attack speed.
 - **The mace is a timing weapon** (`weapon/MaceTiming`): 1.3× ready time, a 0.15 s Perfect Hit window at 0.8 of it for 1.5× damage, 0.9× otherwise. It keeps one attack.
 - **Elites hurt with statuses, not damage.** Captains rally nearby monsters and are the one to kill first. Every monster bonus scales with where it spawns: mild near world spawn, harder underground, Nether and End.
+- **Monsters adapt to the power a player leans on** (`mob/Adaptation`), so players eventually swap weapons. Up to 20% of nearby spawns counter it, growing with how often that power fired; the count lives on the weapon and goes with it when it is lost. Every carried weapon adds to the difficulty on its own, each further one less. Trial chambers and Bad Omen keep their own scaling.
 - **Ominous bottles scale difficulty by hand.** Bad Omen I–V toughens nearby spawns and makes kills drop emeralds (5% + 1% per level after I) and, at V, echo shards (0.2%).
 - **Shields take only a few powers,** one level each, no refinement needed: Wind Charged and Cold Edge (`perk/ShieldPowers`).
