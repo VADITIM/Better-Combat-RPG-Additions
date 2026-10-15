@@ -2,6 +2,22 @@
 
 Shipped work and why it was built this way, newest first. Dates are when it was decided.
 
+## 2026-10-15 (power redesign, docs first, code pending)
+
+- **Seven drafts and two built powers redesigned in the docs.** Renames: Venom → Venomous, Guarding Strike → Guardian Strike, Daze → Copper Shock, Sandstorm → Curse, Phase → Shulker Burst. Trims: Chains moves to **sentry**, Guardian Strike takes **vex** (swap).
+- **Venomous:** a splash potion of poison thrown upwards from the target: Poison II for 2 / 3 / 4 s on enemies; if it hits the player it purifies their poison.
+- **Plunder:** drops are increased, and after 3–6 s (same at every level) part of them turn into emeralds (30 / 45 / 60%), plus a 5% chance of double boss loot. It is no longer a per-kill emerald roll.
+- **Guardian Strike:** every 3 kills within 10 s summon a vex that dies after 2 / 3 / 4 hits (was Resistance I on kill).
+- **Copper Shock:** 10 / 15 / 20% chance on a hit for a copper pulse that jumps to 4 / 5 / 6 enemies (was a charged daze).
+- **Rampaging:** every 2nd kill grants attack speed for 2 s (+20 / 25 / 30%); the count resets after each trigger (was 4 s, refreshed by every kill).
+- **Curse:** 5 / 10 / 15% chance on a hit for a random negative effect, 1.5 / 2 / 2.5 s (was a charged blinding sandstorm).
+- **Shulker Burst:** every 8 hits release 1 / 2 / 3 homing shulker bullets that levitate the target for 2 s (was a teleport).
+- **Shared Pain:** overkill goes to the nearest enemies within 3 blocks (every level), 1 / 2 / 3 of them; it never chains on from those recipients.
+- **Shatter:** now only ×2 lightning damage to frozen enemies, and lightning kills spread chill. The +15% to slowed enemies is dropped.
+- **Cold Edge on a shield** freezes the attacker for 1 s (was chilled hard), still every 10 s.
+- **70-odd draft combinations reworded** to fit (blind, daze, Resistance and teleport effects are gone); several were renamed (Dust Devil → Hexbolt, Stunbolt → Copper Storm, Shield Charge → Vanguard, …). See `POWERS.md`.
+- *Open:* Plunder's 5% boss-loot chance and 3–6 s window are used as given; Venomous's trigger (on hit, once per 8 s per target, carried over from Venom) need the user's confirmation.
+
 ## 2026-10-14 (smithing panel pass)
 
 - **Every power costs levels, the first 10** (then 20, 30, …); the first is no longer free.
