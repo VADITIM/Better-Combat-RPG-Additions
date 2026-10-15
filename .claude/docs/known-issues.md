@@ -21,7 +21,7 @@ It does this when the item has a tuned `critical_hit` clip, because Punchy reads
 
 ## Debt
 
-**The 15-10 power redesign is docs only.** `POWERS.md` and the README describe it; the code still has the old Rampaging (4 s, +20 / 30 / 40%), Shatter (+15% slowed) and shield Cold Edge (chill), and the old trims (Chains on vex). Remapping vex ↔ sentry changes what existing trimmed weapons grant.
+**The 15-10 power redesign is docs only.** `POWERS.md` and the README describe it; the code still has the old Rampaging (4 s, +20 / 30 / 40%), Cold Edge (slow), Momentum (sprint run-up), Shatter (+15% slowed) and shield Cold Edge (chill), and the old trims (Chains on vex). Remapping vex ↔ sentry changes what existing trimmed weapons grant.
 
 **The trim → power remap changes existing items.**
 Trims store their name, not their power, so weapons trimmed before a remap grant the new power. Since the one-power-per-trim remap, dune, coast, rib, spire, host, sentry, shaper and wild grant draft powers that do nothing yet.

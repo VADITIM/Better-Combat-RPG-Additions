@@ -46,10 +46,10 @@ Each armor trim grants one power, raised from level I to III. Powers marked \* a
 | Shockwave | ward | After three swings in a row that each hit 3+ enemies, a wave flies out | 4 / 6 / 8 damage, 8 / 10 / 12 blocks |
 | Chains | sentry | Hits build a charge; when full, the target and nearby enemies are rooted for 0.7 s | binds 2 / 3 / 4 enemies |
 | Echo | silence | Every 4th swing strikes its targets again 0.3 s later | 50 / 65 / 80% of the swing |
-| Cold Edge | tide | Hits slow; 3 s of chill freezes the target solid | −10 / 25 / 40% speed |
+| Cold Edge | tide | Each hit adds chill; enough stacks freeze the mob, and the next hit on it deals ×1.6 and ends the freeze | 5 / 4 / 3 stacks, frozen for 1 / 1.5 / 2 s |
 | Wind Charged | flow | Kills burst like a wind charge, hurting and pushing what's around | 3 / 4 / 5 damage |
 | Gravity | eye | Every landed swing pulls nearby enemies toward the target | 3 / 4 / 5 block radius |
-| Momentum | wayfinder | Sprint, then land a swing within 0.5 s to throw its targets back hard | knockback 0.5 / 0.7 / 0.9 |
+| Marked | wayfinder | Hitting a target at point blank marks it; the next point-blank hit on it deals more damage | ×1.5 / 2 / 2.5 damage |
 | Rampaging | snout | Every 2nd kill grants attack speed for 2 s; the kill count resets after each trigger | +20 / 25 / 30% |
 | Uppercut | raiser | The sword's 3rd swing, the spear's heavy thrust or a grounded mace swing launches the target | launch 0.55 / 0.7 / 0.85 |
 | Venomous\* | wild | Hits throw a splash potion of poison upwards from the target; nearby enemies get Poison II, and it purifies you if it hits you | Poison II for 2 / 3 / 4 s |
@@ -89,8 +89,8 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Singularity | Gravity + Shockwave | The shockwave drags enemies beside its path into it |
 | Black Hole | Gravity + Chains | Every bound enemy pulls the free enemies around it in |
 | Cyclone | Gravity + Wind Charged | Kills pull nearby enemies in before the burst |
-| Launch | Momentum + Uppercut | A launch after a run-up goes higher, and you go up after the target |
-| Blast Step | Momentum + Wind Charged | A kill by a run-up swing bursts you onward |
+| Launch | Marked + Uppercut | A launching swing on a marked mob throws the targets ×1.3 higher, and you go up after them |
+| Blast Step | Marked + Wind Charged | A kill by a point-blank hit on a marked mob bursts you onward (once per swing) |
 | Frenzy | Echo + Refinement V | Echo strikes every 3rd swing instead of every 4th |
 
 ### Planned
@@ -101,7 +101,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 |---|---|---|
 | Thunderwave | Lightning + Shockwave | Every enemy the shockwave cuts is struck by a quarter-power bolt |
 | Lightning Rod | Lightning + Gravity | Before the bolt lands, nearby enemies are pulled to the target |
-| Thunder Charge | Lightning + Momentum | A run-up swing adds 3 hits of Lightning charge |
+| Thunder Charge | Lightning + Marked | A hit on a marked mob adds 3 hits of Lightning charge |
 | Storm Frenzy | Lightning + Rampaging | While rampaging, Lightning charges twice as fast |
 | Skybreaker | Lightning + Uppercut | Launched targets are struck by a half-power bolt at the top of their flight |
 | Toxic Storm | Lightning + Venomous | Bolts leave a poison splash where they strike |
@@ -134,15 +134,15 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Combination | Powers | Effect |
 |---|---|---|
 | Hoarfrost Echo | Cold Edge + Echo | Echo strikes chill |
-| Glacier Wave | Cold Edge + Shockwave | The shockwave chills what it cuts and frosts the ground it passes |
+| Glacier Wave | Cold Edge + Shockwave | The shockwave chills what it cuts and frosts the ground it passes (a chill stack to enemies crossing it, 2 s) |
 | Frost Vortex | Cold Edge + Gravity | Pulled enemies are chilled |
-| Frostbite Charge | Cold Edge + Momentum | A run-up swing freezes its target solid at once |
-| Cold Blood | Cold Edge + Rampaging | While rampaging, chill builds twice as fast |
+| Frostbite Charge | Cold Edge + Marked | A hit on a marked mob freezes it solid at once |
+| Cold Blood | Cold Edge + Rampaging | While rampaging, each hit adds two chill stacks |
 | Frozen Ascent | Cold Edge + Uppercut | Launched targets freeze solid in the air |
 | Frostbite | Cold Edge + Venomous | Chilled enemies take poison damage twice as fast |
 | Cursed Frost | Cold Edge + Curse | Cursed enemies are chilled too |
 | Ice Treasure | Cold Edge + Plunder | Kills on frozen enemies convert twice the usual share of their drops |
-| Necrotic Frost | Cold Edge + Withering | Chill doesn't thaw on withered enemies |
+| Necrotic Frost | Cold Edge + Withering | Freezes last twice as long on withered enemies |
 | Cold Snap | Cold Edge + Shulker Burst | Bullets that hit freeze their target solid |
 | Shattering Pain | Cold Edge + Shared Pain | Overkill from a frozen kill spreads to two enemies |
 | Permafrost | Cold Edge + Guardian Strike | Enemies hit by a vex are chilled |
@@ -155,7 +155,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Aftershock | Echo + Shockwave | A second, half-damage wave follows every shockwave |
 | Reverberation | Echo + Chains | Echo strikes add Chains charge as full hits |
 | Pull Echo | Echo + Gravity | Echo strikes pull nearby enemies to their target |
-| Double Step | Echo + Momentum | A run-up swing always echoes |
+| Double Step | Echo + Marked | A hit on a marked mob always echoes |
 | Bloodlust | Echo + Rampaging | While rampaging, Echo strikes every 3rd swing |
 | Rebound | Echo + Uppercut | Launches echo: the target is launched again, a little higher |
 | Toxic Echo | Echo + Venomous | Echo strikes poison |
@@ -172,7 +172,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Combination | Powers | Effect |
 |---|---|---|
 | Snare Wave | Shockwave + Chains | The shockwave briefly roots what it cuts |
-| Surge | Shockwave + Momentum | A run-up swing fires the shockwave with two of its three swings charged |
+| Surge | Shockwave + Marked | A hit on a marked mob fires the shockwave with 2 of its 3 swings charged |
 | Warpath | Shockwave + Rampaging | While rampaging, Shockwave needs 2 swings instead of 3 |
 | Upheaval | Shockwave + Uppercut | The shockwave launches what it cuts |
 | Plague Wave | Shockwave + Venomous | The shockwave leaves a poison splash trail |
@@ -188,7 +188,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 
 | Combination | Powers | Effect |
 |---|---|---|
-| Grapple | Chains + Momentum | A run-up swing fires Chains if it's half charged |
+| Grapple | Chains + Marked | A hit on a marked mob fires Chains if it is half charged |
 | Hunter's Chains | Chains + Rampaging | Kills add 20% Chains charge |
 | Chain Lift | Chains + Uppercut | Launching a bound enemy launches every enemy bound with it |
 | Venom Links | Chains + Venomous | Bound enemies are poisoned |
@@ -204,7 +204,7 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 
 | Combination | Powers | Effect |
 |---|---|---|
-| Slingshot | Gravity + Momentum | A run-up swing pulls twice as hard |
+| Slingshot | Gravity + Marked | A hit on a marked mob pulls twice as hard |
 | Feeding Frenzy | Gravity + Rampaging | While rampaging, Gravity reaches 2 blocks further |
 | Implosion | Gravity + Uppercut | Launched targets pull nearby enemies under them as they rise |
 | Miasma | Gravity + Venomous | Pulled enemies are poisoned |
@@ -216,19 +216,19 @@ Every two powers have one combination: 153 in all. Powers pair in the order you 
 | Gravity Well | Gravity + Guardian Strike | Vexes pull in the enemies around them |
 | Crush | Gravity + Copper Shock | Pulled enemies that reach the target are struck by a Copper Shock pulse |
 
-**Momentum**
+**Marked**
 
 | Combination | Powers | Effect |
 |---|---|---|
-| Stampede | Momentum + Rampaging | While rampaging, a run-up builds in half the time |
-| Toxic Charge | Momentum + Venomous | A run-up swing poisons hard |
-| Cursed Trail | Momentum + Curse | A run-up swing always curses its targets |
-| Smash and Grab | Momentum + Plunder | Run-up kills convert twice the usual share of their drops |
-| Death Charge | Momentum + Withering | A run-up swing withers its targets hard |
-| Blitz | Momentum + Shulker Burst | A run-up swing triggers Shulker Burst at once |
-| Bowling | Momentum + Shared Pain | Run-up kills throw their overkill at the enemy behind them |
-| Vanguard | Momentum + Guardian Strike | A run-up swing summons a vex |
-| Bull Rush | Momentum + Copper Shock | A run-up swing always releases a Copper Shock pulse |
+| Stampede | Marked + Rampaging | While rampaging, a hit on a marked mob does not spend the mark |
+| Toxic Charge | Marked + Venomous | A hit on a marked mob poisons for twice as long |
+| Cursed Trail | Marked + Curse | A hit on a marked mob always curses it |
+| Smash and Grab | Marked + Plunder | Kills on a marked mob convert twice the usual share of their drops |
+| Death Charge | Marked + Withering | A hit on a marked mob withers it (Wither II) |
+| Blitz | Marked + Shulker Burst | A hit on a marked mob triggers Shulker Burst at once |
+| Bowling | Marked + Shared Pain | Kills on a marked mob throw their overkill at the enemy behind them |
+| Vanguard | Marked + Guardian Strike | A hit on a marked mob summons a vex |
+| Bull Rush | Marked + Copper Shock | A hit on a marked mob always releases a Copper Shock pulse |
 
 **Rampaging**
 

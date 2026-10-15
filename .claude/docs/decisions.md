@@ -5,6 +5,8 @@ Shipped work and why it was built this way, newest first. Dates are when it was 
 ## 2026-10-15 (power redesign, docs first, code pending)
 
 - **Seven drafts and two built powers redesigned in the docs.** Renames: Venom → Venomous, Guarding Strike → Guardian Strike, Daze → Copper Shock, Sandstorm → Curse, Phase → Shulker Burst. Trims: Chains moves to **sentry**, Guardian Strike takes **vex** (swap).
+- **Cold Edge reworked:** each hit adds chill; 5 / 4 / 3 stacks freeze the mob for 1 / 1.5 / 2 s, and the next hit on a frozen mob deals ×1.6 and ends the freeze. The attack-speed debuff (−10 / 25 / 40%) is gone.
+- **Momentum → Marked** (trim wayfinder; the code class stays `Momentum`): a point-blank hit marks the mob, and the next point-blank hit on it deals ×1.5 / 2 / 2.5. The sprint run-up is gone, so the 17 Marked combinations now key off "a hit on a marked mob" instead of "a run-up swing", including the built Launch and Blast Step. *Open:* what counts as point blank (range), and whether Shatter's ×2 stacks with the freeze's ×1.6.
 - **Venomous:** a splash potion of poison thrown upwards from the target: Poison II for 2 / 3 / 4 s on enemies; if it hits the player it purifies their poison.
 - **Plunder:** drops are increased, and after 3–6 s (same at every level) part of them turn into emeralds (30 / 45 / 60%), plus a 5% chance of double boss loot. It is no longer a per-kill emerald roll.
 - **Guardian Strike:** every 3 kills within 10 s summon a vex that dies after 2 / 3 / 4 hits (was Resistance I on kill).
